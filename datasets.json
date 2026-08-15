@@ -1,0 +1,69 @@
+{
+  "$comment": "Registry of importable datasets. Add an entry here (or use `node tools/import.js --add-hkpl-year <year>`) and run `npm run import -- <id>`.",
+  "datasets": [
+    {
+      "id": "hkpl-2025",
+      "title": "Books Printed in Hong Kong — 2025",
+      "shortTitle": "Hong Kong 2025",
+      "adapter": "hkpl-bro",
+      "description": "Every book and periodical registered with the Hong Kong ISBN agency (Books Registration Office) during 2025, published quarterly as A Catalogue of Books Printed in Hong Kong.",
+      "provider": "Leisure and Cultural Services Department — Books Registration Office, Hong Kong Public Libraries",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2025,
+      "sources": [
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q1e.csv",
+          "label": "2025 Q1 (English)",
+          "language": "en",
+          "quarter": "2025 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q1c.csv",
+          "label": "2025 Q1 (Chinese)",
+          "language": "zh",
+          "quarter": "2025 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q2e.csv",
+          "label": "2025 Q2 (English)",
+          "language": "en",
+          "quarter": "2025 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q2c.csv",
+          "label": "2025 Q2 (Chinese)",
+          "language": "zh",
+          "quarter": "2025 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q3e.csv",
+          "label": "2025 Q3 (English)",
+          "language": "en",
+          "quarter": "2025 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q3c.csv",
+          "label": "2025 Q3 (Chinese)",
+          "language": "zh",
+          "quarter": "2025 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q4e.csv",
+          "label": "2025 Q4 (English)",
+          "language": "en",
+          "quarter": "2025 Q4"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q4c.csv",
+          "label": "2025 Q4 (Chinese)",
+          "language": "zh",
+          "quarter": "2025 Q4"
+        }
+      ]
+    }
+  ]
+}

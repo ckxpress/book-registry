@@ -1,0 +1,172 @@
+{
+  "generatedAt": "2026-08-15T07:21:41.234Z",
+  "totalBooks": 10912,
+  "datasets": [
+    {
+      "id": "hkpl-2025",
+      "title": "Books Printed in Hong Kong — 2025",
+      "shortTitle": "Hong Kong 2025",
+      "description": "Every book and periodical registered with the Hong Kong ISBN agency (Books Registration Office) during 2025, published quarterly as A Catalogue of Books Printed in Hong Kong.",
+      "provider": "Leisure and Cultural Services Department — Books Registration Office, Hong Kong Public Libraries",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2025,
+      "adapter": "hkpl-bro",
+      "count": 10912,
+      "files": {
+        "index": [
+          "hkpl-2025.index.0.json",
+          "hkpl-2025.index.1.json",
+          "hkpl-2025.index.2.json",
+          "hkpl-2025.index.3.json"
+        ],
+        "full": [
+          "hkpl-2025.full.0.json",
+          "hkpl-2025.full.1.json",
+          "hkpl-2025.full.2.json",
+          "hkpl-2025.full.3.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "2025 Q1 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q1e.csv",
+          "file": "",
+          "quarter": "2025 Q1",
+          "language": "en",
+          "count": 843
+        },
+        {
+          "label": "2025 Q1 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q1c.csv",
+          "file": "",
+          "quarter": "2025 Q1",
+          "language": "zh",
+          "count": 1452
+        },
+        {
+          "label": "2025 Q2 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q2e.csv",
+          "file": "",
+          "quarter": "2025 Q2",
+          "language": "en",
+          "count": 921
+        },
+        {
+          "label": "2025 Q2 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q2c.csv",
+          "file": "",
+          "quarter": "2025 Q2",
+          "language": "zh",
+          "count": 1287
+        },
+        {
+          "label": "2025 Q3 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q3e.csv",
+          "file": "",
+          "quarter": "2025 Q3",
+          "language": "en",
+          "count": 1103
+        },
+        {
+          "label": "2025 Q3 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q3c.csv",
+          "file": "",
+          "quarter": "2025 Q3",
+          "language": "zh",
+          "count": 1490
+        },
+        {
+          "label": "2025 Q4 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q4e.csv",
+          "file": "",
+          "quarter": "2025 Q4",
+          "language": "en",
+          "count": 1500
+        },
+        {
+          "label": "2025 Q4 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2025Q4c.csv",
+          "file": "",
+          "quarter": "2025 Q4",
+          "language": "zh",
+          "count": 2316
+        }
+      ],
+      "stats": {
+        "withIsbn": 8669,
+        "classifications": 190,
+        "publishers": 2349,
+        "languages": {
+          "zh": 6545,
+          "en": 4367
+        },
+        "yearRange": [
+          1977,
+          2025
+        ],
+        "topPublishers": [
+          {
+            "name": "三聯書店(香港)有限公司",
+            "count": 270
+          },
+          {
+            "name": "Inherit Books Publishing HK Co., Limited",
+            "count": 226
+          },
+          {
+            "name": "中華書局(香港)有限公司",
+            "count": 167
+          },
+          {
+            "name": "Pearson Education Asia Limited",
+            "count": 166
+          },
+          {
+            "name": "LexisNexis",
+            "count": 164
+          }
+        ],
+        "topClassifications": [
+          {
+            "name": "Publications of Listed Companies",
+            "count": 1924
+          },
+          {
+            "name": "兒童及青少年讀物",
+            "count": 1047
+          },
+          {
+            "name": "Textbooks",
+            "count": 786
+          },
+          {
+            "name": "文學",
+            "count": 774
+          },
+          {
+            "name": "教科書",
+            "count": 617
+          },
+          {
+            "name": "Books for Children and Youth",
+            "count": 531
+          },
+          {
+            "name": "漫畫",
+            "count": 507
+          },
+          {
+            "name": "宗教",
+            "count": 390
+          }
+        ]
+      },
+      "importedAt": "2026-08-15T07:21:41.234Z"
+    }
+  ]
+}

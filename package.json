@@ -1,0 +1,15 @@
+{
+  "name": "hk-book-metadata",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Browse and search book metadata. Ships with the Hong Kong ISBN / book-registration catalogue for 2025.",
+  "scripts": {
+    "import": "node tools/import.js",
+    "import:all": "node tools/import.js --all",
+    "start": "node tools/serve.js",
+    "serve": "node tools/serve.js"
+  },
+  "engines": {
+    "node": ">=12"
+  }
+}

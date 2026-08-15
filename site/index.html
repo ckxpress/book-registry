@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Book Registry — browse and search book metadata</title>
+    <meta name="description" content="Browse and search book metadata imported from open bibliographic datasets." />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📚</text></svg>" />
+  </head>
+  <body>
+    <a class="skip" href="#results">Skip to results</a>
+
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="#/" aria-label="Book Registry home">
+          <span class="brand-mark" aria-hidden="true">📚</span>
+          <span class="brand-text">
+            <strong>Book Registry</strong>
+            <small id="brand-sub">loading…</small>
+          </span>
+        </a>
+
+        <form class="search" role="search" id="search-form">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input
+            id="q"
+            type="search"
+            name="q"
+            placeholder="Search title, author, publisher, ISBN…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search books"
+          />
+          <kbd class="hint">/</kbd>
+        </form>
+
+        <div class="topbar-actions">
+          <a class="btn ghost" href="#/about">About the data</a>
+          <button class="btn icon" id="theme-toggle" type="button" title="Switch theme" aria-label="Switch theme">
+            <span aria-hidden="true">◐</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="app">
+      <!-- Browse view -->
+      <div id="browse-view">
+        <button class="filters-toggle btn" id="filters-toggle" type="button" aria-expanded="false">
+          Filters <span class="badge" id="filters-count" hidden>0</span>
+        </button>
+
+        <aside class="sidebar" id="sidebar" aria-label="Filters">
+          <div class="sidebar-head">
+            <h2>Filters</h2>
+            <button class="linkish" id="clear-filters" type="button">Reset</button>
+          </div>
+          <div id="facets"></div>
+        </aside>
+
+        <section class="results" id="results" aria-live="polite">
+          <div class="toolbar">
+            <p class="count" id="count">Loading books…</p>
+            <div class="toolbar-right">
+              <label class="select">
+                <span>Sort</span>
+                <select id="sort">
+                  <option value="relevance">Relevance</option>
+                  <option value="title">Title A–Z</option>
+                  <option value="title-desc">Title Z–A</option>
+                  <option value="year-desc">Newest first</option>
+                  <option value="year">Oldest first</option>
+                  <option value="publisher">Publisher</option>
+                </select>
+              </label>
+              <div class="viewtoggle" role="group" aria-label="Layout">
+                <button type="button" data-view="grid" class="active" title="Grid">▦</button>
+                <button type="button" data-view="list" title="List">☰</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="chips" class="chips"></div>
+          <div id="grid" class="grid"></div>
+          <div id="sentinel"></div>
+          <div id="empty" class="empty" hidden></div>
+          <button class="btn more" id="more" type="button" hidden>Load more</button>
+        </section>
+      </div>
+
+      <!-- Detail view -->
+      <div id="detail-view" hidden></div>
+      <!-- About view -->
+      <div id="about-view" hidden></div>
+    </main>
+
+    <footer class="footer">
+      <p id="footer-text"></p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
