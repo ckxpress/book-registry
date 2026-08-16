@@ -77,11 +77,19 @@ function main() {
   const pages = execFileSync('sqlite3', [DB, 'PRAGMA page_count;']).toString().trim();
 
   // The manifest tells the site to use the database instead of JSON shards.
+  // A known value the browser re-reads on startup to prove the transport is
+  // sound. Some hosts (GitHub Pages) compress the file and then apply byte
+  // ranges to the *compressed* stream, which yields a readable-looking
+  // database that answers queries wrongly. Better to detect that than to
+  // show a visitor silently incorrect results.
+  const probeId = execFileSync('sqlite3', [DB, 'SELECT id FROM books WHERE rowid = 1;']).toString().trim();
+
   manifest.db = {
     file: 'books.db',
     bytes: size,
     pageSize: PAGE_SIZE,
     pages: Number(pages),
+    probe: { rowid: 1, id: probeId },
     builtAt: new Date().toISOString(),
   };
   fs.writeFileSync(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');

@@ -209,18 +209,41 @@ approximate beyond it. A search still transfers ~2.7 MB at this size; the next
 optimisation, if it's needed, is a narrow dictionary-encoded facet table so
 counting stops touching full rows.
 
-### Hosting a large database
+### Hosting the database
 
-The database is read by HTTP range request, so the host must support them
-(GitHub Pages, Cloudflare Pages, S3, R2 and nginx all do; `tools/serve.js`
-implements them for local work).
+The database is read by HTTP range request, so the host must return ranges of
+the file *as stored*. Two things go wrong in practice, and only the first is
+obvious:
 
-Per-file size limits are the real constraint as the catalogue grows: **GitHub
-rejects files over 100 MB**, and **Cloudflare Pages over 25 MB**. Roughly 2 KB
-per record here, so those ceilings arrive at about 50k and 12k books
-respectively. Past them, either split the database into chunks
-(`serverMode: "chunked"`, which the client library supports) or host the single
-file on object storage such as R2 or S3 and keep the site on Pages.
+**GitHub Pages compresses it and ranges the compressed stream.** Asking for
+bytes 4096–8191 returns those bytes of a gzip stream, not of the database:
+
+```
+Accept-Encoding: identity  ->  content-range: bytes 4096-8191/21653504   correct
+Accept-Encoding: gzip      ->  content-range: bytes 4096-8191/3781511    compressed
+```
+
+Browsers always send `gzip` and cannot opt out — `Accept-Encoding` is a
+forbidden header. The result is a database that opens and answers queries
+*wrongly*, which is worse than failing outright. So the build records a known
+row in the manifest and the site reads it back on startup; if it does not
+match, the site says so on the About page and serves the JSON shards instead.
+**On GitHub Pages the site therefore runs on the JSON backend**, which is the
+better choice at this size anyway.
+
+To actually run the database, host it somewhere that serves binary files
+untouched — Cloudflare R2, S3, Backblaze B2 — and point the manifest at it
+with an absolute URL (CORS required); the site stays on Pages:
+
+```json
+"db": { "url": "https://pub-xxxx.r2.dev/books.db", "bytes": 21653504, ... }
+```
+
+That is also the answer past **GitHub's 100 MB per-file limit** and
+**Cloudflare Pages' 25 MB**, which at roughly 2 KB per record arrive at about
+50k and 12k books. The client library also supports splitting the database
+into chunks (`serverMode: "chunked"`) if you would rather keep everything on
+one host.
 
 ## How it fits together
 
