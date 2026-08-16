@@ -7,7 +7,9 @@
     "import": "node tools/import.js",
     "import:all": "node tools/import.js --all",
     "start": "node tools/serve.js",
-    "serve": "node tools/serve.js"
+    "serve": "node tools/serve.js",
+    "build:db": "node tools/build-sqlite.js",
+    "build": "npm run import && npm run build:db"
   },
   "engines": {
     "node": ">=12"

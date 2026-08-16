@@ -53,7 +53,38 @@ const server = http.createServer((req, res) => {
       'content-type': type,
       'cache-control': 'no-store, max-age=0',
       'last-modified': stat.mtime.toUTCString(),
+      'accept-ranges': 'bytes',
     };
+
+    // The SQLite database is read by byte range — the whole point is never
+    // shipping the entire file — so range requests must be honoured exactly.
+    const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+    if (range) {
+      let start = range[1] === '' ? null : Number(range[1]);
+      let end = range[2] === '' ? null : Number(range[2]);
+
+      if (start === null && end === null) {
+        res.writeHead(416, { 'content-range': 'bytes */' + stat.size }).end();
+        return;
+      }
+      if (start === null) {
+        start = Math.max(0, stat.size - end); // suffix range: last N bytes
+        end = stat.size - 1;
+      } else if (end === null || end >= stat.size) {
+        end = stat.size - 1;
+      }
+      if (start > end || start >= stat.size) {
+        res.writeHead(416, { 'content-range': 'bytes */' + stat.size }).end();
+        return;
+      }
+
+      headers['content-range'] = 'bytes ' + start + '-' + end + '/' + stat.size;
+      headers['content-length'] = end - start + 1;
+      res.writeHead(206, headers);
+      fs.createReadStream(file, { start: start, end: end }).pipe(res);
+      return;
+    }
+
     const compressible = /json|text|javascript|svg/.test(type);
     const acceptsGzip = /\bgzip\b/.test(req.headers['accept-encoding'] || '');
 

@@ -21,6 +21,10 @@
   var byId = new Map();
   var fullShards = new Map();
   var results = [];
+  var totalBooks = 0;
+  var totalResults = 0;
+  var source = null; // JsonSource or SqliteSource, chosen by the manifest
+  var renderToken = 0; // guards against out-of-order async renders
   var covers = localStorage.getItem('covers') !== 'off';
   var lastWritten = null; // the hash this app wrote, to skip echoing it back
 
@@ -89,11 +93,14 @@
         manifest = data;
         if (!manifest.datasets || !manifest.datasets.length) throw new Error('no datasets imported yet');
         updateChrome();
-        return loadShards();
+        // A built database is queried by range request; without one, the JSON
+        // shards are loaded up front. Same UI either way.
+        source = manifest.db ? SqliteSource : JsonSource;
+        return source.prepare();
       })
       .then(function () {
         el.brandSub.textContent =
-          fmt(rows.length) + ' books · ' + manifest.datasets.length + ' dataset' + (manifest.datasets.length > 1 ? 's' : '');
+          fmt(totalBooks) + ' books · ' + manifest.datasets.length + ' dataset' + (manifest.datasets.length > 1 ? 's' : '');
         route();
       })
       .catch(function (err) {
@@ -192,10 +199,7 @@
       });
     });
 
-    el.more.addEventListener('click', function () {
-      state.page++;
-      renderGrid(true);
-    });
+    el.more.addEventListener('click', loadMore);
 
     window.addEventListener('resize', maybeLoadMore);
 
@@ -404,30 +408,371 @@
     });
   }
 
+  /* ---------------- data sources ---------------- */
+
+  /**
+   * Everything below the render layer goes through one of these. The JSON
+   * source holds every record in memory, which is fast up to ~50k books; the
+   * SQLite source queries a database file over HTTP range requests and does
+   * not care how large the catalogue is.
+   */
+  var JsonSource = {
+    id: 'json',
+    prepare: function () {
+      return loadShards().then(function () {
+        totalBooks = rows.length;
+      });
+    },
+    page: function (offset, limit) {
+      var sig = querySignature();
+      if (sig !== JsonSource._sig) {
+        JsonSource._sig = sig;
+        JsonSource._all = compute();
+      }
+      var all = JsonSource._all;
+      return Promise.resolve({ rows: all.slice(offset, offset + limit), total: all.length });
+    },
+    facets: function () {
+      var out = {};
+      FACETS.forEach(function (facet) {
+        out[facet.key] = countFacet(facet);
+      });
+      return Promise.resolve(out);
+    },
+    record: function (id) {
+      var row = byId.get(id);
+      if (!row) return Promise.resolve(null);
+      return fetchFull(row);
+    },
+  };
+
+  var SqliteSource = {
+    id: 'sqlite',
+    prepare: function () {
+      var db = manifest.db;
+      return loadScript('vendor/sqlite-httpvfs/index.js')
+        .then(function () {
+          if (typeof createDbWorker !== 'function') throw new Error('sqlite-httpvfs failed to load');
+          // The worker resolves these against its own URL, not the page's, so
+          // they have to be absolute.
+          var abs = function (p) { return new URL(p, location.href).href; };
+          return createDbWorker(
+            [
+              {
+                from: 'inline',
+                config: {
+                  serverMode: 'full',
+                  url: abs(DATA + db.file),
+                  requestChunkSize: 4096, // several 1 KB pages per request
+                  // (The library hardcodes its read-ahead growth, so queries
+                  // are written to avoid large sequential scans instead.)
+                },
+              },
+            ],
+            abs('vendor/sqlite-httpvfs/sqlite.worker.js'),
+            abs('vendor/sqlite-httpvfs/sql-wasm.wasm')
+          );
+        })
+        .then(function (worker) {
+          SqliteSource._worker = worker;
+          // SQLite's default 2 MB page cache thrashes once a query touches
+          // thousands of rows, and every evicted page costs another HTTP
+          // request. Memory is far cheaper than round trips here.
+          return worker.db.query('PRAGMA cache_size = -32000').then(function () { return worker; });
+        })
+        .then(function (worker) {
+          // The manifest already knows the total; COUNT(*) would scan an
+          // entire index over the network to learn the same number.
+          totalBooks = manifest.totalBooks || 0;
+        });
+    },
+    page: function (offset, limit) {
+      var where = sqlWhere(null);
+      var order = sqlOrder();
+      var columns =
+        'b.id, b.dataset, b.title, b.subtitle, b.authors, b.publisher, b.year, b.isbn,' +
+        ' b.classification, b.language, b.series, b.ref, b.src, b.price, b.currency, b.forsale, b.cover';
+      var sql;
+
+      if (where.onlyQuery && order === 'bm25(books_fts)') {
+        // Rank inside the FTS index and take the page there, then fetch only
+        // those rows. Joining first would make SQLite walk a row for every
+        // match — which, over range requests, drags most of the table across
+        // the network to display sixty results.
+        sql =
+          'SELECT ' + columns + ' FROM (SELECT rowid FROM books_fts WHERE books_fts MATCH ?' +
+          ' ORDER BY bm25(books_fts) LIMIT ? OFFSET ?) h JOIN books b ON b.rowid = h.rowid';
+        return Promise.all([
+          SqliteSource.query(sql, [where.match, limit, offset]),
+          SqliteSource.query('SELECT COUNT(*) AS n FROM books_fts WHERE books_fts MATCH ?', [where.match]),
+        ]).then(function (res) {
+          return { rows: res[0].map(mapSqlRow), total: res[1][0].n };
+        });
+      }
+
+      sql = 'SELECT ' + columns + ' FROM ' + where.from + where.sql + ' ORDER BY ' + order + ' LIMIT ? OFFSET ?';
+
+      var counting;
+      if (!where.params.length) {
+        counting = Promise.resolve([{ n: totalBooks }]); // unfiltered: already known
+      } else if (where.onlyQuery) {
+        // Counting a plain search needs the FTS index alone — joining `books`
+        // would pull a page per matching row across the network for nothing.
+        counting = SqliteSource.query('SELECT COUNT(*) AS n FROM books_fts WHERE books_fts MATCH ?', [where.match]);
+      } else {
+        counting = SqliteSource.query('SELECT COUNT(*) AS n FROM ' + where.from + where.sql, where.params);
+      }
+
+      return Promise.all([SqliteSource.query(sql, where.params.concat([limit, offset])), counting]).then(function (res) {
+        return { rows: res[0].map(mapSqlRow), total: res[1][0].n };
+      });
+    },
+    facets: function () {
+      var base = sqlWhere(null);
+
+      // A plain search: every facet sees the same hit set, so all eight counts
+      // come back from one query over one bounded pass, instead of eight
+      // queries each re-walking the matches.
+      if (base.onlyQuery) {
+        var selects = FACETS.map(function (facet) {
+          var expr = SQL_FACET[facet.key];
+          return (
+            "SELECT '" + facet.key + "' AS k, " + expr + ' AS v, COUNT(*) AS n' +
+            ' FROM hits JOIN books b ON b.rowid = hits.rowid' +
+            ' WHERE ' + expr + " <> '' GROUP BY v"
+          );
+        });
+        var sql =
+          'WITH hits AS MATERIALIZED (SELECT rowid FROM books_fts WHERE books_fts MATCH ? LIMIT ' + FACET_SCAN_CAP + ') ' +
+          selects.join(' UNION ALL ');
+
+        return SqliteSource.query(sql, [base.match]).then(function (list) {
+          var out = {};
+          FACETS.forEach(function (facet) { out[facet.key] = []; });
+          list.forEach(function (r) {
+            if (out[r.k]) out[r.k].push(toOption(r));
+          });
+          Object.keys(out).forEach(function (key) {
+            out[key].sort(function (a, b) { return b.count - a.count || String(a.value).localeCompare(String(b.value)); });
+            out[key] = out[key].slice(0, FACET_LIMIT);
+          });
+          return out;
+        });
+      }
+
+      // Each facet is counted against the *other* active filters, so its
+      // options stay meaningful — same rule as the in-memory path.
+      var jobs = FACETS.map(function (facet) {
+        var where = sqlWhere(facet.key);
+        var expr = SQL_FACET[facet.key];
+
+        // Nothing narrows this facet, so the answer is the build-time table —
+        // a few indexed rows instead of aggregating the whole catalogue.
+        if (!where.params.length) {
+          return SqliteSource.query(
+            'SELECT value AS v, n FROM facet_counts WHERE facet = ? ORDER BY n DESC, value LIMIT ?',
+            [facet.key, FACET_LIMIT]
+          ).then(function (list) {
+            return { key: facet.key, list: list.map(toOption) };
+          });
+        }
+
+        var sql =
+          'SELECT ' + expr + ' AS v, COUNT(*) AS n FROM ' + where.from + where.sql +
+          (where.sql ? ' AND ' : ' WHERE ') + expr + " <> '' GROUP BY v ORDER BY n DESC, v LIMIT " + FACET_LIMIT;
+        return SqliteSource.query(sql, where.params).then(function (list) {
+          return { key: facet.key, list: list.map(toOption) };
+        });
+      });
+
+      return Promise.all(jobs).then(function (all) {
+        var out = {};
+        all.forEach(function (entry) {
+          out[entry.key] = entry.list;
+        });
+        return out;
+      });
+    },
+    record: function (id) {
+      return SqliteSource.query(
+        'SELECT d.doc AS doc FROM books b JOIN docs d ON d.rowid = b.rowid WHERE b.id = ? LIMIT 1',
+        [id]
+      ).then(function (res) {
+        return res.length ? JSON.parse(res[0].doc) : null;
+      });
+    },
+    query: function (sql, params) {
+      return SqliteSource._worker.db.query(sql, params || []);
+    },
+  };
+
+  /* SQL_FACET and FACET_LIMIT come from schema.js, shared with the builder. */
+
+  function toOption(r) {
+    return { value: String(r.v), count: r.n };
+  }
+
+  /** WHERE clause for the active filters and query, optionally skipping one facet. */
+  function sqlWhere(skipFacet) {
+    var clauses = [];
+    var params = [];
+    var from = 'books b';
+
+    var match = matchExpression(state.q);
+    if (match) {
+      from = 'books_fts f JOIN books b ON b.rowid = f.rowid';
+      clauses.push('f.books_fts MATCH ?');
+      params.push(match);
+    }
+
+    FACETS.forEach(function (facet) {
+      if (facet.key === skipFacet) return;
+      var set = state.filters[facet.key];
+      if (!set || !set.size) return;
+      var values = [];
+      set.forEach(function (value) {
+        values.push('?');
+        params.push(value);
+      });
+      clauses.push(SQL_FACET[facet.key] + ' IN (' + values.join(',') + ')');
+    });
+
+    return {
+      from: from,
+      sql: clauses.length ? ' WHERE ' + clauses.join(' AND ') : '',
+      params: params,
+      match: match,
+      onlyQuery: !!match && clauses.length === 1,
+    };
+  }
+
+  /* How many matches a search-time facet count will look at. Beyond this the
+     counts are marked approximate rather than making the user wait while the
+     whole result set is walked over the network. */
+  var FACET_SCAN_CAP = 600;
+
+  function sqlOrder() {
+    switch (state.sort) {
+      case 'title':
+        return 'b.title';
+      case 'title-desc':
+        return 'b.title DESC';
+      case 'year':
+        return 'b.year IS NULL, b.year, b.title';
+      case 'year-desc':
+        return 'b.year IS NULL, b.year DESC, b.title';
+      case 'publisher':
+        return "b.publisher = '', b.publisher, b.title";
+      default:
+        return state.q ? 'bm25(books_fts)' : 'b.title';
+    }
+  }
+
+  /** SQL row -> the same shape the card renderer gets from the JSON index. */
+  function mapSqlRow(r) {
+    var row = {
+      id: r.id,
+      _ds: r.dataset,
+      title: r.title,
+      subtitle: r.subtitle,
+      authors: r.authors ? String(r.authors).split(', ') : [],
+      publisher: r.publisher,
+      year: r.year,
+      isbn: r.isbn,
+      classification: r.classification,
+      language: r.language,
+      series: r.series,
+      ref: r.ref,
+      src: r.src,
+      cover: r.cover || '',
+    };
+    if (typeof r.price === 'number') {
+      row.price = r.price;
+      row.currency = r.currency;
+    }
+    if (r.forsale === 0 || r.forsale === 1) row.forSale = r.forsale === 1;
+    return row;
+  }
+
+  function querySignature() {
+    var parts = [state.q, state.sort];
+    FACETS.forEach(function (facet) {
+      var set = state.filters[facet.key];
+      parts.push(facet.key + '=' + (set ? [...set].sort().join('|') : ''));
+    });
+    return parts.join(' ');
+  }
+
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var tag = document.createElement('script');
+      tag.src = src;
+      tag.onload = resolve;
+      tag.onerror = function () { reject(new Error('could not load ' + src)); };
+      document.head.appendChild(tag);
+    });
+  }
+
   /* ---------------- render: browse ---------------- */
 
   function render() {
-    if (!rows.length) return;
-    results = compute();
-    renderCount();
-    renderChips();
-    renderFacets();
-    renderGrid(false);
+    var token = ++renderToken;
+    state.page = 1;
+
+    return source
+      .page(0, PAGE_SIZE)
+      .then(function (res) {
+        if (token !== renderToken) return null;
+        results = res.rows;
+        totalResults = res.total;
+        renderCount();
+        renderChips();
+        renderGrid(false);
+        return source.facets();
+      })
+      .then(function (counts) {
+        if (token !== renderToken || !counts) return;
+        renderFacets(counts);
+        requestAnimationFrame(maybeLoadMore);
+      })
+      .catch(function (err) {
+        if (token !== renderToken) return;
+        el.grid.innerHTML = '';
+        el.empty.hidden = false;
+        el.empty.innerHTML = '<h3>Query failed</h3><p>' + escapeHtml(err.message) + '</p>';
+      });
+  }
+
+  /** Fetches the next page and appends it, without re-running the facets. */
+  function loadMore() {
+    if (SqliteSource._busy) return;
+    var token = renderToken;
+    SqliteSource._busy = true;
+    return source
+      .page(results.length, PAGE_SIZE)
+      .then(function (res) {
+        SqliteSource._busy = false;
+        if (token !== renderToken || !res.rows.length) return;
+        var start = results.length;
+        results = results.concat(res.rows);
+        totalResults = res.total;
+        renderGrid(true, start);
+      })
+      .catch(function () {
+        SqliteSource._busy = false;
+      });
   }
 
   function renderCount() {
-    var total = rows.length;
-    var shown = results.length;
     el.count.innerHTML =
-      shown === total
-        ? '<strong>' + fmt(total) + '</strong> books'
-        : '<strong>' + fmt(shown) + '</strong> of ' + fmt(total) + ' books';
+      totalResults === totalBooks
+        ? '<strong>' + fmt(totalBooks) + '</strong> books'
+        : '<strong>' + fmt(totalResults) + '</strong> of ' + fmt(totalBooks) + ' books';
   }
 
-  function renderGrid(append) {
-    var limit = state.page * PAGE_SIZE;
-    var start = append ? (state.page - 1) * PAGE_SIZE : 0;
-    var slice = results.slice(start, limit);
+  function renderGrid(append, from) {
+    var start = append ? from || 0 : 0;
+    var slice = results.slice(start);
 
     if (!append) {
       el.grid.innerHTML = '';
@@ -441,9 +786,9 @@
     });
     el.grid.appendChild(frag);
 
-    el.more.hidden = results.length <= limit;
-    el.empty.hidden = results.length !== 0;
-    if (!results.length) {
+    el.more.hidden = results.length >= totalResults;
+    el.empty.hidden = totalResults !== 0;
+    if (!totalResults) {
       el.empty.innerHTML =
         '<h3>No books match</h3><p>Try fewer words, or <button class="linkish" id="empty-reset">reset the filters</button>.</p>';
       var reset = document.getElementById('empty-reset');
@@ -457,9 +802,8 @@
   function maybeLoadMore() {
     if (el.browse.hidden || el.more.hidden) return;
     if (el.sentinel.getBoundingClientRect().top > window.innerHeight + 600) return;
-    state.page++;
-    renderGrid(true);
-    requestAnimationFrame(maybeLoadMore);
+    var pending = loadMore();
+    if (pending) pending.then(function () { requestAnimationFrame(maybeLoadMore); });
   }
 
   function card(row, terms) {
@@ -649,7 +993,9 @@
 
   /* ---------------- render: facets ---------------- */
 
-  function renderFacets() {
+  function renderFacets(allCounts) {
+    if (allCounts) renderFacets._counts = allCounts;
+    var counts = renderFacets._counts || {};
     var open = {};
     el.facets.querySelectorAll('details').forEach(function (d) { open[d.dataset.key] = d.open; });
     var searches = {};
@@ -659,12 +1005,12 @@
     var active = 0;
 
     FACETS.forEach(function (facet) {
-      var counts = countFacet(facet);
+      var options = counts[facet.key] || [];
       var selected = state.filters[facet.key] || new Set();
       active += selected.size;
 
-      if (!counts.length) return;
-      if (facet.hideIfSingle && counts.length < 2 && !selected.size) return;
+      if (!options.length) return;
+      if (facet.hideIfSingle && options.length < 2 && !selected.size) return;
 
       var details = document.createElement('details');
       details.className = 'facet';
@@ -702,7 +1048,7 @@
         details.appendChild(input); // body is appended after this, keeping order
       }
 
-      var visible = counts.filter(function (entry) {
+      var visible = options.filter(function (entry) {
         if (!query) return true;
         return displayName(facet, entry.value).toLowerCase().indexOf(query) !== -1;
       });
@@ -838,24 +1184,25 @@
   /* ---------------- render: detail ---------------- */
 
   function renderDetail(id) {
-    var row = byId.get(id);
-    if (!row) {
-      el.detail.innerHTML =
-        '<div class="detail"><a class="backlink" href="#/">← Back to all books</a>' +
-        '<h1>Book not found</h1><p>Nothing in the loaded datasets has the id <code>' +
-        escapeHtml(id) +
-        '</code>.</p></div>';
-      return;
-    }
+    var token = ++renderToken;
 
     el.detail.innerHTML = '<div class="detail"><a class="backlink" href="' + backHref() + '">← Back to results</a>' +
       '<div class="detail-head"><div class="cover skeleton"></div><div><div class="skeleton" style="height:30px;width:70%"></div>' +
       '<div class="skeleton" style="height:16px;width:40%;margin-top:12px"></div></div></div></div>';
 
-    fetchFull(row).then(function (book) {
-      el.detail.innerHTML = detailHtml(book, row);
+    source.record(id).then(function (book) {
+      if (token !== renderToken) return;
+      if (!book) {
+        el.detail.innerHTML =
+          '<div class="detail"><a class="backlink" href="#/">← Back to all books</a>' +
+          '<h1>Book not found</h1><p>Nothing in the loaded datasets has the id <code>' +
+          escapeHtml(id) +
+          '</code>.</p></div>';
+        return;
+      }
+      el.detail.innerHTML = detailHtml(book, book);
       var host = el.detail.querySelector('.detail-cover');
-      if (host) host.replaceWith(bigCover(book, row));
+      if (host) host.replaceWith(bigCover(book, book));
       document.title = (book.title || 'Book') + ' — Book Registry';
     });
   }
@@ -1005,16 +1352,18 @@
     return out.join('');
   }
 
-  function bigCover(book, row) {
-    var merged = {
-      id: book.id,
-      title: book.title,
-      authors: (book.authors || []).map(function (a) { return a.display || a.name; }),
-      publisher: book.publisher,
-      isbn: book.isbn,
-      cover: book.cover ? book.cover.url : row.cover,
-    };
-    return coverEl(merged, true);
+  function bigCover(book) {
+    return coverEl(
+      {
+        id: book.id,
+        title: book.title,
+        authors: (book.authors || []).map(function (a) { return a.display || a.name; }),
+        publisher: book.publisher,
+        isbn: book.isbn,
+        cover: book.cover ? book.cover.url : '',
+      },
+      true
+    );
   }
 
   function row2(out, label, value, isHtml) {
