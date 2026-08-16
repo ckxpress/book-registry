@@ -464,6 +464,10 @@
                   serverMode: 'full',
                   url: abs(DATA + db.file),
                   requestChunkSize: 4096, // several 1 KB pages per request
+                  // Some static hosts (GitHub Pages among them) answer HEAD
+                  // without content-length, leaving the library unable to
+                  // discover the file size. The manifest records it exactly.
+                  databaseLengthBytes: db.bytes,
                   // (The library hardcodes its read-ahead growth, so queries
                   // are written to avoid large sequential scans instead.)
                 },
