@@ -4,10 +4,10 @@
   "datasets": [
     {
       "id": "hkpl-2025",
-      "title": "Books Printed in Hong Kong — 2025",
+      "title": "Books Printed in Hong Kong \u2014 2025",
       "shortTitle": "Hong Kong 2025",
       "description": "Every book and periodical registered with the Hong Kong ISBN agency (Books Registration Office) during 2025, published quarterly as A Catalogue of Books Printed in Hong Kong.",
-      "provider": "Leisure and Cultural Services Department — Books Registration Office, Hong Kong Public Libraries",
+      "provider": "Leisure and Cultural Services Department \u2014 Books Registration Office, Hong Kong Public Libraries",
       "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
       "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
       "license": "Terms of use of DATA.GOV.HK",
@@ -111,7 +111,7 @@
         ],
         "topPublishers": [
           {
-            "name": "三聯書店(香港)有限公司",
+            "name": "\u4e09\u806f\u66f8\u5e97(\u9999\u6e2f)\u6709\u9650\u516c\u53f8",
             "count": 270
           },
           {
@@ -119,7 +119,7 @@
             "count": 226
           },
           {
-            "name": "中華書局(香港)有限公司",
+            "name": "\u4e2d\u83ef\u66f8\u5c40(\u9999\u6e2f)\u6709\u9650\u516c\u53f8",
             "count": 167
           },
           {
@@ -137,7 +137,7 @@
             "count": 1924
           },
           {
-            "name": "兒童及青少年讀物",
+            "name": "\u5152\u7ae5\u53ca\u9752\u5c11\u5e74\u8b80\u7269",
             "count": 1047
           },
           {
@@ -145,11 +145,11 @@
             "count": 786
           },
           {
-            "name": "文學",
+            "name": "\u6587\u5b78",
             "count": 774
           },
           {
-            "name": "教科書",
+            "name": "\u6559\u79d1\u66f8",
             "count": 617
           },
           {
@@ -157,16 +157,23 @@
             "count": 531
           },
           {
-            "name": "漫畫",
+            "name": "\u6f2b\u756b",
             "count": 507
           },
           {
-            "name": "宗教",
+            "name": "\u5b97\u6559",
             "count": 390
           }
         ]
       },
       "importedAt": "2026-08-15T07:21:41.234Z"
     }
-  ]
+  ],
+  "db": {
+    "file": "books.db",
+    "bytes": 21653504,
+    "pageSize": 1024,
+    "pages": 21146,
+    "builtAt": "2026-08-16T00:35:35.238Z"
+  }
 }
