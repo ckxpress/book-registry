@@ -27,6 +27,7 @@
   var renderToken = 0; // guards against out-of-order async renders
   var covers = localStorage.getItem('covers') !== 'off';
   var lastWritten = null; // the hash this app wrote, to skip echoing it back
+  var dbFallbackReason = ''; // set when the database was rejected and JSON took over
 
   var el = {
     q: document.getElementById('q'),
@@ -96,7 +97,16 @@
         // A built database is queried by range request; without one, the JSON
         // shards are loaded up front. Same UI either way.
         source = manifest.db ? SqliteSource : JsonSource;
-        return source.prepare();
+        return source.prepare().catch(function (err) {
+          if (source === JsonSource) throw err;
+          // Serving stale-but-correct data beats serving wrong data.
+          console.warn('SQLite backend unavailable: ' + err.message + '. Falling back to JSON shards.');
+          dbFallbackReason = err.message;
+          source = JsonSource;
+          rows = [];
+          byId = new Map();
+          return JsonSource.prepare();
+        });
       })
       .then(function () {
         el.brandSub.textContent =
@@ -462,7 +472,10 @@
                 from: 'inline',
                 config: {
                   serverMode: 'full',
-                  url: abs(DATA + db.file),
+                  // `db.url` points the database at another origin — object
+                  // storage such as R2 or S3 — for hosts that will not serve
+                  // byte ranges of a binary file untouched. It needs CORS.
+                  url: db.url ? db.url : abs(DATA + db.file),
                   requestChunkSize: 4096, // several 1 KB pages per request
                   // Some static hosts (GitHub Pages among them) answer HEAD
                   // without content-length, leaving the library unable to
@@ -488,7 +501,29 @@
           // The manifest already knows the total; COUNT(*) would scan an
           // entire index over the network to learn the same number.
           totalBooks = manifest.totalBooks || 0;
+          return SqliteSource.verify();
         });
+    },
+
+    /**
+     * Reads back a value recorded when the database was built. A host that
+     * compresses the file and then applies byte ranges to the compressed
+     * stream (GitHub Pages does exactly this) serves a database that opens
+     * and answers queries — with wrong answers. Checking one known row costs
+     * a single indexed lookup and turns silent corruption into a clean
+     * fallback to the JSON shards.
+     */
+    verify: function () {
+      var probe = manifest.db.probe;
+      if (!probe) return Promise.resolve();
+      return SqliteSource.query('SELECT id FROM books WHERE rowid = ?', [probe.rowid]).then(function (res) {
+        if (!res.length || res[0].id !== probe.id) {
+          throw new Error(
+            'database read back wrong data (expected ' + probe.id + ', got ' +
+              (res.length ? res[0].id : 'nothing') + ') — the host may be compressing it'
+          );
+        }
+      });
     },
     page: function (offset, limit) {
       var where = sqlWhere(null);
@@ -1389,6 +1424,14 @@
         (covers ? ' and cover thumbnails looked up by ISBN' : '') +
         '.</p>'
     );
+
+    if (dbFallbackReason) {
+      out.push(
+        '<p class="lede">This site was built with a SQLite database for large catalogues, but it could not be used here: ' +
+          escapeHtml(dbFallbackReason) +
+          '. The JSON copy of the same records is being served instead, so everything you see is correct.</p>'
+      );
+    }
 
     out.push('<h2>Datasets</h2>');
     manifest.datasets.forEach(function (ds) {
