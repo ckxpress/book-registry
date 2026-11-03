@@ -51,23 +51,23 @@
   /* ---------------- facet definitions ---------------- */
 
   var FACETS = [
-    { key: 'dataset', label: 'Dataset', get: function (r) { return r._ds; }, name: datasetName, hideIfSingle: true },
-    { key: 'language', label: 'Language', get: function (r) { return r.language; }, name: languageName },
-    { key: 'classification', label: 'Category', get: function (r) { return r.classification; }, search: true, limit: 10 },
-    { key: 'publisher', label: 'Publisher', get: function (r) { return r.publisher; }, search: true, limit: 8 },
-    { key: 'year', label: 'Year of publication', get: function (r) { return r.year ? String(r.year) : ''; }, limit: 10, sort: 'key-desc' },
-    { key: 'source', label: 'Release', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
+    { key: 'dataset', label: '資料集', get: function (r) { return r._ds; }, name: datasetName, hideIfSingle: true },
+    { key: 'language', label: '語言', get: function (r) { return r.language; }, name: languageName },
+    { key: 'classification', label: '類別', get: function (r) { return r.classification; }, search: true, limit: 10 },
+    { key: 'publisher', label: '出版者', get: function (r) { return r.publisher; }, search: true, limit: 8 },
+    { key: 'year', label: '出版年份', get: function (r) { return r.year ? String(r.year) : ''; }, limit: 10, sort: 'key-desc' },
+    { key: 'source', label: '發佈季度', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
     {
       key: 'availability',
-      label: 'Availability',
+      label: '發售狀況',
       get: function (r) { return r.forSale === true ? 'sale' : r.forSale === false ? 'nosale' : ''; },
-      name: function (v) { return v === 'sale' ? 'For sale' : 'Not for sale'; },
+      name: function (v) { return v === 'sale' ? '售賣品' : '非賣品'; },
     },
     {
       key: 'identifier',
-      label: 'Identifier',
+      label: '識別號',
       get: function (r) { return r.isbn ? 'isbn' : ''; },
-      name: function () { return 'Has an ISBN'; },
+      name: function () { return '設有 ISBN'; },
     },
   ];
 
@@ -110,7 +110,7 @@
       })
       .then(function () {
         el.brandSub.textContent =
-          fmt(totalBooks) + ' books · ' + manifest.datasets.length + ' dataset' + (manifest.datasets.length > 1 ? 's' : '');
+          fmt(totalBooks) + ' 本書刊 · ' + manifest.datasets.length + ' 個資料集';
         route();
       })
       .catch(function (err) {
@@ -118,10 +118,10 @@
         el.grid.innerHTML = '';
         el.empty.hidden = false;
         el.empty.innerHTML =
-          '<h3>No data loaded</h3><p>' +
+          '<h3>未能載入資料</h3><p>' +
           escapeHtml(err.message) +
-          '</p><p>Run <code>npm run import</code> in the project folder, then reload.</p>';
-        el.brandSub.textContent = 'no data';
+          '</p><p>請在專案資料夾執行 <code>npm run import</code>，然後重新載入。</p>';
+        el.brandSub.textContent = '沒有資料';
       });
   }
 
@@ -157,9 +157,33 @@
     });
   }
 
+  /* The catalogue registers Chinese and English books separately, and an
+     English record often carries the Chinese form of its title as the
+     parallel title ("... = 葉智榮"). This is a Traditional Chinese site, so
+     the Chinese form leads wherever a record has one; the other title is kept
+     and shown underneath rather than dropped. */
+  var CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
+
+  function hasCjk(text) {
+    return CJK.test(text || '');
+  }
+
+  function displayTitle(row) {
+    if (!hasCjk(row.title) && hasCjk(row.parallelTitle)) return row.parallelTitle;
+    return row.title || '';
+  }
+
+  function altTitle(row) {
+    var shown = displayTitle(row);
+    if (row.title && row.title !== shown) return row.title;
+    if (row.parallelTitle && row.parallelTitle !== shown) return row.parallelTitle;
+    return '';
+  }
+
   function haystack(row) {
     return [
       row.title,
+      row.parallelTitle,
       row.subtitle,
       (row.authors || []).join(' '),
       row.publisher,
@@ -280,6 +304,11 @@
       if (raw) state.filters[facet.key] = new Set(raw.split('|'));
     });
 
+    // A reader arriving with no address of their own gets the Chinese
+    // catalogue. Once they touch anything the hash is written, so unticking
+    // Chinese sticks rather than being reapplied on the next load.
+    if (!hash) state.filters.language = new Set(['zh']);
+
     el.q.value = state.q;
     el.sort.value = state.sort;
   }
@@ -378,7 +407,7 @@
   function score(row, terms, isbnQuery) {
     var value = 0;
     if (isbnQuery && row.isbn === isbnQuery) value += 500;
-    var title = (row.title || '').toLowerCase();
+    var title = ((row.title || '') + ' ' + (row.parallelTitle || '')).toLowerCase();
     var authors = (row.authors || []).join(' ').toLowerCase();
     var publisher = (row.publisher || '').toLowerCase();
 
@@ -397,23 +426,30 @@
     var collator = new Intl.Collator(['zh-Hant', 'en'], { numeric: true, sensitivity: 'base' });
     var mode = state.sort;
 
+    // Latin sorts before CJK in every standard collation, which would bury
+    // ~4,300 English titles ahead of the first Chinese one. Group by script
+    // first so a Traditional Chinese catalogue reads as one.
+    function script(row) {
+      return hasCjk(displayTitle(row)) ? 0 : 1;
+    }
+    function byTitle(a, b) {
+      return script(a) - script(b) || collator.compare(displayTitle(a), displayTitle(b));
+    }
+
     list.sort(function (a, b) {
       switch (mode) {
         case 'title':
-          return collator.compare(a.title || '', b.title || '');
+          return byTitle(a, b);
         case 'title-desc':
-          return collator.compare(b.title || '', a.title || '');
+          return script(a) - script(b) || collator.compare(displayTitle(b), displayTitle(a));
         case 'year':
-          return (a.year || 9999) - (b.year || 9999) || collator.compare(a.title || '', b.title || '');
+          return (a.year || 9999) - (b.year || 9999) || byTitle(a, b);
         case 'year-desc':
-          return (b.year || 0) - (a.year || 0) || collator.compare(a.title || '', b.title || '');
+          return (b.year || 0) - (a.year || 0) || byTitle(a, b);
         case 'publisher':
-          return (
-            collator.compare(a.publisher || 'zzz', b.publisher || 'zzz') ||
-            collator.compare(a.title || '', b.title || '')
-          );
+          return collator.compare(a.publisher || 'zzz', b.publisher || 'zzz') || byTitle(a, b);
         default:
-          return (b._score || 0) - (a._score || 0) || collator.compare(a.title || '', b.title || '');
+          return (b._score || 0) - (a._score || 0) || byTitle(a, b);
       }
     });
   }
@@ -501,7 +537,12 @@
           // The manifest already knows the total; COUNT(*) would scan an
           // entire index over the network to learn the same number.
           totalBooks = manifest.totalBooks || 0;
-          return SqliteSource.verify();
+          return SqliteSource.query('PRAGMA table_info(books)')
+            .then(function (cols) {
+              // Databases built before the Chinese-first change lack these.
+              SqliteSource._zh = cols.some(function (c) { return c.name === 'zh_first'; });
+            })
+            .then(SqliteSource.verify);
         });
     },
 
@@ -530,7 +571,8 @@
       var order = sqlOrder();
       var columns =
         'b.id, b.dataset, b.title, b.subtitle, b.authors, b.publisher, b.year, b.isbn,' +
-        ' b.classification, b.language, b.series, b.ref, b.src, b.price, b.currency, b.forsale, b.cover';
+        ' b.classification, b.language, b.series, b.ref, b.src, b.price, b.currency, b.forsale, b.cover' +
+        (SqliteSource._zh ? ', b.parallel_title' : '');
       var sql;
 
       if (where.onlyQuery && order === 'bm25(books_fts)') {
@@ -691,19 +733,24 @@
   var FACET_SCAN_CAP = 600;
 
   function sqlOrder() {
+    // With the Chinese-first columns present, every title ordering groups CJK
+    // titles ahead of Latin ones — the same rule the in-memory path applies.
+    var t = SqliteSource._zh ? 'b.zh_first, b.title_display' : 'b.title';
+    var tDesc = SqliteSource._zh ? 'b.zh_first, b.title_display DESC' : 'b.title DESC';
+
     switch (state.sort) {
       case 'title':
-        return 'b.title';
+        return t;
       case 'title-desc':
-        return 'b.title DESC';
+        return tDesc;
       case 'year':
-        return 'b.year IS NULL, b.year, b.title';
+        return 'b.year IS NULL, b.year, ' + t;
       case 'year-desc':
-        return 'b.year IS NULL, b.year DESC, b.title';
+        return 'b.year IS NULL, b.year DESC, ' + t;
       case 'publisher':
-        return "b.publisher = '', b.publisher, b.title";
+        return "b.publisher = '', b.publisher, " + t;
       default:
-        return state.q ? 'bm25(books_fts)' : 'b.title';
+        return state.q ? 'bm25(books_fts)' : t;
     }
   }
 
@@ -721,6 +768,7 @@
       classification: r.classification,
       language: r.language,
       series: r.series,
+      parallelTitle: r.parallel_title || '',
       ref: r.ref,
       src: r.src,
       cover: r.cover || '',
@@ -778,7 +826,7 @@
         if (token !== renderToken) return;
         el.grid.innerHTML = '';
         el.empty.hidden = false;
-        el.empty.innerHTML = '<h3>Query failed</h3><p>' + escapeHtml(err.message) + '</p>';
+        el.empty.innerHTML = '<h3>查詢失敗</h3><p>' + escapeHtml(err.message) + '</p>';
       });
   }
 
@@ -805,8 +853,8 @@
   function renderCount() {
     el.count.innerHTML =
       totalResults === totalBooks
-        ? '<strong>' + fmt(totalBooks) + '</strong> books'
-        : '<strong>' + fmt(totalResults) + '</strong> of ' + fmt(totalBooks) + ' books';
+        ? '共 <strong>' + fmt(totalBooks) + '</strong> 本'
+        : '<strong>' + fmt(totalResults) + '</strong> 本（全部 ' + fmt(totalBooks) + ' 本）';
   }
 
   function renderGrid(append, from) {
@@ -828,10 +876,25 @@
     el.more.hidden = results.length >= totalResults;
     el.empty.hidden = totalResults !== 0;
     if (!totalResults) {
+      // A search for an English title finds nothing while the default Chinese
+      // filter is on, so offer the way out rather than leaving a dead end.
+      var langFilter = state.filters.language;
       el.empty.innerHTML =
-        '<h3>No books match</h3><p>Try fewer words, or <button class="linkish" id="empty-reset">reset the filters</button>.</p>';
+        '<h3>沒有符合的書刊</h3><p>試試減少關鍵詞，或<button class="linkish" id="empty-reset">重設篩選</button>。</p>' +
+        (langFilter && langFilter.size
+          ? '<p><button class="linkish" id="empty-all-langs">搜尋全部語言的書刊</button></p>'
+          : '');
       var reset = document.getElementById('empty-reset');
       if (reset) reset.addEventListener('click', function () { document.getElementById('clear-filters').click(); });
+      var allLangs = document.getElementById('empty-all-langs');
+      if (allLangs) {
+        allLangs.addEventListener('click', function () {
+          delete state.filters.language;
+          state.page = 1;
+          pushRoute();
+          render();
+        });
+      }
     }
   }
 
@@ -857,8 +920,16 @@
 
     var title = document.createElement('h3');
     title.className = 'card-title';
-    title.innerHTML = highlight(row.title || 'Untitled', terms);
+    title.innerHTML = highlight(displayTitle(row) || '無題', terms);
     body.appendChild(title);
+
+    var other = altTitle(row);
+    if (other) {
+      var alt = document.createElement('p');
+      alt.className = 'card-alt';
+      alt.innerHTML = highlight(other, terms);
+      body.appendChild(alt);
+    }
 
     if (state.view === 'list' && row.subtitle) {
       var sub = document.createElement('p');
@@ -879,7 +950,7 @@
       if (row.classification) tags.appendChild(tag(row.classification));
       if (row.isbn) tags.appendChild(tag('ISBN ' + row.isbn));
       if (typeof row.price === 'number') tags.appendChild(tag(money(row.price, row.currency)));
-      else if (row.forSale === false) tags.appendChild(tag('Not for sale'));
+      else if (row.forSale === false) tags.appendChild(tag('非賣品'));
       body.appendChild(tags);
     }
 
@@ -1021,7 +1092,7 @@
 
     var t = document.createElement('div');
     t.className = 'ft';
-    t.textContent = row.title || 'Untitled';
+    t.textContent = displayTitle(row) || '無題';
     var a = document.createElement('div');
     a.className = 'fa';
     a.textContent = (row.authors && row.authors[0]) || row.publisher || '';
@@ -1075,7 +1146,7 @@
         input.className = 'facet-search';
         input.type = 'search';
         input.dataset.key = facet.key;
-        input.placeholder = 'Filter ' + facet.label.toLowerCase() + '…';
+        input.placeholder = '篩選' + facet.label + '…';
         input.value = searches[facet.key] || '';
         input.addEventListener('input', function () {
           searches[facet.key] = input.value;
@@ -1106,7 +1177,7 @@
         var more = document.createElement('button');
         more.className = 'linkish facet-more';
         more.type = 'button';
-        more.textContent = 'Show ' + (visible.length - list.length) + ' more';
+        more.textContent = '顯示其餘 ' + (visible.length - list.length) + ' 項';
         more.addEventListener('click', function () {
           visible.slice(list.length).forEach(function (entry) {
             body.appendChild(option(facet, entry, selected.has(entry.value)));
@@ -1225,7 +1296,7 @@
   function renderDetail(id) {
     var token = ++renderToken;
 
-    el.detail.innerHTML = '<div class="detail"><a class="backlink" href="' + backHref() + '">← Back to results</a>' +
+    el.detail.innerHTML = '<div class="detail"><a class="backlink" href="' + backHref() + '">← 返回搜尋結果</a>' +
       '<div class="detail-head"><div class="cover skeleton"></div><div><div class="skeleton" style="height:30px;width:70%"></div>' +
       '<div class="skeleton" style="height:16px;width:40%;margin-top:12px"></div></div></div></div>';
 
@@ -1233,8 +1304,8 @@
       if (token !== renderToken) return;
       if (!book) {
         el.detail.innerHTML =
-          '<div class="detail"><a class="backlink" href="#/">← Back to all books</a>' +
-          '<h1>Book not found</h1><p>Nothing in the loaded datasets has the id <code>' +
+          '<div class="detail"><a class="backlink" href="#/">← 返回全部書刊</a>' +
+          '<h1>找不到此書刊</h1><p>已載入的資料集中沒有這個編號 <code>' +
           escapeHtml(id) +
           '</code>.</p></div>';
         return;
@@ -1242,7 +1313,7 @@
       el.detail.innerHTML = detailHtml(book, book);
       var host = el.detail.querySelector('.detail-cover');
       if (host) host.replaceWith(bigCover(book, book));
-      document.title = (book.title || 'Book') + ' — Book Registry';
+      document.title = (displayTitle(book) || '書刊') + ' — 香港書刊目錄';
     });
   }
 
@@ -1275,11 +1346,12 @@
 
     var out = [];
     out.push('<div class="detail">');
-    out.push('<a class="backlink" href="' + backHref() + '">← Back to results</a>');
+    out.push('<a class="backlink" href="' + backHref() + '">← 返回搜尋結果</a>');
     out.push('<div class="detail-head"><div class="detail-cover"></div><div>');
-    out.push('<h1>' + escapeHtml(book.title || 'Untitled') + '</h1>');
+    out.push('<h1>' + escapeHtml(displayTitle(book) || '無題') + '</h1>');
+    var otherTitle = altTitle(book);
+    if (otherTitle) out.push('<p class="sub">' + escapeHtml(otherTitle) + '</p>');
     if (book.subtitle) out.push('<p class="sub">' + escapeHtml(book.subtitle) + '</p>');
-    if (book.parallelTitle) out.push('<p class="sub">' + escapeHtml(book.parallelTitle) + '</p>');
     if (authors.length) out.push('<p class="byline">' + authors.join(' · ') + '</p>');
 
     if (book.description && book.description.text) {
@@ -1287,7 +1359,7 @@
         '<p class="lede">' +
           escapeHtml(book.description.text) +
           (book.description.source === 'derived'
-            ? '<span class="derived" title="Composed from the catalogue fields — the source dataset carries no abstract">derived</span>'
+            ? '<span class="derived" title="由目錄各欄位組成——原始資料集沒有內容簡介">推算</span>'
             : '') +
           '</p>'
       );
@@ -1296,52 +1368,52 @@
     out.push('<div class="linkrow">');
     if (book.isbn) {
       out.push(link('https://openlibrary.org/isbn/' + book.isbn, 'Open Library'));
-      out.push(link('https://www.google.com/search?q=' + encodeURIComponent('ISBN ' + book.isbn), 'Search the web'));
+      out.push(link('https://www.google.com/search?q=' + encodeURIComponent('ISBN ' + book.isbn), '網上搜尋'));
     }
-    out.push(link('https://www.hkpl.gov.hk/en/search?q=' + encodeURIComponent(book.title || ''), 'Hong Kong Public Libraries'));
+    out.push(link('https://www.hkpl.gov.hk/en/search?q=' + encodeURIComponent(book.title || ''), '香港公共圖書館'));
     out.push('</div>');
     out.push('</div></div>');
 
     /* --- bibliographic --- */
-    out.push('<h2 class="section-title">Bibliographic record</h2>');
+    out.push('<h2 class="section-title">書目紀錄</h2>');
     out.push('<table class="meta-table"><tbody>');
-    row2(out, 'Title', book.title);
-    row2(out, 'Subtitle', book.subtitle);
-    row2(out, 'Parallel title', book.parallelTitle);
-    row2(out, 'Full title statement', book.titleFull);
-    row2(out, 'Statement of responsibility', book.statementOfResponsibility);
+    row2(out, '書刊名', book.title);
+    row2(out, '副題', book.subtitle);
+    row2(out, '並列書名', book.parallelTitle);
+    row2(out, '完整書名著錄', book.titleFull);
+    row2(out, '責任者說明', book.statementOfResponsibility);
     row2(
       out,
-      'Author(s)',
+      '著者',
       (book.authors || []).map(function (a) { return a.display || a.name; }).join(' · ')
     );
-    row2(out, 'Edition', book.edition);
-    row2(out, 'Series', book.series ? [book.series.title, book.series.number].filter(Boolean).join(' ; ') : '');
-    row2(out, 'Frequency', book.frequency);
+    row2(out, '版次', book.edition);
+    row2(out, '叢書', book.series ? [book.series.title, book.series.number].filter(Boolean).join(' ; ') : '');
+    row2(out, '出版刊期', book.frequency);
     out.push('</tbody></table>');
 
     /* --- publication --- */
-    out.push('<h2 class="section-title">Publication</h2>');
+    out.push('<h2 class="section-title">出版資料</h2>');
     out.push('<table class="meta-table"><tbody>');
-    row2(out, 'Publisher', book.publisher);
-    row2(out, 'Place of publication', book.place);
-    row2(out, 'Date', book.dateRaw || (book.year ? String(book.year) : ''));
+    row2(out, '出版者', book.publisher);
+    row2(out, '出版地', book.place);
+    row2(out, '出版年份', book.dateRaw || (book.year ? String(book.year) : ''));
     if (book.copyright) {
       row2(
         out,
-        'Copyright',
+        '版權',
         escapeHtml(book.copyright.statement) +
           (book.copyright.source === 'derived'
-            ? '<span class="derived" title="Publisher and year of publication; the source dataset has no rights field">derived</span>'
+            ? '<span class="derived" title="出版者及出版年份；原始資料集沒有版權欄位">derived</span>'
             : ''),
         true
       );
     }
-    row2(out, 'Language of catalogue', languageName(book.language));
+    row2(out, '目錄語言', languageName(book.language));
     out.push('</tbody></table>');
 
     /* --- identifiers --- */
-    out.push('<h2 class="section-title">Identifiers &amp; physical form</h2>');
+    out.push('<h2 class="section-title">識別號及形態</h2>');
     out.push('<table class="meta-table"><tbody>');
     if (book.isbns && book.isbns.length) {
       var isbnHtml = book.isbns
@@ -1352,21 +1424,21 @@
           );
         })
         .join('<br>');
-      row2(out, 'ISBN', isbnHtml, true);
-      if (book.isbns[0] && book.isbns[0].isbn13) row2(out, 'ISBN-13 (normalised)', '<code>' + book.isbns[0].isbn13 + '</code>', true);
+      row2(out, '國際標準書號', isbnHtml, true);
+      if (book.isbns[0] && book.isbns[0].isbn13) row2(out, 'ISBN-13（標準化）', '<code>' + book.isbns[0].isbn13 + '</code>', true);
     }
-    row2(out, 'ISSN', book.issn ? '<code>' + escapeHtml(book.issn) + '</code>' : '', true);
-    row2(out, 'Physical description', book.physical ? book.physical.raw : '');
-    row2(out, 'Pages', book.physical && book.physical.pages ? book.physical.pages + ' pages' : '');
-    row2(out, 'Dimensions', book.physical ? book.physical.dimensions : '');
-    row2(out, 'Category', book.classification);
-    row2(out, 'Notes', book.notes);
+    row2(out, '國際標準期刊號', book.issn ? '<code>' + escapeHtml(book.issn) + '</code>' : '', true);
+    row2(out, '著錄', book.physical ? book.physical.raw : '');
+    row2(out, '頁數', book.physical && book.physical.pages ? book.physical.pages + ' 頁' : '');
+    row2(out, '尺寸', book.physical ? book.physical.dimensions : '');
+    row2(out, '類別', book.classification);
+    row2(out, '附註', book.notes);
     if (book.price) {
       var price =
         typeof book.price.amount === 'number'
           ? money(book.price.amount, book.price.currency)
           : escapeHtml(book.price.raw || '');
-      row2(out, 'Price', price + (book.price.availability ? ' <span class="tag">' + escapeHtml(book.price.availability) + '</span>' : ''), true);
+      row2(out, '定價', price + (book.price.availability ? ' <span class="tag">' + escapeHtml(book.price.availability) + '</span>' : ''), true);
     }
     if (book.extra) {
       Object.keys(book.extra).forEach(function (key) { row2(out, titleCase(key), book.extra[key]); });
@@ -1374,17 +1446,17 @@
     out.push('</tbody></table>');
 
     /* --- provenance --- */
-    out.push('<h2 class="section-title">Record provenance</h2>');
+    out.push('<h2 class="section-title">紀錄來源</h2>');
     out.push('<table class="meta-table"><tbody>');
-    row2(out, 'Dataset', '<a href="#/about">' + escapeHtml(ds.title || book.dataset || '') + '</a>', true);
-    row2(out, 'Registration number', book.ref);
-    row2(out, 'Catalogue serial number', book.serial);
+    row2(out, '資料集', '<a href="#/about">' + escapeHtml(ds.title || book.dataset || '') + '</a>', true);
+    row2(out, '參考編號', book.ref);
+    row2(out, '順序編號', book.serial);
     if (book.source) {
-      row2(out, 'Release', book.source.label || book.source.quarter);
-      if (book.source.url) row2(out, 'Source file', '<a href="' + escapeAttr(book.source.url) + '" rel="noreferrer">' + escapeHtml(fileName(book.source.url)) + '</a>', true);
+      row2(out, '發佈季度', book.source.label || book.source.quarter);
+      if (book.source.url) row2(out, '來源檔案', '<a href="' + escapeAttr(book.source.url) + '" rel="noreferrer">' + escapeHtml(fileName(book.source.url)) + '</a>', true);
       if (book.source.file) row2(out, 'Source file', '<code>' + escapeHtml(book.source.file) + '</code>', true);
     }
-    row2(out, 'Record id', '<code>' + escapeHtml(book.id) + '</code>', true);
+    row2(out, '紀錄編號', '<code>' + escapeHtml(book.id) + '</code>', true);
     out.push('</tbody></table>');
     out.push('</div>');
 
@@ -1415,72 +1487,72 @@
   function renderAbout() {
     var out = [];
     out.push('<div class="about">');
-    out.push('<a class="backlink" href="' + backHref() + '">← Back to results</a>');
-    out.push('<h1>About this site</h1>');
+    out.push('<a class="backlink" href="' + backHref() + '">← 返回搜尋結果</a>');
+    out.push('<h1>關於本站</h1>');
     out.push(
-      '<p>A static catalogue of book metadata: ' +
+      '<p>靜態書刊資料目錄，收錄 ' +
         fmt(rows.length) +
-        ' titles, browsable and searchable entirely in the browser. Data is imported from open datasets by a small Node script; nothing is fetched at runtime except the data files themselves' +
-        (covers ? ' and cover thumbnails looked up by ISBN' : '') +
-        '.</p>'
+        ' 項書刊，全部瀏覽與搜尋均在瀏覽器內完成。資料由一個小型 Node 程式從公開資料集匯入；除資料檔案本身' +
+        (covers ? '及以 ISBN 查詢的封面縮圖' : '') +
+        '外，執行時不會向外抓取任何內容。</p>'
     );
 
     if (dbFallbackReason) {
       out.push(
-        '<p class="lede">This site was built with a SQLite database for large catalogues, but it could not be used here: ' +
+        '<p class="lede">本站備有供大型目錄使用的 SQLite 資料庫，但在此無法使用：' +
           escapeHtml(dbFallbackReason) +
-          '. The JSON copy of the same records is being served instead, so everything you see is correct.</p>'
+          '。現改用同一批紀錄的 JSON 版本，所見資料同樣正確。</p>'
       );
     }
 
-    out.push('<h2>Datasets</h2>');
+    out.push('<h2>資料集</h2>');
     manifest.datasets.forEach(function (ds) {
       out.push('<div class="dscard">');
       out.push('<h3>' + escapeHtml(ds.title) + '</h3>');
       if (ds.description) out.push('<p>' + escapeHtml(ds.description) + '</p>');
       out.push('<ul class="stats">');
-      out.push('<li><strong>' + fmt(ds.count) + '</strong>books</li>');
+      out.push('<li><strong>' + fmt(ds.count) + '</strong>項書刊</li>');
       if (ds.stats) {
-        out.push('<li><strong>' + fmt(ds.stats.withIsbn) + '</strong>with an ISBN</li>');
-        out.push('<li><strong>' + fmt(ds.stats.publishers) + '</strong>publishers</li>');
-        out.push('<li><strong>' + fmt(ds.stats.classifications) + '</strong>categories</li>');
-        if (ds.stats.yearRange) out.push('<li><strong>' + ds.stats.yearRange[0] + '–' + ds.stats.yearRange[1] + '</strong>years of publication</li>');
+        out.push('<li><strong>' + fmt(ds.stats.withIsbn) + '</strong>設有 ISBN</li>');
+        out.push('<li><strong>' + fmt(ds.stats.publishers) + '</strong>個出版者</li>');
+        out.push('<li><strong>' + fmt(ds.stats.classifications) + '</strong>個類別</li>');
+        if (ds.stats.yearRange) out.push('<li><strong>' + ds.stats.yearRange[0] + '–' + ds.stats.yearRange[1] + '</strong>出版年份跨度</li>');
       }
       out.push('</ul>');
       out.push('<p style="margin-top:14px">');
-      if (ds.provider) out.push('Provided by ' + escapeHtml(ds.provider) + '.<br>');
-      if (ds.homepage) out.push('<a href="' + escapeAttr(ds.homepage) + '" rel="noreferrer">Dataset home</a> · ');
-      if (ds.dataDictionary) out.push('<a href="' + escapeAttr(ds.dataDictionary) + '" rel="noreferrer">Data dictionary</a> · ');
-      if (ds.licenseUrl) out.push('<a href="' + escapeAttr(ds.licenseUrl) + '" rel="noreferrer">' + escapeHtml(ds.license || 'Licence') + '</a>');
+      if (ds.provider) out.push('資料提供：' + escapeHtml(ds.provider) + '<br>');
+      if (ds.homepage) out.push('<a href="' + escapeAttr(ds.homepage) + '" rel="noreferrer">資料集首頁</a> · ');
+      if (ds.dataDictionary) out.push('<a href="' + escapeAttr(ds.dataDictionary) + '" rel="noreferrer">資料字典</a> · ');
+      if (ds.licenseUrl) out.push('<a href="' + escapeAttr(ds.licenseUrl) + '" rel="noreferrer">' + escapeHtml(ds.license || '使用條款') + '</a>');
       else if (ds.license) out.push(escapeHtml(ds.license));
       out.push('</p>');
-      out.push('<p style="font-size:12.5px">Imported ' + escapeHtml(String(ds.importedAt || '').slice(0, 10)) + ' · ' + ds.sources.length + ' source files · adapter <code>' + escapeHtml(ds.adapter) + '</code></p>');
+      out.push('<p style="font-size:12.5px">匯入日期 ' + escapeHtml(String(ds.importedAt || '').slice(0, 10)) + ' · ' + ds.sources.length + ' 個來源檔案 · 轉換器 <code>' + escapeHtml(ds.adapter) + '</code></p>');
       out.push('</div>');
     });
 
-    out.push('<h2>Adding another dataset</h2>');
-    out.push('<p>Datasets are declared in <code>datasets.json</code> and imported with:</p>');
+    out.push('<h2>加入其他資料集</h2>');
+    out.push('<p>資料集在 <code>datasets.json</code> 中宣告，並以下列指令匯入：</p>');
     out.push(
-      '<pre>npm run import                        # everything registered\n' +
-        'npm run import -- --add-hkpl-year 2026  # next Hong Kong year\n' +
+      '<pre>npm run import                        # 匯入全部已登記資料集\n' +
+        'npm run import -- --add-hkpl-year 2026  # 下一年香港目錄\n' +
         'npm run import -- --file books.csv --id my-shelf --title "My shelf"\n' +
         'npm run import -- --url https://host/books.json --id x --title "X"</pre>'
     );
     out.push(
-      '<p>CSV and JSON sources are auto-mapped by column name (title, author, publisher, ISBN, description, cover…), so most exports import without configuration. Each import writes slim browse shards plus full-record shards into <code>site/data/</code> and updates the manifest.</p>'
+      '<p>CSV 與 JSON 來源會按欄位名稱自動對應（書名、著者、出版者、ISBN、簡介、封面…），因此大部分匯出檔無需設定即可匯入。每次匯入會在 <code>site/data/</code> 寫入精簡的瀏覽分片及完整紀錄分片，並更新 manifest。</p>'
     );
 
-    out.push('<h2>How the metadata is built</h2>');
+    out.push('<h2>資料如何整理</h2>');
     out.push(
-      '<p>Catalogue records use ISBD punctuation, so <em>“Main title : subtitle = parallel title / statement of responsibility”</em> is split into separate fields. ISBNs, prices, page counts and dimensions are parsed out of free text. Two fields are marked <span class="derived">derived</span>: the description is composed from the catalogue fields (the source has no abstracts) and the copyright line is the publisher plus year of publication.</p>'
+      '<p>目錄紀錄採用 ISBD 標點，因此<em>「正書名 : 副題 = 並列書名 / 責任者說明」</em>會拆分為獨立欄位。ISBN、定價、頁數與尺寸皆從自由文本中解析。兩個欄位標示為<span class="derived">推算</span>：內容簡介由目錄欄位組成（原始資料沒有簡介），版權一行則為出版者加出版年份。</p><p>目錄分中英文兩冊出版，不少英文紀錄以並列書名記載中文書名。本站以中文書名為主，另一語言的書名顯示於其下。</p>'
     );
 
-    out.push('<h2>Cover images</h2>');
+    out.push('<h2>封面圖片</h2>');
     out.push(
-      '<label class="switch"><input type="checkbox" id="covers-toggle"' + (covers ? ' checked' : '') + '> Look up cover images by ISBN</label>'
+      '<label class="switch"><input type="checkbox" id="covers-toggle"' + (covers ? ' checked' : '') + '> 以 ISBN 查詢封面圖片</label>'
     );
     out.push(
-      '<p style="margin-top:8px">Covers are not part of the source dataset. When enabled, the browser asks <code>books.google.com</code> and then <code>covers.openlibrary.org</code> for a thumbnail matching the ISBN; roughly half of Hong Kong ISBNs resolve, and everything else gets a generated cover. Turn this off to keep the page entirely self-contained — no third-party requests at all.</p>'
+      '<p style="margin-top:8px">原始資料集並不包含封面。啟用後，瀏覽器會依 ISBN 向 <code>books.google.com</code> 及 <code>covers.openlibrary.org</code> 查詢縮圖；約半數香港 ISBN 能找到封面，其餘會自動生成封面。關閉後本頁將完全自給自足，不會向第三方發出任何請求。</p>'
     );
     out.push('</div>');
 
@@ -1491,7 +1563,7 @@
       localStorage.setItem('covers', covers ? 'on' : 'off');
       renderAbout();
     });
-    document.title = 'About the data — Book Registry';
+    document.title = '資料說明 — 香港書刊目錄';
   }
 
   /* ---------------- helpers ---------------- */
@@ -1502,9 +1574,9 @@
       escapeHtml(names) +
       ' · ' +
       fmt(manifest.totalBooks || 0) +
-      ' records · generated ' +
+      ' 項紀錄 · 製作於 ' +
       escapeHtml(String(manifest.generatedAt || '').slice(0, 10)) +
-      ' · <a href="#/about">about the data and how to add more</a>';
+      ' · <a href="#/about">資料說明及新增資料集方法</a>';
   }
 
   function datasetById(id) {
@@ -1524,8 +1596,8 @@
   }
 
   function languageName(code) {
-    if (code === 'zh') return 'Chinese';
-    if (code === 'en') return 'English';
+    if (code === 'zh') return '中文';
+    if (code === 'en') return '英文';
     return code || '';
   }
 
