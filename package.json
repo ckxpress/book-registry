@@ -10,7 +10,8 @@
     "serve": "node tools/serve.js",
     "build:db": "node tools/build-sqlite.js",
     "build": "npm run import && npm run covers && npm run build:db",
-    "covers": "node tools/resolve-covers.js"
+    "covers": "node tools/resolve-covers.js",
+    "deploy": "sh tools/deploy.sh"
   },
   "engines": {
     "node": ">=12"

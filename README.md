@@ -208,6 +208,31 @@ per language, under the
 Field definitions are in the
 [data dictionary](https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf).
 
+## Deploying
+
+The site is static files, so it needs no server and no build at serve time.
+
+```bash
+npm run deploy
+```
+
+That publishes the contents of `site/` to the `gh-pages` branch, which is what
+GitHub Pages serves at **https://ckxpress.github.io/book-registry/**. `main`
+holds the source; `gh-pages` holds only what is inside `site/`, at its root,
+because branch-based Pages can serve from the root or `/docs` and nothing else.
+Push `main` as usual — that alone does not update the site.
+
+The command compares the two trees first and exits without pushing when they
+already match, so running it twice is harmless.
+
+It deliberately avoids `git subtree push`. That command maintains a separate
+split history, and once both methods have been used on the same branch, every
+later subtree push is rejected as a non-fast-forward. One way in, no choice to
+get wrong.
+
+Hash routing means no rewrite rules are needed, and every path is relative, so
+a project subpath works without configuration.
+
 ## Two query backends
 
 The site reads its data one of two ways, chosen automatically by what's in
