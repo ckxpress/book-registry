@@ -1,3 +1,7 @@
 node_modules/
-cache/
 .DS_Store
+
+# Downloaded source files are disposable, but the cover lookups are 15,996
+# requests to someone else's service — keep those so rebuilds don't repeat them.
+cache/*
+!cache/covers.json

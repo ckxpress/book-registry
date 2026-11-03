@@ -72,23 +72,42 @@ verbatim from the dataset.
 
 ### Covers
 
-Most books here have no real cover, and that is the data, not a bug. Covers are
-not in the source catalogue at all; the browser looks them up by ISBN against
-Google Books, then Open Library, then falls back to a generated cover built from
-the title and a colour seeded by the record id — so every book shows something
-and nothing renders broken.
+Covers are **resolved once at build time**, not looked up per visitor:
 
-Measured on a 52-ISBN sample: **21% return a real cover**, the rest return a
-placeholder bitmap. With 2,243 records carrying no ISBN at all, roughly **17% of
-the catalogue** gets a real cover. That is what the collection is — 1,924 listed
-company annual reports, plus textbooks and government publications, which Google
-Books has never scanned. Open Library has effectively no Hong Kong ISBNs.
+```bash
+npm run covers
+```
 
-Google answers a missing cover with a placeholder bitmap instead of a 404, so
-each lookup is probed at `zoom=1`, where the two placeholder variants are
-identifiable by their fixed dimensions (128×170 and 128×184), and only then
-upgraded to a larger image. Cover lookups can be switched off entirely on the
-**About the data** page — the site then makes no third-party requests at all.
+That probes Google Books for every ISBN on every record, detects the
+placeholder bitmap it returns instead of a 404, and writes the URL into the
+data for the ones that resolve. Results are cached in `cache/covers.json`
+(committed — it represents 15,996 requests), so re-runs only probe what is new.
+`npm run build` does it as part of the pipeline.
+
+**1,126 of 10,912 records have a real cover — 10%, or 13% of the records that
+carry an ISBN.** The rest get a generated cover built from the title and a
+colour seeded by the record id, so every book shows something and nothing
+renders broken.
+
+That number is the ceiling, not a shortfall in effort. Measured across sources:
+
+| Source | Hit rate | Notes |
+| --- | --- | --- |
+| Google Books | 13% | the only source that works |
+| Open Library | 0% | effectively no Hong Kong ISBNs |
+| Amazon | 3% | doesn't carry these titles |
+| TAAZE | 0% | returns a placeholder for every ISBN |
+| 博客來 books.com.tw | — | HTTP 403, blocks automated access |
+| hkbookcity | — | connection refused |
+
+The catalogue is largely listed-company annual reports, textbooks and
+government publications, which were never scanned. The shops that do stock the
+trade titles refuse automated requests, and this project does not work around
+that.
+
+Resolving at build time also means a reader loads **one request per book that
+has a cover, and none for the books that don't** — previously every card fired
+one or two lookups that mostly failed.
 
 ## Adding more datasets
 
