@@ -1552,7 +1552,7 @@
       '<label class="switch"><input type="checkbox" id="covers-toggle"' + (covers ? ' checked' : '') + '> 以 ISBN 查詢封面圖片</label>'
     );
     out.push(
-      '<p style="margin-top:8px">原始資料集並不包含封面。啟用後，瀏覽器會依 ISBN 向 <code>books.google.com</code> 及 <code>covers.openlibrary.org</code> 查詢縮圖；約半數香港 ISBN 能找到封面，其餘會自動生成封面。關閉後本頁將完全自給自足，不會向第三方發出任何請求。</p>'
+      '<p style="margin-top:8px">原始資料集並不包含封面。啟用後，瀏覽器會依 ISBN 向 <code>books.google.com</code> 及 <code>covers.openlibrary.org</code> 查詢縮圖；約五分之一的香港 ISBN 能找到封面，其餘會自動生成封面。關閉後本頁將完全自給自足，不會向第三方發出任何請求。</p>'
     );
     out.push('</div>');
 

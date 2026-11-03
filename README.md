@@ -72,10 +72,17 @@ verbatim from the dataset.
 
 ### Covers
 
-Roughly half of Hong Kong ISBNs resolve to a real cover. The browser tries
+Most books here have no real cover, and that is the data, not a bug. Covers are
+not in the source catalogue at all; the browser looks them up by ISBN against
 Google Books, then Open Library, then falls back to a generated cover built from
-the title and a colour seeded by the record id — so every book has a cover, and
-nothing renders as a broken image.
+the title and a colour seeded by the record id — so every book shows something
+and nothing renders broken.
+
+Measured on a 52-ISBN sample: **21% return a real cover**, the rest return a
+placeholder bitmap. With 2,243 records carrying no ISBN at all, roughly **17% of
+the catalogue** gets a real cover. That is what the collection is — 1,924 listed
+company annual reports, plus textbooks and government publications, which Google
+Books has never scanned. Open Library has effectively no Hong Kong ISBNs.
 
 Google answers a missing cover with a placeholder bitmap instead of a 404, so
 each lookup is probed at `zoom=1`, where the two placeholder variants are

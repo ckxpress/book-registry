@@ -27,6 +27,8 @@ const DB = path.join(DATA_DIR, 'books.db');
 // so one request still covers several pages.
 const PAGE_SIZE = 1024;
 
+const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
+
 main();
 
 function main() {
@@ -182,8 +184,6 @@ function insertBook(rowid, rec, ds) {
     'INSERT INTO books_fts(rowid, search) VALUES (' + rowid + ',' + str(tokens) + ');\n'
   );
 }
-
-const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
 
 function hasCjk(text) {
   return CJK.test(text || '');
