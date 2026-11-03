@@ -46,6 +46,8 @@
     footer: document.getElementById('footer-text'),
     filtersCount: document.getElementById('filters-count'),
     sentinel: document.getElementById('sentinel'),
+    shelf: document.getElementById('shelf-view'),
+    shelfCount: document.getElementById('shelf-count'),
   };
 
   /* ---------------- facet definitions ---------------- */
@@ -73,13 +75,12 @@
 
   /* ---------------- boot ---------------- */
 
-  init();
-
   function init() {
     applyTheme(localStorage.getItem('theme'));
     el.sort.value = state.sort;
     setViewButtons();
     wireEvents();
+    updateShelfCount();
     readRoute();
     load();
   }
@@ -338,6 +339,9 @@
     } else if (path === '/about') {
       showView('about');
       renderAbout();
+    } else if (path === '/shelf') {
+      showView('shelf');
+      renderShelf();
     } else {
       showView('browse');
       render();
@@ -348,6 +352,7 @@
     el.browse.hidden = name !== 'browse';
     el.detail.hidden = name !== 'detail';
     el.about.hidden = name !== 'about';
+    el.shelf.hidden = name !== 'shelf';
     if (name !== 'browse') window.scrollTo(0, 0);
   }
 
@@ -454,6 +459,119 @@
     });
   }
 
+  /* ---------------- the reader's shelf ---------------- */
+
+  /**
+   * Which books the reader owns.
+   *
+   * This lives in the browser, because the site is static files with no
+   * server: there is nothing to authenticate against and nowhere to keep a
+   * profile. That has real consequences the UI is honest about — the shelf is
+   * per-device, and clearing site data loses it, so it can be exported and a
+   * share link carries it to someone else.
+   *
+   * Everything above this object goes through its methods, so swapping in a
+   * backed store (accounts, cross-device sync, live public profiles) means
+   * replacing these four functions, not the interface.
+   */
+  var Shelf = {
+    key: 'shelf.owned',
+    _set: null,
+
+    all: function () {
+      if (Shelf._set) return Shelf._set;
+      var ids = [];
+      try {
+        ids = JSON.parse(localStorage.getItem(Shelf.key) || '[]');
+      } catch (err) {
+        ids = [];
+      }
+      Shelf._set = new Set(Array.isArray(ids) ? ids : []);
+      return Shelf._set;
+    },
+
+    has: function (id) {
+      return Shelf.all().has(id);
+    },
+
+    toggle: function (id) {
+      var set = Shelf.all();
+      if (set.has(id)) set.delete(id);
+      else set.add(id);
+      Shelf.save();
+      return set.has(id);
+    },
+
+    save: function () {
+      try {
+        localStorage.setItem(Shelf.key, JSON.stringify([...Shelf.all()]));
+      } catch (err) {
+        // Private browsing, or storage full. Say so rather than pretending.
+        alert('無法儲存書架：瀏覽器拒絕寫入本機儲存空間。');
+      }
+      updateShelfCount();
+    },
+
+    size: function () {
+      return Shelf.all().size;
+    },
+  };
+
+  function updateShelfCount() {
+    var n = Shelf.size();
+    el.shelfCount.hidden = n === 0;
+    el.shelfCount.textContent = String(n);
+  }
+
+  /**
+   * A shelf packed into a URL, since there is no server to host a profile.
+   * Ids repeat their dataset, so that is written once and the registration
+   * numbers follow.
+   */
+  function encodeShelf(ids) {
+    if (!ids.length) return '';
+    var byDataset = {};
+    ids.forEach(function (id) {
+      var at = id.indexOf(':');
+      var ds = at === -1 ? '' : id.slice(0, at);
+      var ref = at === -1 ? id : id.slice(at + 1);
+      (byDataset[ds] = byDataset[ds] || []).push(ref);
+    });
+    var parts = Object.keys(byDataset).map(function (ds) {
+      return ds + '=' + byDataset[ds].join(',');
+    });
+    return base64url(unescape(encodeURIComponent('1|' + parts.join(';'))));
+  }
+
+  function decodeShelf(code) {
+    try {
+      var text = decodeURIComponent(escape(unbase64url(code)));
+      if (text.indexOf('1|') !== 0) return [];
+      var ids = [];
+      text.slice(2).split(';').forEach(function (chunk) {
+        var at = chunk.indexOf('=');
+        if (at === -1) return;
+        var ds = chunk.slice(0, at);
+        chunk.slice(at + 1).split(',').forEach(function (ref) {
+          if (ref) ids.push(ds ? ds + ':' + ref : ref);
+        });
+      });
+      return ids;
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function base64url(raw) {
+    return btoa(raw).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function unbase64url(code) {
+    var b = code.replace(/-/g, '+').replace(/_/g, '/');
+    while (b.length % 4) b += '=';
+    return atob(b);
+  }
+
   /* ---------------- data sources ---------------- */
 
   /**
@@ -489,6 +607,9 @@
       var row = byId.get(id);
       if (!row) return Promise.resolve(null);
       return fetchFull(row);
+    },
+    byIds: function (ids) {
+      return Promise.resolve(ids.map(function (id) { return byId.get(id); }).filter(Boolean));
     },
   };
 
@@ -681,6 +802,21 @@
       ).then(function (res) {
         return res.length ? JSON.parse(res[0].doc) : null;
       });
+    },
+    byIds: function (ids) {
+      if (!ids.length) return Promise.resolve([]);
+      var columns =
+        'b.id, b.dataset, b.title, b.subtitle, b.authors, b.publisher, b.year, b.isbn,' +
+        ' b.classification, b.language, b.series, b.ref, b.src, b.price, b.currency, b.forsale, b.cover' +
+        (SqliteSource._zh ? ', b.parallel_title' : '');
+      var holes = ids.map(function () { return '?'; }).join(',');
+      return SqliteSource.query('SELECT ' + columns + ' FROM books b WHERE b.id IN (' + holes + ')', ids).then(
+        function (res) {
+          var found = {};
+          res.map(mapSqlRow).forEach(function (r) { found[r.id] = r; });
+          return ids.map(function (id) { return found[id]; }).filter(Boolean);
+        }
+      );
     },
     query: function (sql, params) {
       return SqliteSource._worker.db.query(sql, params || []);
@@ -954,8 +1090,36 @@
       body.appendChild(tags);
     }
 
+    body.appendChild(ownButton(row.id, false));
+
     a.appendChild(body);
     return a;
+  }
+
+  /** The own/not-own control. Same element on a card and on a book page. */
+  function ownButton(id, long) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'own' + (Shelf.has(id) ? ' owned' : '');
+    b.dataset.id = id;
+    paintOwn(b, long);
+    b.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      Shelf.toggle(id);
+      b.classList.toggle('owned');
+      paintOwn(b, long);
+      // Keep the shelf honest if the reader is looking at it.
+      if (!el.shelf.hidden) renderShelf();
+    });
+    return b;
+  }
+
+  function paintOwn(b, long) {
+    var owned = b.classList.contains('owned');
+    b.textContent = owned ? (long ? '✓ 已在我的書架' : '✓ 我有') : (long ? '＋ 加入我的書架' : '＋ 我有');
+    b.setAttribute('aria-pressed', String(owned));
+    b.title = owned ? '從我的書架移除' : '加入我的書架';
   }
 
   function tag(text) {
@@ -1317,6 +1481,8 @@
       el.detail.innerHTML = detailHtml(book, book);
       var host = el.detail.querySelector('.detail-cover');
       if (host) host.replaceWith(bigCover(book, book));
+      var ownHost = el.detail.querySelector('#detail-own');
+      if (ownHost) ownHost.replaceWith(ownButton(book.id, true));
       document.title = (displayTitle(book) || '書刊') + ' — 香港書刊目錄';
     });
   }
@@ -1369,7 +1535,7 @@
       );
     }
 
-    out.push('<div class="linkrow">');
+    out.push('<div class="linkrow"><span id="detail-own"></span>');
     if (book.isbn) {
       out.push(link('https://openlibrary.org/isbn/' + book.isbn, 'Open Library'));
       out.push(link('https://www.google.com/search?q=' + encodeURIComponent('ISBN ' + book.isbn), '網上搜尋'));
@@ -1484,6 +1650,117 @@
   function row2(out, label, value, isHtml) {
     if (value === undefined || value === null || value === '') return;
     out.push('<tr><th>' + escapeHtml(label) + '</th><td>' + (isHtml ? value : escapeHtml(String(value))) + '</td></tr>');
+  }
+
+  /* ---------------- render: bookshelf ---------------- */
+
+  /**
+   * Renders either the reader's own shelf, or one someone sent them — the
+   * shared case is read-only and carries its books in the URL, because there
+   * is no server holding profiles.
+   */
+  function renderShelf() {
+    var params = new URLSearchParams((location.hash.split('?')[1] || ''));
+    var shared = params.get('s');
+    var ids = shared ? decodeShelf(shared) : [...Shelf.all()];
+    var mine = !shared;
+
+    var out = [];
+    out.push('<div class="shelf">');
+    out.push('<a class="backlink" href="#/">← 返回全部書刊</a>');
+    out.push('<h1>' + (mine ? '我的書架' : '分享的書架') + '</h1>');
+
+    if (!ids.length) {
+      out.push(
+        mine
+          ? '<p class="shelf-empty">書架還是空的。在任何書刊上按「＋ 我有」，就會收進這裡。</p>'
+          : '<p class="shelf-empty">這個分享連結沒有包含任何書刊。</p>'
+      );
+      out.push('</div>');
+      el.shelf.innerHTML = out.join('');
+      document.title = (mine ? '我的書架' : '分享的書架') + ' — 香港書刊目錄';
+      return;
+    }
+
+    out.push('<p class="shelf-count">共 <strong>' + fmt(ids.length) + '</strong> 本</p>');
+    if (mine) {
+      out.push(
+        '<div class="shelf-actions">' +
+          '<button class="btn" id="shelf-share">分享書架</button>' +
+          '<button class="btn" id="shelf-export">匯出 JSON</button>' +
+          '<label class="btn" for="shelf-import">匯入 JSON<input id="shelf-import" type="file" accept="application/json" hidden></label>' +
+          '</div>' +
+          '<p class="shelf-note">書架儲存在這部裝置的瀏覽器中，並未上載。清除瀏覽資料會一併清除書架，建議匯出備份。</p>'
+      );
+    } else {
+      out.push('<p class="shelf-note">這是別人分享的書架，內容來自連結本身。</p>');
+    }
+    out.push('<div class="grid" id="shelf-grid"></div>');
+    out.push('</div>');
+    el.shelf.innerHTML = out.join('');
+    document.title = (mine ? '我的書架' : '分享的書架') + ' — 香港書刊目錄';
+
+    var grid = document.getElementById('shelf-grid');
+    grid.className = 'grid' + (state.view === 'list' ? ' list' : '');
+    source.byIds(ids).then(function (rows) {
+      if (!rows.length) {
+        grid.outerHTML = '<p class="shelf-empty">找不到這些書刊，可能來自尚未載入的資料集。</p>';
+        return;
+      }
+      var frag = document.createDocumentFragment();
+      rows.forEach(function (row) { frag.appendChild(card(row, [])); });
+      grid.appendChild(frag);
+    });
+
+    if (mine) wireShelfActions(ids);
+  }
+
+  function wireShelfActions(ids) {
+    var share = document.getElementById('shelf-share');
+    share.addEventListener('click', function () {
+      var url = location.origin + location.pathname + '#/shelf?s=' + encodeShelf(ids);
+      copyText(url).then(function (ok) {
+        share.textContent = ok ? '已複製連結 ✓' : '請手動複製';
+        if (!ok) window.prompt('複製這個連結來分享書架：', url);
+        setTimeout(function () { share.textContent = '分享書架'; }, 2500);
+      });
+    });
+
+    document.getElementById('shelf-export').addEventListener('click', function () {
+      var blob = new Blob([JSON.stringify({ version: 1, owned: ids }, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'my-bookshelf.json';
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    });
+
+    document.getElementById('shelf-import').addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var data = JSON.parse(String(reader.result));
+          var incoming = Array.isArray(data) ? data : data.owned;
+          if (!Array.isArray(incoming)) throw new Error('格式不符');
+          // Merge rather than replace: an import should not silently drop books.
+          incoming.forEach(function (id) { if (typeof id === 'string') Shelf.all().add(id); });
+          Shelf.save();
+          renderShelf();
+        } catch (err) {
+          alert('無法匯入：' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return false; });
+    }
+    return Promise.resolve(false);
   }
 
   /* ---------------- render: about ---------------- */
@@ -1711,4 +1988,7 @@
     }
     el.grid.appendChild(frag);
   }
+  // Started here, not above: the objects init() touches are assigned as it
+  // reads down the file, so calling earlier finds them undefined.
+  init();
 })();

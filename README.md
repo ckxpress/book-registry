@@ -109,6 +109,43 @@ Resolving at build time also means a reader loads **one request per book that
 has a cover, and none for the books that don't** — previously every card fired
 one or two lookups that mostly failed.
 
+## The reader's bookshelf
+
+Any book can be marked **＋ 我有** from a card or its page, and 我的書架 lists
+what the reader owns.
+
+**There are no accounts.** The site is static files on GitHub Pages — there is
+no server to authenticate against and nowhere to keep a profile — so the shelf
+is stored in the reader's own browser. That is honest but limited, and the UI
+says so: the shelf belongs to one device and one browser, and clearing site
+data loses it.
+
+Two ways out of that, both working today:
+
+- **匯出 / 匯入 JSON** — a backup the reader controls, which also moves a shelf
+  between devices. Importing merges rather than replaces.
+- **分享書架** — a link with the shelf packed into the URL fragment
+  (`#/shelf?s=…`, dataset written once, then registration numbers). Whoever
+  opens it sees that shelf read-only, and can add any of those books to their
+  own. Nothing is uploaded; the link *is* the data.
+
+That share link is as close to a public profile as a static site honestly gets:
+it is a snapshot, not a live profile, and it is unlisted rather than
+discoverable.
+
+### Adding real accounts later
+
+`Shelf` in [`site/app.js`](site/app.js) is deliberately four functions —
+`all`, `has`, `toggle`, `save` — with the rest of the UI going through them.
+Email sign-in, cross-device sync and live public profiles mean replacing those
+four with calls to a hosted backend (Supabase is the obvious fit: free tier,
+Postgres, email magic links, row-level security, and it works from a static
+page). The ownership UI, the shelf page and the share link do not change.
+
+Two things to decide before that: you would be holding readers' email
+addresses, which carries obligations under the PDPO; and public profiles make
+reading habits visible, which is a product decision as much as a technical one.
+
 ## Adding more datasets
 
 Datasets are declared in [`datasets.json`](datasets.json) and imported by
