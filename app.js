@@ -1071,6 +1071,10 @@
      time, best source first, with a generated cover if nothing resolves. */
   function coverSources(row, large) {
     if (row.cover) return [row.cover];
+    // When the build has already resolved covers, a record without one is
+    // known not to have one. Probing again per visitor would mean two failed
+    // requests for most of the catalogue, for nothing.
+    if (manifest && manifest.coversResolvedAt) return [];
     if (!row.isbn) return [];
     return [
       googleCover(row.isbn, 1),
@@ -1552,7 +1556,9 @@
       '<label class="switch"><input type="checkbox" id="covers-toggle"' + (covers ? ' checked' : '') + '> 以 ISBN 查詢封面圖片</label>'
     );
     out.push(
-      '<p style="margin-top:8px">原始資料集並不包含封面。啟用後，瀏覽器會依 ISBN 向 <code>books.google.com</code> 及 <code>covers.openlibrary.org</code> 查詢縮圖；約五分之一的香港 ISBN 能找到封面，其餘會自動生成封面。關閉後本頁將完全自給自足，不會向第三方發出任何請求。</p>'
+      '<p style="margin-top:8px">原始資料集並不包含封面。封面已於製作資料時逐一以 ISBN 向 Google Books 查證' +
+        (manifest.coversFound ? '，當中 ' + fmt(manifest.coversFound) + ' 項找到封面' : '') +
+        '，其餘自動生成，瀏覽時不會再逐本查詢。香港出版的書刊大多未被掃描收錄：本目錄以上市公司年報、教科書及政府刊物為主，Open Library 幾乎沒有香港 ISBN，而有收錄的網上書店則拒絕程式存取。關閉此選項後，本頁不會向第三方發出任何請求。</p>'
     );
     out.push('</div>');
 
