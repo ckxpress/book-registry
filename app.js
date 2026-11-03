@@ -1049,7 +1049,11 @@
     a.className = 'card';
     a.href = '#/book/' + encodeURIComponent(row.id);
 
-    a.appendChild(coverEl(row));
+    var cover = coverEl(row);
+    // One control per card: the grid gets it on the cover, the list gets the
+    // labelled one beside the text, where the thumbnail is too small for it.
+    if (state.view !== 'list') cover.appendChild(ownButton(row.id, 'icon'));
+    a.appendChild(cover);
 
     var body = document.createElement('div');
     body.className = 'card-body';
@@ -1090,36 +1094,47 @@
       body.appendChild(tags);
     }
 
-    body.appendChild(ownButton(row.id, false));
+    if (state.view === 'list') body.appendChild(ownButton(row.id, 'inline'));
 
     a.appendChild(body);
     return a;
   }
 
-  /** The own/not-own control. Same element on a card and on a book page. */
-  function ownButton(id, long) {
+  /**
+   * The own/not-own control.
+   *
+   * `mode` is 'icon' on a cover in the grid, 'inline' beside a row in the
+   * list, and 'long' on a book page. The grid gets it on the cover because
+   * below the text it sat at the bottom of a card, after the publisher line,
+   * where nobody found it.
+   */
+  function ownButton(id, mode) {
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'own' + (Shelf.has(id) ? ' owned' : '');
+    b.className = 'own own-' + mode + (Shelf.has(id) ? ' owned' : '');
     b.dataset.id = id;
-    paintOwn(b, long);
+    paintOwn(b, mode);
     b.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
       Shelf.toggle(id);
       b.classList.toggle('owned');
-      paintOwn(b, long);
+      paintOwn(b, mode);
       // Keep the shelf honest if the reader is looking at it.
       if (!el.shelf.hidden) renderShelf();
     });
     return b;
   }
 
-  function paintOwn(b, long) {
+  function paintOwn(b, mode) {
     var owned = b.classList.contains('owned');
-    b.textContent = owned ? (long ? '✓ 已在我的書架' : '✓ 我有') : (long ? '＋ 加入我的書架' : '＋ 我有');
+    if (mode === 'icon') b.textContent = owned ? '✓' : '＋';
+    else if (mode === 'long') b.textContent = owned ? '✓ 已在我的書架' : '＋ 加入我的書架';
+    else b.textContent = owned ? '✓ 我有' : '＋ 我有';
+    var label = owned ? '從我的書架移除' : '加入我的書架';
     b.setAttribute('aria-pressed', String(owned));
-    b.title = owned ? '從我的書架移除' : '加入我的書架';
+    b.setAttribute('aria-label', label);
+    b.title = label;
   }
 
   function tag(text) {
@@ -1482,7 +1497,7 @@
       var host = el.detail.querySelector('.detail-cover');
       if (host) host.replaceWith(bigCover(book, book));
       var ownHost = el.detail.querySelector('#detail-own');
-      if (ownHost) ownHost.replaceWith(ownButton(book.id, true));
+      if (ownHost) ownHost.replaceWith(ownButton(book.id, 'long'));
       document.title = (displayTitle(book) || '書刊') + ' — 香港書刊目錄';
     });
   }
