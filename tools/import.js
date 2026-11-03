@@ -232,6 +232,9 @@ function toIndexRow(rec) {
   const row = {
     id: rec.id,
     title: rec.title,
+    // Many English-catalogue records carry the Chinese form of the title here
+    // ("... = 葉智榮"). The site leads with it, so the grid needs it too.
+    parallelTitle: rec.parallelTitle || '',
     subtitle: rec.subtitle || '',
     authors: (rec.authors || []).map((a) => a.display || a.name),
     publisher: rec.publisher || '',

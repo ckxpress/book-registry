@@ -111,6 +111,9 @@ function schema() {
       id TEXT NOT NULL,
       dataset TEXT,
       title TEXT,
+      parallel_title TEXT,
+      title_display TEXT,
+      zh_first INTEGER,
       subtitle TEXT,
       authors TEXT,
       publisher TEXT,
@@ -148,6 +151,9 @@ function insertBook(rowid, rec, ds) {
     str(rec.id),
     str(rec.dataset || ds.id),
     str(rec.title),
+    str(rec.parallelTitle),
+    str(displayTitleOf(rec)),
+    hasCjk(displayTitleOf(rec)) ? 0 : 1,
     str(rec.subtitle),
     str(authors),
     str(rec.publisher),
@@ -175,6 +181,23 @@ function insertBook(rowid, rec, ds) {
     'INSERT INTO docs VALUES (' + rowid + ',' + str(JSON.stringify(rec)) + ');\n' +
     'INSERT INTO books_fts(rowid, search) VALUES (' + rowid + ',' + str(tokens) + ');\n'
   );
+}
+
+const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
+
+function hasCjk(text) {
+  return CJK.test(text || '');
+}
+
+/**
+ * The catalogue is published as separate Chinese and English volumes, and an
+ * English record often carries the Chinese title as its parallel title. This
+ * is a Traditional Chinese site, so the Chinese form is what gets displayed
+ * and sorted on. Mirrors displayTitle() in site/app.js.
+ */
+function displayTitleOf(rec) {
+  if (!hasCjk(rec.title) && hasCjk(rec.parallelTitle)) return rec.parallelTitle;
+  return rec.title || '';
 }
 
 /** Records carry a source label; map it back to the dataset's source list. */
@@ -221,6 +244,8 @@ function finalise() {
     'CREATE UNIQUE INDEX idx_id ON books(id);',
     // Browse order without a query: keeps the default listing off a full sort.
     'CREATE INDEX idx_title ON books(title);',
+    // Default browse order: Chinese titles first, alphabetical within each group.
+    'CREATE INDEX idx_zh_title ON books(zh_first, title_display);',
     'CREATE INDEX idx_year_title ON books(year DESC, title);',
     'COMMIT;',
     'VACUUM;',

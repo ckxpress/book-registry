@@ -1,23 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant-HK">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Book Registry — browse and search book metadata</title>
-    <meta name="description" content="Browse and search book metadata imported from open bibliographic datasets." />
+    <title>香港書刊目錄 — 瀏覽及搜尋書刊資料</title>
+    <meta name="description" content="瀏覽及搜尋由公開書目資料集匯入的書刊資料。" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📚</text></svg>" />
   </head>
   <body>
-    <a class="skip" href="#results">Skip to results</a>
+    <a class="skip" href="#results">跳至結果</a>
 
     <header class="topbar">
       <div class="topbar-inner">
-        <a class="brand" href="#/" aria-label="Book Registry home">
+        <a class="brand" href="#/" aria-label="香港書刊目錄 首頁">
           <span class="brand-mark" aria-hidden="true">📚</span>
           <span class="brand-text">
-            <strong>Book Registry</strong>
-            <small id="brand-sub">loading…</small>
+            <strong>香港書刊目錄</strong>
+            <small id="brand-sub">載入中…</small>
           </span>
         </a>
 
@@ -27,17 +27,17 @@
             id="q"
             type="search"
             name="q"
-            placeholder="Search title, author, publisher, ISBN…"
+            placeholder="搜尋書名、著者、出版者、ISBN…"
             autocomplete="off"
             spellcheck="false"
-            aria-label="Search books"
+            aria-label="搜尋書刊"
           />
           <kbd class="hint">/</kbd>
         </form>
 
         <div class="topbar-actions">
-          <a class="btn ghost" href="#/about">About the data</a>
-          <button class="btn icon" id="theme-toggle" type="button" title="Switch theme" aria-label="Switch theme">
+          <a class="btn ghost" href="#/about">資料說明</a>
+          <button class="btn icon" id="theme-toggle" type="button" title="切換主題" aria-label="切換主題">
             <span aria-hidden="true">◐</span>
           </button>
         </div>
@@ -48,35 +48,35 @@
       <!-- Browse view -->
       <div id="browse-view">
         <button class="filters-toggle btn" id="filters-toggle" type="button" aria-expanded="false">
-          Filters <span class="badge" id="filters-count" hidden>0</span>
+          篩選 <span class="badge" id="filters-count" hidden>0</span>
         </button>
 
-        <aside class="sidebar" id="sidebar" aria-label="Filters">
+        <aside class="sidebar" id="sidebar" aria-label="篩選">
           <div class="sidebar-head">
-            <h2>Filters</h2>
-            <button class="linkish" id="clear-filters" type="button">Reset</button>
+            <h2>篩選</h2>
+            <button class="linkish" id="clear-filters" type="button">重設</button>
           </div>
           <div id="facets"></div>
         </aside>
 
         <section class="results" id="results" aria-live="polite">
           <div class="toolbar">
-            <p class="count" id="count">Loading books…</p>
+            <p class="count" id="count">載入書刊…</p>
             <div class="toolbar-right">
               <label class="select">
-                <span>Sort</span>
+                <span>排序</span>
                 <select id="sort">
-                  <option value="relevance">Relevance</option>
-                  <option value="title">Title A–Z</option>
-                  <option value="title-desc">Title Z–A</option>
-                  <option value="year-desc">Newest first</option>
-                  <option value="year">Oldest first</option>
-                  <option value="publisher">Publisher</option>
+                  <option value="relevance">相關度</option>
+                  <option value="title">書名 A–Z</option>
+                  <option value="title-desc">書名 Z–A</option>
+                  <option value="year-desc">出版年份（新至舊）</option>
+                  <option value="year">出版年份（舊至新）</option>
+                  <option value="publisher">出版者</option>
                 </select>
               </label>
-              <div class="viewtoggle" role="group" aria-label="Layout">
-                <button type="button" data-view="grid" class="active" title="Grid">▦</button>
-                <button type="button" data-view="list" title="List">☰</button>
+              <div class="viewtoggle" role="group" aria-label="版面">
+                <button type="button" data-view="grid" class="active" title="格狀">▦</button>
+                <button type="button" data-view="list" title="列表">☰</button>
               </div>
             </div>
           </div>
@@ -85,7 +85,7 @@
           <div id="grid" class="grid"></div>
           <div id="sentinel"></div>
           <div id="empty" class="empty" hidden></div>
-          <button class="btn more" id="more" type="button" hidden>Load more</button>
+          <button class="btn more" id="more" type="button" hidden>載入更多</button>
         </section>
       </div>
 

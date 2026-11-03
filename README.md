@@ -24,8 +24,18 @@ built-ins.
 **Browse** a cover grid or a detail list, sorted by relevance, title, year or
 publisher.
 
-**Search** across title, subtitle, authors, publisher, series, category, ISBN
-and registration number. Chinese queries work without spaces (`香港` → ~1,600
+**Traditional Chinese throughout.** The interface is in Traditional Chinese,
+and the catalogue leads with Chinese titles: the source publishes separate
+Chinese and English volumes, and 2,250 of the English records carry the Chinese
+form of their title as a parallel title, so that form is displayed and the other
+language is shown beneath it. Title ordering groups Chinese ahead of Latin —
+otherwise ~4,300 English titles sort first in any standard collation. A fresh
+visit opens on the 6,545 Chinese-language records, with English a click away in
+the Language filter; a search that finds nothing because of it offers to search
+every language.
+
+**Search** across title (both language forms), subtitle, authors, publisher,
+series, category, ISBN and registration number. Chinese queries work without spaces (`香港` → ~1,600
 hits) and so do partial words. All terms must match; matches are highlighted.
 Pasting a full ISBN finds that book directly.
 
@@ -43,7 +53,7 @@ friendly, works down to phone width.
 
 | Field | Source |
 | --- | --- |
-| Title, subtitle, parallel title, statement of responsibility | Split from the catalogue's ISBD title string |
+| Title, subtitle, parallel title, statement of responsibility | Split from the catalogue's ISBD title string; the Chinese form is shown first |
 | Authors (up to 10) | Source columns, with inverted names shown naturally (`Cheung, Ysabelle` → Ysabelle Cheung) |
 | Publisher, place, year, edition, series, frequency | Source columns |
 | ISBN / ISSN | Parsed from free text; every ISBN on a record is kept with its qualifier (pbk., 精裝, 全12冊), plus normalised ISBN-13 and ISBN-10 |
