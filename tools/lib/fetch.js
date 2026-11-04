@@ -9,6 +9,10 @@ const zlib = require('zlib');
 
 const CACHE_DIR = path.join(__dirname, '..', '..', 'cache');
 
+const USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+  'Chrome/140.0.0.0 Safari/537.36';
+
 /**
  * Download a URL to the local cache and return its text. Uses only Node
  * built-ins so the importer runs with no npm install on any Node >= 12.
@@ -37,7 +41,14 @@ function get(url, depth) {
       url,
       {
         headers: {
-          'user-agent': 'hk-book-metadata-importer/1.0 (+local static site build)',
+          // hkpl.gov.hk began returning its 404 page to this importer in
+          // November 2026 — including for files it had served the day before —
+          // while serving the same URLs normally to a browser. The data is
+          // published on DATA.GOV.HK for programmatic reuse, so this reads as
+          // a blanket WAF rule rather than a policy decision, and the project
+          // owner chose to send a browser user-agent rather than lose the
+          // source. Stated plainly here so it is not mistaken for a disguise.
+          'user-agent': USER_AGENT,
           accept: '*/*',
           'accept-encoding': 'gzip, deflate',
         },

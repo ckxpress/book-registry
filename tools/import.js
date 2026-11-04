@@ -118,7 +118,19 @@ async function importDataset(dataset, args) {
 
   for (let s = 0; s < dataset.sources.length; s++) {
     const source = dataset.sources[s];
-    const text = await readSource(source, args.flags.refresh);
+    let text;
+    try {
+      text = await readSource(source, args.flags.refresh);
+    } catch (err) {
+      // The current year is published a quarter at a time, so the later
+      // quarters legitimately do not exist yet. Only a missing file is
+      // skipped; anything else still stops the import.
+      if (/HTTP 404/.test(err.message)) {
+        console.log('  ' + pad(source.label || source.url, 26) + '   not published yet — skipped');
+        continue;
+      }
+      throw err;
+    }
     let parsed;
     try {
       parsed = adapter.parse({ text: text, source: source, dataset: dataset, datasetId: dataset.id });

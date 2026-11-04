@@ -1,8 +1,8 @@
 # 神保町 · jinbocho.app
 
 A static site for browsing and searching book metadata, seeded with every book
-and periodical registered with the Hong Kong ISBN agency in 2024 and 2025 —
-**22,101 titles**.
+and periodical registered with the Hong Kong ISBN agency from 2024 to 2026 —
+**25,385 titles**.
 
 No framework, no npm dependencies, no server. A Node script imports datasets and
 the browser does the rest — reading plain JSON, or querying a SQLite database by
@@ -84,7 +84,7 @@ data for the ones that resolve. Results are cached in `cache/covers.json`
 (committed — it represents 15,996 requests), so re-runs only probe what is new.
 `npm run build` does it as part of the pipeline.
 
-**2,336 of 22,101 records have a real cover — 11%.** The rest get a generated cover built from the title and a
+**2,555 of 25,385 records have a real cover — 10%.** The rest get a generated cover built from the title and a
 colour seeded by the record id, so every book shows something and nothing
 renders broken.
 
@@ -180,6 +180,19 @@ npm run import -- --file examples/sample-books.csv --id sample-shelf --title "Sa
 
 The site picks up new datasets on reload — nothing to rebuild. Multiple datasets
 coexist, and a **Dataset** filter appears once there is more than one.
+
+### A note on fetching
+
+The importer sends a browser user-agent. In November 2026 hkpl.gov.hk began
+answering this project's own identifier with its 404 page — including for files
+it had served the day before — while serving the same URLs normally to a
+browser. The catalogue is published on DATA.GOV.HK for programmatic reuse, so
+this looks like a blanket WAF rule rather than a policy decision. It is stated
+in `tools/lib/fetch.js` rather than left as an unexplained string.
+
+The current year is published a quarter at a time, so `--add-hkpl-year` skips
+quarters that return 404 and imports what exists. Re-run it when the next
+quarter appears; the download cache means only the new file is fetched.
 
 ### Adapters
 
