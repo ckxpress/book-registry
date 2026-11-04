@@ -964,7 +964,7 @@ a.tag-link:focus-visible {
 @media (max-width: 900px) {
   .topbar-inner {
     flex-wrap: wrap;
-    gap: 10px 12px;
+    gap: 10px;
   }
   /* The mark alone, left of the search box — small enough to cost nothing
      and it gives the header back its way home. The wordmark and the counts
@@ -974,6 +974,25 @@ a.tag-link:focus-visible {
     order: 1;
     flex: 0 0 auto;
     margin-right: 0;
+  }
+  /* The mark and the search box are pinned to the same explicit height.
+     Stretching the mark to the flex line instead is circular — the item
+     that defines the line's height cannot also be sized from it, and the
+     bar grows every reflow. 44px is also the minimum comfortable tap
+     target, so the mark doubles as the home button. */
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+  .search input {
+    height: 44px;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 34px;
+  }
+  .search-icon {
+    left: 11px;
   }
   .brand-text {
     display: none;
