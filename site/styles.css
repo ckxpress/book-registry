@@ -123,9 +123,10 @@ a {
   flex: 0 0 auto;
 }
 .brand-mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 7px;
+  /* Same height as the search box, at every width. */
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: block;
   flex: 0 0 auto;
 }
@@ -975,16 +976,12 @@ a.tag-link:focus-visible {
     flex: 0 0 auto;
     margin-right: 0;
   }
-  /* The mark and the search box are pinned to the same explicit height.
-     Stretching the mark to the flex line instead is circular — the item
-     that defines the line's height cannot also be sized from it, and the
-     bar grows every reflow. 44px is also the minimum comfortable tap
-     target, so the mark doubles as the home button. */
-  .brand-mark {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-  }
+  /* The mark is 44px from the base rule — the same height as the search
+     box, which is pinned here rather than left to its padding so the two
+     match exactly. Stretching the mark to the flex line instead is
+     circular: the item that defines a line's cross size cannot also be
+     sized from it. 44px is also the minimum comfortable tap target, which
+     matters because the mark is the only way home on a narrow screen. */
   .search input {
     height: 44px;
     padding-top: 0;
