@@ -1,4 +1,4 @@
-/* 神保町 (jinbocho.app) — browse & search UI.
+/* 神保町 (jimbocho.app) — browse & search UI.
    No build step, no dependencies: reads site/data/manifest.json, loads the
    slim index shards for browsing, and pulls a full shard only when a book is
    opened. */
@@ -2142,7 +2142,7 @@
     out.push('<a class="backlink" href="' + backHref() + '">← 返回搜尋結果</a>');
     out.push('<h1>關於本站</h1>');
     out.push(
-      '<p><strong>神保町</strong>（jinbocho.app）是一個靜態書刊資料目錄，收錄 ' +
+      '<p><strong>神保町</strong>（jimbocho.app）是一個靜態書刊資料目錄，收錄 ' +
         fmt(rows.length) +
         ' 項書刊，全部瀏覽與搜尋均在瀏覽器內完成。資料由一個小型 Node 程式從公開資料集匯入；除資料檔案本身' +
         (covers ? '及以 ISBN 查詢的封面縮圖' : '') +

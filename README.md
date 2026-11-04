@@ -1,4 +1,4 @@
-# 神保町 · jinbocho.app
+# 神保町 · jimbocho.app
 
 A static site for browsing and searching book metadata, seeded with every book
 and periodical registered with the Hong Kong ISBN agency from 2024 to 2026 —
@@ -313,7 +313,7 @@ npm run deploy
 ```
 
 That publishes the contents of `site/` to the `gh-pages` branch, which is what
-GitHub Pages serves at **https://jinbocho.app**. `site/CNAME` carries the custom
+GitHub Pages serves at **https://jimbocho.app**. `site/CNAME` carries the custom
 domain; it must stay in `site/` so it lands at the root of the published branch,
 which is where GitHub looks for it. `main`
 holds the source; `gh-pages` holds only what is inside `site/`, at its root,
