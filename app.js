@@ -450,6 +450,13 @@
       return script(a) - script(b) || collator.compare(displayTitle(a), displayTitle(b));
     }
 
+    // Only about one book in nine has a real cover, so a page of generated
+    // ones reads as empty. Browsing leads with the books that have a picture;
+    // a search does not, because relevance has to outrank decoration.
+    function byCover(a, b) {
+      return (a.cover ? 0 : 1) - (b.cover ? 0 : 1);
+    }
+
     list.sort(function (a, b) {
       switch (mode) {
         case 'title':
@@ -463,7 +470,7 @@
         case 'publisher':
           return collator.compare(a.publisher || 'zzz', b.publisher || 'zzz') || byTitle(a, b);
         default:
-          return (b._score || 0) - (a._score || 0) || byTitle(a, b);
+          return (b._score || 0) - (a._score || 0) || byCover(a, b) || byTitle(a, b);
       }
     });
   }
@@ -1003,7 +1010,8 @@
       case 'publisher':
         return "b.publisher = '', b.publisher, " + t;
       default:
-        return state.q ? 'bm25(books_fts)' : t;
+        // Empty cover sorts last, so books with one lead the browse order.
+        return state.q ? 'bm25(books_fts)' : "b.cover = '', " + t;
     }
   }
 
