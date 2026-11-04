@@ -1045,3 +1045,112 @@ mark {
   color: var(--text-soft);
   padding: 40px 0;
 }
+
+/* ---------- asking price ---------- */
+.price-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+}
+.price-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.price-value.unpriced {
+  font-weight: 400;
+  color: var(--text-faint);
+}
+.price-edit {
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-faint);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.price-edit:hover {
+  color: var(--accent);
+}
+
+.price-dialog {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  color: var(--text);
+  padding: 22px 24px;
+  max-width: 400px;
+  width: calc(100vw - 40px);
+  box-shadow: var(--shadow);
+}
+.price-dialog::backdrop {
+  background: rgba(10, 8, 6, 0.55);
+}
+.price-dialog h3 {
+  font-family: var(--serif);
+  font-size: 19px;
+  margin: 0 0 4px;
+}
+.pd-book {
+  margin: 0 0 16px;
+  color: var(--text-soft);
+  font-size: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pd-field {
+  display: block;
+  font-size: 13px;
+  color: var(--text-faint);
+}
+.pd-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.pd-input i {
+  font-style: normal;
+  color: var(--text-faint);
+  font-size: 14px;
+}
+.pd-input input {
+  flex: 1;
+  font: inherit;
+  font-size: 17px;
+  color: var(--text);
+  background: none;
+  border: 0;
+  outline: none;
+  min-width: 0;
+}
+.pd-hint {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--text-faint);
+  line-height: 1.5;
+}
+.price-dialog menu {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+}
+.price-dialog .btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 500;
+}
