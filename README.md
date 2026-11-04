@@ -213,6 +213,25 @@ per language, under the
 Field definitions are in the
 [data dictionary](https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf).
 
+## Icon
+
+`site/icons/icon-1600.png` is the master — the supplied artwork cropped to its
+panel and flattened to a full-bleed square, since iOS and Android apply their
+own rounding and a pre-rounded icon ends up with dark corners inside their
+mask. Everything else is derived from it with `sips`:
+
+```bash
+for s in 512 192 180 64 48 32 16; do
+  sips -Z $s site/icons/icon-1600.png --out site/icons/icon-$s.png
+done
+cp site/icons/icon-180.png site/apple-touch-icon.png
+cp site/icons/icon-32.png  site/favicon.png
+```
+
+The panel colour `#BE4E30` is the `theme_color` in `site.webmanifest` and the
+`theme-color` meta, so the browser chrome matches on Android and in installed
+windows.
+
 ## Deploying
 
 The site is static files, so it needs no server and no build at serve time.
