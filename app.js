@@ -864,7 +864,7 @@
         // the network to display sixty results.
         sql =
           'SELECT ' + columns + ' FROM (SELECT rowid FROM books_fts WHERE books_fts MATCH ?' +
-          ' ORDER BY bm25(books_fts) LIMIT ? OFFSET ?) h JOIN books b ON b.rowid = h.rowid';
+          ' ORDER BY bm25(books_fts) LIMIT ? OFFSET ?) h CROSS JOIN books b ON b.rowid = h.rowid';
         return Promise.all([
           SqliteSource.query(sql, [where.match, limit, offset]),
           knownTotal !== undefined
@@ -917,7 +917,13 @@
           var expr = SQL_FACET[facet.key];
           return (
             "SELECT '" + facet.key + "' AS k, " + expr + ' AS v, COUNT(*) AS n' +
-            ' FROM hits JOIN books b ON b.rowid = hits.rowid' +
+            // CROSS JOIN, not JOIN: it is the documented way to pin the join
+            // order. Left to itself the planner scans the whole covering index
+            // for the facet's column and probes `hits` for each row — cheaper
+            // on a local disk, and on this backend six full index scans, about
+            // 20 MB. Driving from the few hundred materialised hits and
+            // fetching each row by rowid is what the LIMIT is for.
+            ' FROM hits CROSS JOIN books b ON b.rowid = hits.rowid' +
             ' WHERE ' + expr + " <> '' GROUP BY v"
           );
         });
