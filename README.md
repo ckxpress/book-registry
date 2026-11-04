@@ -1,4 +1,4 @@
-# Book Registry
+# 神保町 · jinbocho.app
 
 A static site for browsing and searching book metadata, seeded with every book
 and periodical registered with the Hong Kong ISBN agency in 2025 — **10,912

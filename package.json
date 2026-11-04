@@ -1,8 +1,8 @@
 {
-  "name": "hk-book-metadata",
+  "name": "jinbocho",
   "version": "1.0.0",
   "private": true,
-  "description": "Browse and search book metadata. Ships with the Hong Kong ISBN / book-registration catalogue for 2025.",
+  "description": "\u795e\u4fdd\u753a (jinbocho.app) \u2014 browse and search book metadata, and keep a shelf of what you own. Ships with the Hong Kong ISBN / book-registration catalogue for 2025.",
   "scripts": {
     "import": "node tools/import.js",
     "import:all": "node tools/import.js --all",
