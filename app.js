@@ -22,6 +22,8 @@
   var fullShards = new Map();
   var results = [];
   var totalBooks = 0;
+  var firstPage = null;      // precomputed landing views, keyed by language scope
+  var sourcePrepared = null; // the open-the-backend promise, created once
   var totalResults = 0;
   var source = null; // JsonSource or SqliteSource, chosen by the manifest
   var renderToken = 0; // guards against out-of-order async renders
@@ -87,6 +89,26 @@
     load();
   }
 
+  /**
+   * Opens the backend, once. The landing view is answered from a precomputed
+   * file, so this is deliberately not awaited before first paint — it runs
+   * while the reader is already reading, and the first search waits on it.
+   */
+  function ensureSource() {
+    if (sourcePrepared) return sourcePrepared;
+    sourcePrepared = source.prepare().catch(function (err) {
+      if (source === JsonSource) throw err;
+      // Serving stale-but-correct data beats serving wrong data.
+      console.warn('SQLite backend unavailable: ' + err.message + '. Falling back to JSON shards.');
+      dbFallbackReason = err.message;
+      source = JsonSource;
+      rows = [];
+      byId = new Map();
+      return JsonSource.prepare();
+    });
+    return sourcePrepared;
+  }
+
   function load() {
     fetch(DATA + 'manifest.json', { cache: 'no-cache' })
       .then(function (res) {
@@ -96,20 +118,27 @@
       .then(function (data) {
         manifest = data;
         if (!manifest.datasets || !manifest.datasets.length) throw new Error('no datasets imported yet');
+        // The total is in the manifest, so the chrome does not wait for a
+        // backend to open.
+        totalBooks = manifest.totalBooks || 0;
         updateChrome();
         // A built database is queried by range request; without one, the JSON
         // shards are loaded up front. Same UI either way.
         source = manifest.db ? SqliteSource : JsonSource;
-        return source.prepare().catch(function (err) {
-          if (source === JsonSource) throw err;
-          // Serving stale-but-correct data beats serving wrong data.
-          console.warn('SQLite backend unavailable: ' + err.message + '. Falling back to JSON shards.');
-          dbFallbackReason = err.message;
-          source = JsonSource;
-          rows = [];
-          byId = new Map();
-          return JsonSource.prepare();
-        });
+
+        // Fetch the precomputed landing view before anything else. It is one
+        // small asset and it decides whether first paint needs the backend at
+        // all; if it is missing or stale, the backend answers as it always did.
+        if (!manifest.firstPage || source === JsonSource) return ensureSource();
+        return fetch(DATA + manifest.firstPage.file)
+          .then(function (res) { return res.ok ? res.json() : null; })
+          .then(function (data) { firstPage = data; })
+          .catch(function () { firstPage = null; })
+          .then(function () {
+            // Nothing to paint without the backend, so wait for it.
+            if (!prerendered()) return ensureSource();
+            ensureSource(); // opens in the background, for the first interaction
+          });
       })
       .then(function () {
         el.brandSub.textContent =
@@ -988,6 +1017,19 @@
    * and the reason the scoped rows exist at all. Anything else (a search
    * term, a publisher, two languages at once) has to be counted live.
    */
+  /**
+   * The payload for the current view if the build step precomputed it: the
+   * first screenful, in default order, of the whole catalogue or of a single
+   * language, with nothing else narrowing it.
+   */
+  function prerendered() {
+    if (!firstPage || !firstPage.scopes) return null;
+    if (state.q || state.sort !== 'relevance') return null;
+    var scope = precomputedScope(null);
+    if (scope === null) return null;
+    return firstPage.scopes[scope] || null;
+  }
+
   function precomputedScope(skipFacet) {
     if (matchExpression(state.q)) return null;
 
@@ -1070,6 +1112,15 @@
   }
 
   /** SQL row -> the same shape the card renderer gets from the JSON index. */
+  /** The precomputed counts are stored as {v, n}; toOption() shapes them. */
+  function unpackFacets(packed) {
+    var out = {};
+    FACETS.forEach(function (facet) {
+      out[facet.key] = (packed[facet.key] || []).map(toOption);
+    });
+    return out;
+  }
+
   function mapSqlRow(r) {
     var row = {
       id: r.id,
@@ -1121,8 +1172,24 @@
     var token = ++renderToken;
     state.page = 1;
 
-    return source
-      .page(0, PAGE_SIZE)
+    // Identical data to the query below, already on hand. Painting from it
+    // costs no round trips, so the landing view appears with the page.
+    var pre = prerendered();
+    if (pre) {
+      results = pre.rows.map(mapSqlRow);
+      totalResults = pre.total;
+      renderCount();
+      renderChips();
+      renderGrid(false);
+      renderFacets(unpackFacets(pre.facets));
+      requestAnimationFrame(maybeLoadMore);
+      return Promise.resolve();
+    }
+
+    return ensureSource()
+      .then(function () {
+        return source.page(0, PAGE_SIZE);
+      })
       .then(function (res) {
         if (token !== renderToken) return null;
         results = res.rows;
@@ -1150,8 +1217,10 @@
     if (SqliteSource._busy) return;
     var token = renderToken;
     SqliteSource._busy = true;
-    return source
-      .page(results.length, PAGE_SIZE, totalResults)
+    return ensureSource()
+      .then(function () {
+        return source.page(results.length, PAGE_SIZE, totalResults);
+      })
       .then(function (res) {
         SqliteSource._busy = false;
         if (token !== renderToken || !res.rows.length) return;
@@ -1780,7 +1849,7 @@
       '<div class="detail-head"><div class="cover skeleton"></div><div><div class="skeleton" style="height:30px;width:70%"></div>' +
       '<div class="skeleton" style="height:16px;width:40%;margin-top:12px"></div></div></div></div>';
 
-    source.record(id).then(function (book) {
+    ensureSource().then(function () { return source.record(id); }).then(function (book) {
       if (token !== renderToken) return;
       if (!book) {
         el.detail.innerHTML =
@@ -2065,7 +2134,7 @@
 
     var grid = document.getElementById('shelf-grid');
     grid.className = 'grid' + (state.view === 'list' ? ' list' : '');
-    source.byIds(ids).then(function (rows) {
+    ensureSource().then(function () { return source.byIds(ids); }).then(function (rows) {
       if (!rows.length) {
         grid.outerHTML = '<p class="shelf-empty">找不到這些書刊，可能來自尚未載入的資料集。</p>';
         return;

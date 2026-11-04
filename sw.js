@@ -9,7 +9,7 @@
  */
 'use strict';
 
-var CACHE = 'jimbocho-v1';
+var CACHE = 'jimbocho-v2';
 var NET_TIMEOUT = 4000;
 
 /* Enough to open the app and show the shelf with no network at all. The data
@@ -24,6 +24,8 @@ var SHELL = [
   'app.js',
   'install.js',
   'site.webmanifest',
+  'data/manifest.json',
+  'data/firstpage.json',
   'favicon.png',
   'icons/icon-192.png',
   'icons/icon-512.png',

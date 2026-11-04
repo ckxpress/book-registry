@@ -1599,7 +1599,16 @@
       "rowid": 1,
       "id": "hkpl-2017:2017-09285"
     },
-    "builtAt": "2026-11-04T20:10:16.345Z",
+    "builtAt": "2026-11-04T23:48:29.471Z",
     "url": "https://db.jimbocho.app/books.db"
+  },
+  "firstPage": {
+    "file": "firstpage.json",
+    "rows": 60,
+    "scopes": [
+      "",
+      "zh",
+      "en"
+    ]
   }
 }
