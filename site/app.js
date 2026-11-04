@@ -1204,7 +1204,15 @@
     if (state.view === 'list') {
       var tags = document.createElement('div');
       tags.className = 'tagrow';
-      if (row.classification) tags.appendChild(tag(row.classification));
+      if (row.classification) {
+        tags.appendChild(
+          tagLink(
+            row.classification,
+            '#/?classification=' + encodeURIComponent(row.classification),
+            '瀏覽類別：' + row.classification
+          )
+        );
+      }
       if (row.isbn) tags.appendChild(tag('ISBN ' + row.isbn));
       if (typeof row.price === 'number') tags.appendChild(tag(money(row.price, row.currency)));
       else if (row.forSale === false) tags.appendChild(tag('非賣品'));
@@ -1314,6 +1322,16 @@
     link.innerHTML = highlight(text, terms);
     link.title = label;
     return link;
+  }
+
+  /** A tag that filters, for the list view's category chip. */
+  function tagLink(text, href, label) {
+    var a = document.createElement('a');
+    a.className = 'tag tag-link';
+    a.href = href;
+    a.textContent = text;
+    a.title = label;
+    return a;
   }
 
   function tag(text) {
@@ -1768,7 +1786,16 @@
       true
     );
     row2(out, '版次', book.edition);
-    row2(out, '叢書', book.series ? [book.series.title, book.series.number].filter(Boolean).join(' ; ') : '');
+    row2(
+      out,
+      '叢書',
+      book.series && book.series.title
+        ? // No series facet exists, so this searches rather than filters.
+          metaLinkHtml(book.series.title, searchHref(book.series.title), '搜尋叢書：' + book.series.title) +
+          (book.series.number ? ' ; ' + escapeHtml(book.series.number) : '')
+        : '',
+      true
+    );
     row2(out, '出版刊期', book.frequency);
     out.push('</tbody></table>');
 
@@ -1818,7 +1845,18 @@
     row2(out, '著錄', book.physical ? book.physical.raw : '');
     row2(out, '頁數', book.physical && book.physical.pages ? book.physical.pages + ' 頁' : '');
     row2(out, '尺寸', book.physical ? book.physical.dimensions : '');
-    row2(out, '類別', book.classification);
+    row2(
+      out,
+      '類別',
+      book.classification
+        ? metaLinkHtml(
+            book.classification,
+            '#/?classification=' + encodeURIComponent(book.classification),
+            '瀏覽類別：' + book.classification
+          )
+        : '',
+      true
+    );
     row2(out, '附註', book.notes);
     if (book.price) {
       var price =

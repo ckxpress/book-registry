@@ -669,6 +669,15 @@ mark {
   padding: 1px 8px;
   white-space: nowrap;
 }
+a.tag-link {
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+a.tag-link:hover,
+a.tag-link:focus-visible {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
 
 .more {
   display: block;
