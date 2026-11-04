@@ -223,7 +223,7 @@ npm run deploy
 ```
 
 That publishes the contents of `site/` to the `gh-pages` branch, which is what
-GitHub Pages serves at **https://ckxpress.github.io/book-registry/**. `main`
+GitHub Pages serves at **https://ckxpress.github.io/jinbochoapp/**. `main`
 holds the source; `gh-pages` holds only what is inside `site/`, at its root,
 because branch-based Pages can serve from the root or `/docs` and nothing else.
 Push `main` as usual — that alone does not update the site.
