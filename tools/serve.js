@@ -27,6 +27,9 @@ const TYPES = {
   '.woff2': 'font/woff2',
 };
 
+const rangeBytes = {};
+const rangeCount = {};
+
 const server = http.createServer((req, res) => {
   let pathname;
   try {
@@ -83,6 +86,20 @@ const server = http.createServer((req, res) => {
       }
 
       headers['content-range'] = 'bytes ' + start + '-' + end + '/' + stat.size;
+
+      // LOG_RANGES=1 prints a running total per file. Range traffic is the
+      // whole cost model of the SQLite backend, and it is invisible from the
+      // page — the reads happen inside a worker, where neither the resource
+      // timeline nor devtools' network list shows them.
+      if (process.env.LOG_RANGES) {
+        const name = path.basename(file);
+        rangeBytes[name] = (rangeBytes[name] || 0) + (end - start + 1);
+        rangeCount[name] = (rangeCount[name] || 0) + 1;
+        console.log(
+          '  range ' + name + '  ' + String(Math.round((end - start + 1) / 1024)).padStart(5) + ' KiB' +
+            '   total ' + (rangeBytes[name] / 1048576).toFixed(2) + ' MB in ' + rangeCount[name] + ' requests'
+        );
+      }
       headers['content-length'] = end - start + 1;
       res.writeHead(206, headers);
       fs.createReadStream(file, { start: start, end: end }).pipe(res);

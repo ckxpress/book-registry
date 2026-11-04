@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["start"],
       "port": 8080
+    },
+    {
+      "name": "jinbocho-ranges",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["LOG_RANGES=1", "npm", "start"],
+      "port": 8080
     }
   ]
 }

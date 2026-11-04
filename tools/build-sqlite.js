@@ -10,6 +10,15 @@
  *
  * Needs the sqlite3 CLI (ships with macOS; `apt install sqlite3` elsewhere)
  * with FTS5 — checked before anything is written.
+ *
+ * The database is too big to serve from GitHub Pages, which compresses it and
+ * then applies byte ranges to the *compressed* stream. Point the site at
+ * object storage instead, once:
+ *
+ *   npm run build:db -- --db-url https://db.example.com/books.db
+ *
+ * The URL is remembered in the manifest, so later rebuilds need no flag.
+ * `--db-url ""` clears it and goes back to serving books.db beside the site.
  */
 
 const fs = require('fs');
@@ -33,6 +42,13 @@ main();
 
 function main() {
   requireSqlite();
+
+  const args = process.argv.slice(2);
+  const at = args.indexOf('--db-url');
+  if (at !== -1 && at === args.length - 1) {
+    throw new Error('--db-url needs a value (use --db-url "" to serve books.db from the site itself).');
+  }
+  const dbUrlArg = at === -1 ? undefined : args[at + 1];
 
   const manifest = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'manifest.json'), 'utf8'));
   if (!manifest.datasets || !manifest.datasets.length) throw new Error('No datasets imported yet — run `npm run import` first.');
@@ -86,6 +102,12 @@ function main() {
   // show a visitor silently incorrect results.
   const probeId = execFileSync('sqlite3', [DB, 'SELECT id FROM books WHERE rowid = 1;']).toString().trim();
 
+  // An existing url survives a rebuild: the database is uploaded separately
+  // from the site, so re-running the build must not quietly point the app
+  // back at a books.db that was never deployed.
+  const previousUrl = manifest.db && manifest.db.url;
+  const url = dbUrlArg === undefined ? previousUrl : dbUrlArg || undefined;
+
   manifest.db = {
     file: 'books.db',
     bytes: size,
@@ -94,13 +116,20 @@ function main() {
     probe: { rowid: 1, id: probeId },
     builtAt: new Date().toISOString(),
   };
+  if (url) manifest.db.url = url;
   fs.writeFileSync(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 
   console.log(
     '\n✓ ' + total.toLocaleString('en-US') + ' books → ' + (size / 1048576).toFixed(1) + ' MB, ' +
       Number(pages).toLocaleString('en-US') + ' pages of ' + PAGE_SIZE + ' bytes'
   );
-  console.log('  The site now queries books.db by range request; JSON shards remain as a fallback.');
+  if (url) {
+    console.log('  Served from ' + url);
+    console.log('  Upload the new file there, or the site keeps reading the old one.');
+  } else {
+    console.log('  Served from the site itself — note GitHub Pages cannot do this correctly.');
+  }
+  console.log('  The site queries it by range request; JSON shards remain as a fallback.');
 }
 
 function schema() {
@@ -247,6 +276,16 @@ function finalise() {
     // Default browse order: Chinese titles first, alphabetical within each group.
     'CREATE INDEX idx_zh_title ON books(zh_first, title_display);',
     'CREATE INDEX idx_year_title ON books(year DESC, title);',
+
+    // The default browse order, indexed as the expression the query actually
+    // sorts by. Without these SQLite answers the opening page with SCAN +
+    // TEMP B-TREE over every row, and over a range-request transport that
+    // means dragging the whole table down the wire — 8.3 MB to show sixty
+    // books. With them both plans are covering index walks that stop at the
+    // LIMIT. The second one carries `language` because the site opens with
+    // that facet applied.
+    "CREATE INDEX idx_browse ON books(cover = '', zh_first, title_display);",
+    "CREATE INDEX idx_browse_lang ON books(language, cover = '', zh_first, title_display);",
     'COMMIT;',
     'VACUUM;',
     'PRAGMA optimize;',
