@@ -1,4 +1,4 @@
-/* Book Registry — browse & search UI.
+/* 神保町 (jinbocho.app) — browse & search UI.
    No build step, no dependencies: reads site/data/manifest.json, loads the
    slim index shards for browsing, and pulls a full shard only when a book is
    opened. */
@@ -1628,7 +1628,7 @@
           })
         );
       }
-      document.title = (displayTitle(book) || '書刊') + ' — 香港書刊目錄';
+      document.title = (displayTitle(book) || '書刊') + ' — 神保町';
     });
   }
 
@@ -1825,7 +1825,7 @@
       );
       out.push('</div>');
       el.shelf.innerHTML = out.join('');
-      document.title = (mine ? '我的書架' : '分享的書架') + ' — 香港書刊目錄';
+      document.title = (mine ? '我的書架' : '分享的書架') + ' — 神保町';
       return;
     }
 
@@ -1851,7 +1851,7 @@
     out.push('<div class="grid" id="shelf-grid"></div>');
     out.push('</div>');
     el.shelf.innerHTML = out.join('');
-    document.title = (mine ? '我的書架' : '分享的書架') + ' — 香港書刊目錄';
+    document.title = (mine ? '我的書架' : '分享的書架') + ' — 神保町';
 
     var grid = document.getElementById('shelf-grid');
     grid.className = 'grid' + (state.view === 'list' ? ' list' : '');
@@ -1978,7 +1978,7 @@
     out.push('<a class="backlink" href="' + backHref() + '">← 返回搜尋結果</a>');
     out.push('<h1>關於本站</h1>');
     out.push(
-      '<p>靜態書刊資料目錄，收錄 ' +
+      '<p><strong>神保町</strong>（jinbocho.app）是一個靜態書刊資料目錄，收錄 ' +
         fmt(rows.length) +
         ' 項書刊，全部瀏覽與搜尋均在瀏覽器內完成。資料由一個小型 Node 程式從公開資料集匯入；除資料檔案本身' +
         (covers ? '及以 ISBN 查詢的封面縮圖' : '') +
@@ -2053,7 +2053,7 @@
       localStorage.setItem('covers', covers ? 'on' : 'off');
       renderAbout();
     });
-    document.title = '資料說明 — 香港書刊目錄';
+    document.title = '資料說明 — 神保町';
   }
 
   /* ---------------- helpers ---------------- */
