@@ -52,13 +52,15 @@
 
   /* ---------------- facet definitions ---------------- */
 
+  // Sidebar order. 出版者 leads, then when it was published, then how it was
+  // catalogued.
   var FACETS = [
+    { key: 'publisher', label: '出版者', get: function (r) { return r.publisher; }, search: true, limit: 8, open: true },
+    { key: 'year', label: '出版年份', get: function (r) { return r.year ? String(r.year) : ''; }, limit: 10, sort: 'key-desc', open: true },
+    { key: 'source', label: '發佈季度', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
+    { key: 'classification', label: '類別', get: function (r) { return r.classification; }, search: true, limit: 10 },
     { key: 'dataset', label: '資料集', get: function (r) { return r._ds; }, name: datasetName, hideIfSingle: true },
     { key: 'language', label: '語言', get: function (r) { return r.language; }, name: languageName },
-    { key: 'classification', label: '類別', get: function (r) { return r.classification; }, search: true, limit: 10 },
-    { key: 'publisher', label: '出版者', get: function (r) { return r.publisher; }, search: true, limit: 8 },
-    { key: 'year', label: '出版年份', get: function (r) { return r.year ? String(r.year) : ''; }, limit: 10, sort: 'key-desc' },
-    { key: 'source', label: '發佈季度', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
     {
       key: 'availability',
       label: '發售狀況',
@@ -1512,7 +1514,7 @@
       var details = document.createElement('details');
       details.className = 'facet';
       details.dataset.key = facet.key;
-      details.open = open[facet.key] !== undefined ? open[facet.key] : selected.size > 0 || facet.key === 'language' || facet.key === 'classification';
+      details.open = open[facet.key] !== undefined ? open[facet.key] : selected.size > 0 || !!facet.open;
 
       var summary = document.createElement('summary');
       summary.textContent = facet.label;
