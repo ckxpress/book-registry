@@ -67,10 +67,11 @@ function parseCsvRecords(text) {
   const rows = parseCsv(text);
   if (!rows.length) return { headers: [], records: [] };
 
-  const headers = rows[0].map(normaliseHeader);
+  const start = headerRow(rows);
+  const headers = rows[start].map(normaliseHeader);
   const records = [];
 
-  for (let i = 1; i < rows.length; i++) {
+  for (let i = start + 1; i < rows.length; i++) {
     const cells = rows[i];
     if (!cells.length) continue;
     if (cells.every((c) => c.trim() === '')) continue;
@@ -86,7 +87,28 @@ function parseCsvRecords(text) {
     records.push(rec);
   }
 
-  return { headers, records, rawHeaders: rows[0] };
+  return { headers, records, rawHeaders: rows[start] };
+}
+
+/**
+ * Which row is the header.
+ *
+ * Usually the first. HKPL's older quarterly catalogues (2017 through 2019
+ * Q1) open with a banner instead — a title line, a line naming the language
+ * section, and a blank line — so taking row 0 produced a header of one
+ * populated cell and every record was then dropped for having no title.
+ *
+ * Rather than hard-code three, look for the first row that carries several
+ * populated columns. A banner line is one cell of text followed by empty
+ * ones; a header is not.
+ */
+function headerRow(rows) {
+  const limit = Math.min(rows.length, 20);
+  for (let i = 0; i < limit; i++) {
+    const filled = rows[i].filter((c) => String(c).trim() !== '').length;
+    if (filled >= 3) return i;
+  }
+  return 0;
 }
 
 /**

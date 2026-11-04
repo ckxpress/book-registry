@@ -126,7 +126,15 @@ async function importDataset(dataset, args) {
       // quarters legitimately do not exist yet. Only a missing file is
       // skipped; anything else still stops the import.
       if (/HTTP 404/.test(err.message)) {
-        console.log('  ' + pad(source.label || source.url, 26) + '   not published yet — skipped');
+        // A missing file means two very different things. A quarter that has
+        // not ended yet simply is not out. A quarter long past is not coming:
+        // HKPL's CSV archive only reaches back so far — 2019 and earlier are
+        // absent entirely — and saying "not published yet" about 2018 reads
+        // as "try again later", which is wrong.
+        console.log(
+          '  ' + pad(source.label || source.url, 26) +
+            (quarterHasEnded(source.quarter) ? '   not in HKPL\'s archive — skipped' : '   not published yet — skipped')
+        );
         continue;
       }
       throw err;
@@ -199,8 +207,22 @@ async function readSource(source, refresh) {
     return decode(fs.readFileSync(file), source.file);
   }
   if (!source.url) throw new Error('Source has neither `url` nor `file`');
-  const res = await download(source.url, { refresh: refresh });
-  return decode(res.body, source.url);
+
+  // HKPL has renamed and moved these files over the years, so a source may
+  // carry alternates. The first that is actually there wins; only if every
+  // one 404s does the quarter count as missing.
+  const candidates = [source.url].concat(source.altUrls || []);
+  let last;
+  for (const url of candidates) {
+    try {
+      const res = await download(url, { refresh: refresh });
+      return decode(res.body, url);
+    } catch (err) {
+      if (!/HTTP 404/.test(err.message)) throw err;
+      last = err;
+    }
+  }
+  throw last;
 }
 
 /**
@@ -327,22 +349,46 @@ function byTitle(a, b) {
 
 /* ---------- dataset definitions ---------- */
 
+/** True once the quarter ("2019 Q1") is over, so a missing file is final. */
+function quarterHasEnded(label) {
+  const m = /^(\d{4}) Q([1-4])$/.exec(String(label || ''));
+  if (!m) return false;
+  const endsAfter = new Date(Date.UTC(Number(m[1]), Number(m[2]) * 3, 1));
+  return Date.now() >= endsAfter.getTime();
+}
+
 function hkplYearDataset(yearArg) {
   const year = Number(String(yearArg).trim());
   if (!/^\d{4}$/.test(String(year))) throw new Error('--add-hkpl-year expects a 4-digit year');
 
-  const base =
-    'https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK';
+  // The same quarterly catalogue has lived at three different addresses.
+  // 2020 onwards uses a four-digit year under BRO-PSI-CSV/; 2017, 2018 and
+  // 2019 Q4 use a two-digit year in the same folder; 2019 Q1 to Q3 use a
+  // two-digit year one level up. Rather than encode which year is which,
+  // every quarter offers all three and takes whichever answers.
+  const root =
+    'https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/';
+  const yy = String(year).slice(2);
+  const forms = (q, lang) => [
+    root + 'BRO-PSI-CSV/catalogueHK' + year + 'Q' + q + lang + '.csv',
+    root + 'BRO-PSI-CSV/catalogueHK' + yy + 'Q' + q + lang + '.csv',
+    root + 'catalogueHK' + yy + 'Q' + q + lang + '.csv',
+  ];
+
   const sources = [];
   for (let q = 1; q <= 4; q++) {
+    const en = forms(q, 'e');
+    const zh = forms(q, 'c');
     sources.push({
-      url: base + year + 'Q' + q + 'e.csv',
+      url: en[0],
+      altUrls: en.slice(1),
       label: year + ' Q' + q + ' (English)',
       language: 'en',
       quarter: year + ' Q' + q,
     });
     sources.push({
-      url: base + year + 'Q' + q + 'c.csv',
+      url: zh[0],
+      altUrls: zh.slice(1),
       label: year + ' Q' + q + ' (Chinese)',
       language: 'zh',
       quarter: year + ' Q' + q,

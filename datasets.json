@@ -192,6 +192,550 @@
           "quarter": "2026 Q4"
         }
       ]
+    },
+    {
+      "id": "hkpl-2023",
+      "title": "香港印刷書刊目錄 — 2023",
+      "shortTitle": "香港 2023",
+      "adapter": "hkpl-bro",
+      "description": "2023年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2023,
+      "sources": [
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2023Q1e.csv",
+          "label": "2023 Q1 (English)",
+          "language": "en",
+          "quarter": "2023 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2023Q1c.csv",
+          "label": "2023 Q1 (Chinese)",
+          "language": "zh",
+          "quarter": "2023 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2023Q2e.csv",
+          "label": "2023 Q2 (English)",
+          "language": "en",
+          "quarter": "2023 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2023Q2c.csv",
+          "label": "2023 Q2 (Chinese)",
+          "language": "zh",
+          "quarter": "2023 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2023Q3e.csv",
+          "label": "2023 Q3 (English)",
+          "language": "en",
+          "quarter": "2023 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2023Q3c.csv",
+          "label": "2023 Q3 (Chinese)",
+          "language": "zh",
+          "quarter": "2023 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2023Q4e.csv",
+          "label": "2023 Q4 (English)",
+          "language": "en",
+          "quarter": "2023 Q4"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2023Q4c.csv",
+          "label": "2023 Q4 (Chinese)",
+          "language": "zh",
+          "quarter": "2023 Q4"
+        }
+      ]
+    },
+    {
+      "id": "hkpl-2022",
+      "title": "香港印刷書刊目錄 — 2022",
+      "shortTitle": "香港 2022",
+      "adapter": "hkpl-bro",
+      "description": "2022年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2022,
+      "sources": [
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2022Q1e.csv",
+          "label": "2022 Q1 (English)",
+          "language": "en",
+          "quarter": "2022 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2022Q1c.csv",
+          "label": "2022 Q1 (Chinese)",
+          "language": "zh",
+          "quarter": "2022 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2022Q2e.csv",
+          "label": "2022 Q2 (English)",
+          "language": "en",
+          "quarter": "2022 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2022Q2c.csv",
+          "label": "2022 Q2 (Chinese)",
+          "language": "zh",
+          "quarter": "2022 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2022Q3e.csv",
+          "label": "2022 Q3 (English)",
+          "language": "en",
+          "quarter": "2022 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2022Q3c.csv",
+          "label": "2022 Q3 (Chinese)",
+          "language": "zh",
+          "quarter": "2022 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2022Q4e.csv",
+          "label": "2022 Q4 (English)",
+          "language": "en",
+          "quarter": "2022 Q4"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2022Q4c.csv",
+          "label": "2022 Q4 (Chinese)",
+          "language": "zh",
+          "quarter": "2022 Q4"
+        }
+      ]
+    },
+    {
+      "id": "hkpl-2021",
+      "title": "香港印刷書刊目錄 — 2021",
+      "shortTitle": "香港 2021",
+      "adapter": "hkpl-bro",
+      "description": "2021年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2021,
+      "sources": [
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2021Q1e.csv",
+          "label": "2021 Q1 (English)",
+          "language": "en",
+          "quarter": "2021 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2021Q1c.csv",
+          "label": "2021 Q1 (Chinese)",
+          "language": "zh",
+          "quarter": "2021 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2021Q2e.csv",
+          "label": "2021 Q2 (English)",
+          "language": "en",
+          "quarter": "2021 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2021Q2c.csv",
+          "label": "2021 Q2 (Chinese)",
+          "language": "zh",
+          "quarter": "2021 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2021Q3e.csv",
+          "label": "2021 Q3 (English)",
+          "language": "en",
+          "quarter": "2021 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2021Q3c.csv",
+          "label": "2021 Q3 (Chinese)",
+          "language": "zh",
+          "quarter": "2021 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2021Q4e.csv",
+          "label": "2021 Q4 (English)",
+          "language": "en",
+          "quarter": "2021 Q4"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2021Q4c.csv",
+          "label": "2021 Q4 (Chinese)",
+          "language": "zh",
+          "quarter": "2021 Q4"
+        }
+      ]
+    },
+    {
+      "id": "hkpl-2020",
+      "title": "香港印刷書刊目錄 — 2020",
+      "shortTitle": "香港 2020",
+      "adapter": "hkpl-bro",
+      "description": "2020年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2020,
+      "sources": [
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2020Q1e.csv",
+          "label": "2020 Q1 (English)",
+          "language": "en",
+          "quarter": "2020 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2020Q1c.csv",
+          "label": "2020 Q1 (Chinese)",
+          "language": "zh",
+          "quarter": "2020 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2020Q2e.csv",
+          "label": "2020 Q2 (English)",
+          "language": "en",
+          "quarter": "2020 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2020Q2c.csv",
+          "label": "2020 Q2 (Chinese)",
+          "language": "zh",
+          "quarter": "2020 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2020Q3e.csv",
+          "label": "2020 Q3 (English)",
+          "language": "en",
+          "quarter": "2020 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2020Q3c.csv",
+          "label": "2020 Q3 (Chinese)",
+          "language": "zh",
+          "quarter": "2020 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2020Q4e.csv",
+          "label": "2020 Q4 (English)",
+          "language": "en",
+          "quarter": "2020 Q4"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2020Q4c.csv",
+          "label": "2020 Q4 (Chinese)",
+          "language": "zh",
+          "quarter": "2020 Q4"
+        }
+      ]
+    },
+    {
+      "id": "hkpl-2019",
+      "title": "香港印刷書刊目錄 — 2019",
+      "shortTitle": "香港 2019",
+      "adapter": "hkpl-bro",
+      "description": "2019年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2019,
+      "sources": [
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2019Q1e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK19Q1e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK19Q1e.csv"
+          ],
+          "label": "2019 Q1 (English)",
+          "language": "en",
+          "quarter": "2019 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2019Q1c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK19Q1c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK19Q1c.csv"
+          ],
+          "label": "2019 Q1 (Chinese)",
+          "language": "zh",
+          "quarter": "2019 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2019Q2e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK19Q2e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK19Q2e.csv"
+          ],
+          "label": "2019 Q2 (English)",
+          "language": "en",
+          "quarter": "2019 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2019Q2c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK19Q2c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK19Q2c.csv"
+          ],
+          "label": "2019 Q2 (Chinese)",
+          "language": "zh",
+          "quarter": "2019 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2019Q3e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK19Q3e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK19Q3e.csv"
+          ],
+          "label": "2019 Q3 (English)",
+          "language": "en",
+          "quarter": "2019 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2019Q3c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK19Q3c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK19Q3c.csv"
+          ],
+          "label": "2019 Q3 (Chinese)",
+          "language": "zh",
+          "quarter": "2019 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2019Q4e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK19Q4e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK19Q4e.csv"
+          ],
+          "label": "2019 Q4 (English)",
+          "language": "en",
+          "quarter": "2019 Q4"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2019Q4c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK19Q4c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK19Q4c.csv"
+          ],
+          "label": "2019 Q4 (Chinese)",
+          "language": "zh",
+          "quarter": "2019 Q4"
+        }
+      ]
+    },
+    {
+      "id": "hkpl-2018",
+      "title": "香港印刷書刊目錄 — 2018",
+      "shortTitle": "香港 2018",
+      "adapter": "hkpl-bro",
+      "description": "2018年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2018,
+      "sources": [
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2018Q1e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK18Q1e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK18Q1e.csv"
+          ],
+          "label": "2018 Q1 (English)",
+          "language": "en",
+          "quarter": "2018 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2018Q1c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK18Q1c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK18Q1c.csv"
+          ],
+          "label": "2018 Q1 (Chinese)",
+          "language": "zh",
+          "quarter": "2018 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2018Q2e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK18Q2e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK18Q2e.csv"
+          ],
+          "label": "2018 Q2 (English)",
+          "language": "en",
+          "quarter": "2018 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2018Q2c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK18Q2c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK18Q2c.csv"
+          ],
+          "label": "2018 Q2 (Chinese)",
+          "language": "zh",
+          "quarter": "2018 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2018Q3e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK18Q3e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK18Q3e.csv"
+          ],
+          "label": "2018 Q3 (English)",
+          "language": "en",
+          "quarter": "2018 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2018Q3c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK18Q3c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK18Q3c.csv"
+          ],
+          "label": "2018 Q3 (Chinese)",
+          "language": "zh",
+          "quarter": "2018 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2018Q4e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK18Q4e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK18Q4e.csv"
+          ],
+          "label": "2018 Q4 (English)",
+          "language": "en",
+          "quarter": "2018 Q4"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2018Q4c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK18Q4c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK18Q4c.csv"
+          ],
+          "label": "2018 Q4 (Chinese)",
+          "language": "zh",
+          "quarter": "2018 Q4"
+        }
+      ]
+    },
+    {
+      "id": "hkpl-2017",
+      "title": "香港印刷書刊目錄 — 2017",
+      "shortTitle": "香港 2017",
+      "adapter": "hkpl-bro",
+      "description": "2017年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2017,
+      "sources": [
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2017Q1e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK17Q1e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK17Q1e.csv"
+          ],
+          "label": "2017 Q1 (English)",
+          "language": "en",
+          "quarter": "2017 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2017Q1c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK17Q1c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK17Q1c.csv"
+          ],
+          "label": "2017 Q1 (Chinese)",
+          "language": "zh",
+          "quarter": "2017 Q1"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2017Q2e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK17Q2e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK17Q2e.csv"
+          ],
+          "label": "2017 Q2 (English)",
+          "language": "en",
+          "quarter": "2017 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2017Q2c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK17Q2c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK17Q2c.csv"
+          ],
+          "label": "2017 Q2 (Chinese)",
+          "language": "zh",
+          "quarter": "2017 Q2"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2017Q3e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK17Q3e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK17Q3e.csv"
+          ],
+          "label": "2017 Q3 (English)",
+          "language": "en",
+          "quarter": "2017 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2017Q3c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK17Q3c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK17Q3c.csv"
+          ],
+          "label": "2017 Q3 (Chinese)",
+          "language": "zh",
+          "quarter": "2017 Q3"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2017Q4e.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK17Q4e.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK17Q4e.csv"
+          ],
+          "label": "2017 Q4 (English)",
+          "language": "en",
+          "quarter": "2017 Q4"
+        },
+        {
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2017Q4c.csv",
+          "altUrls": [
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK17Q4c.csv",
+            "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK17Q4c.csv"
+          ],
+          "label": "2017 Q4 (Chinese)",
+          "language": "zh",
+          "quarter": "2017 Q4"
+        }
+      ]
     }
   ]
 }
