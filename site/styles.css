@@ -274,6 +274,10 @@ a {
   align-items: start;
 }
 
+.browse-head {
+  display: none;
+  grid-column: 1 / -1;
+}
 .filters-toggle {
   display: none;
   grid-column: 1 / -1;
@@ -962,15 +966,24 @@ a.tag-link:focus-visible {
     flex-wrap: wrap;
     gap: 10px 12px;
   }
-  /* The whole wordmark goes: on a narrow screen the header is the search
-     box and the ☰, nothing else. Every other view carries its own
-     ← 返回 link, so none of them depended on the brand as the way home. */
+  /* The mark alone, left of the search box — small enough to cost nothing
+     and it gives the header back its way home. The wordmark and the counts
+     stay gone; the counts are in the row under 篩選 instead. */
   .brand {
+    display: flex;
+    order: 1;
+    flex: 0 0 auto;
+    margin-right: 0;
+  }
+  .brand-text {
     display: none;
   }
   .search {
     order: 2;
-    flex: 1 1 auto;
+    /* Zero basis, not auto: with flex-wrap on, a line wraps on base sizes
+       before anything shrinks, so a content-sized search box would push the
+       ☰ onto a row of its own. */
+    flex: 1 1 0;
     max-width: none;
     min-width: 0;
     margin: 0;
@@ -1045,11 +1058,24 @@ a.tag-link:focus-visible {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
+  .browse-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
   .filters-toggle {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     justify-self: start;
+    flex: 0 0 auto;
+  }
+  /* Only .toolbar-right is left in the toolbar here, so give it the full
+     width and let it keep 排序 left and the view switch right. */
+  .toolbar-right {
+    flex: 1 1 100%;
+    justify-content: space-between;
   }
   .sidebar {
     display: none;
@@ -1082,6 +1108,11 @@ a.tag-link:focus-visible {
   }
   .hint {
     display: none;
+  }
+  /* The ⌨ hint is gone here, so stop reserving its room — the search box
+     is narrow enough already with the mark and the ☰ beside it. */
+  .search input {
+    padding-right: 14px;
   }
 }
 
@@ -1496,10 +1527,11 @@ a.tag-link:focus-visible {
   .install-nudge {
     display: none !important;
   }
-  /* The OS already shows the name and icon — on the home screen, in the
-     app switcher, in the Dock, in the window title. Repeating them in the
-     top bar is clutter. */
-  .brand {
+  /* The OS already shows the name — on the home screen, in the app
+     switcher, in the window title — so the wordmark and counts are
+     clutter. The mark stays: in an installed window there is no browser
+     UI, so it is the only way back to the catalogue. */
+  .brand-text {
     display: none;
   }
   .topbar {
