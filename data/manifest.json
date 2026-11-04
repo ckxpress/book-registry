@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-04T02:57:07.035Z",
-  "totalBooks": 22101,
+  "generatedAt": "2026-11-04T06:00:41.997Z",
+  "totalBooks": 25385,
   "datasets": [
     {
       "id": "hkpl-2024",
@@ -333,8 +333,122 @@
         ]
       },
       "importedAt": "2026-11-04T02:57:06.379Z"
+    },
+    {
+      "id": "hkpl-2026",
+      "title": "香港印刷書刊目錄 — 2026",
+      "shortTitle": "香港 2026",
+      "description": "2026年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "Terms of use of DATA.GOV.HK",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "Hong Kong",
+      "year": 2026,
+      "adapter": "hkpl-bro",
+      "count": 3284,
+      "files": {
+        "index": [
+          "hkpl-2026.index.0.json",
+          "hkpl-2026.index.1.json"
+        ],
+        "full": [
+          "hkpl-2026.full.0.json",
+          "hkpl-2026.full.1.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "2026 Q1 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2026Q1e.csv",
+          "file": "",
+          "quarter": "2026 Q1",
+          "language": "en",
+          "count": 1469
+        },
+        {
+          "label": "2026 Q1 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2026Q1c.csv",
+          "file": "",
+          "quarter": "2026 Q1",
+          "language": "zh",
+          "count": 1815
+        }
+      ],
+      "stats": {
+        "withIsbn": 2764,
+        "classifications": 134,
+        "publishers": 965,
+        "languages": {
+          "zh": 1815,
+          "en": 1469
+        },
+        "yearRange": [
+          2008,
+          2026
+        ],
+        "topPublishers": [
+          {
+            "name": "Modern Educational Research Society Limited",
+            "count": 160
+          },
+          {
+            "name": "現代教育研究社有限公司",
+            "count": 156
+          },
+          {
+            "name": "Pearson Education Asia Limited",
+            "count": 80
+          },
+          {
+            "name": "玉皇朝(國際)有限公司",
+            "count": 76
+          },
+          {
+            "name": "三聯書店(香港)有限公司",
+            "count": 73
+          }
+        ],
+        "topClassifications": [
+          {
+            "name": "Publications of ListedCompanies",
+            "count": 463
+          },
+          {
+            "name": "Textbooks",
+            "count": 377
+          },
+          {
+            "name": "教科書",
+            "count": 330
+          },
+          {
+            "name": "Books forChildren and Youth",
+            "count": 265
+          },
+          {
+            "name": "文學",
+            "count": 212
+          },
+          {
+            "name": "宗教",
+            "count": 138
+          },
+          {
+            "name": "兒童及青少年讀物",
+            "count": 129
+          },
+          {
+            "name": "漫畫",
+            "count": 123
+          }
+        ]
+      },
+      "importedAt": "2026-11-04T06:00:41.997Z"
     }
   ],
-  "coversResolvedAt": "2026-11-04T02:57:07.691Z",
-  "coversFound": 2336
+  "coversResolvedAt": "2026-11-04T06:05:43.261Z",
+  "coversFound": 2555
 }
