@@ -669,6 +669,15 @@ mark {
   padding: 1px 8px;
   white-space: nowrap;
 }
+a.tag-link {
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+a.tag-link:hover,
+a.tag-link:focus-visible {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
 
 .more {
   display: block;
@@ -731,10 +740,15 @@ mark {
 }
 .detail .byline a {
   color: var(--accent);
-  text-decoration: none;
 }
-.detail .byline a:hover {
-  text-decoration: underline;
+/* In the metadata tables the links sit in ordinary body text, so they need
+   the same underline the cards use rather than relying on colour alone. */
+.meta-table .meta-link {
+  color: var(--text);
+}
+.meta-table .meta-link:hover,
+.meta-table .meta-link:focus-visible {
+  color: var(--accent);
 }
 .lede {
   font-size: 15px;
