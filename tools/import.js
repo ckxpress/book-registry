@@ -339,14 +339,13 @@ function hkplYearDataset(yearArg) {
 
   return {
     id: 'hkpl-' + year,
-    title: 'Books Printed in Hong Kong — ' + year,
-    shortTitle: 'Hong Kong ' + year,
+    // Shown in a Traditional Chinese interface, so named in Chinese.
+    title: '香港印刷書刊目錄 — ' + year,
+    shortTitle: '香港 ' + year,
     adapter: 'hkpl-bro',
     description:
-      'Every book and periodical registered with the Hong Kong ISBN agency (Books Registration Office) during ' +
-      year +
-      '.',
-    provider: 'Leisure and Cultural Services Department — Books Registration Office, Hong Kong Public Libraries',
+      year + '年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。',
+    provider: '康樂及文化事務署書刊註冊組 · 香港公共圖書館',
     homepage: 'https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro',
     dataDictionary:
       'https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf',

@@ -1,8 +1,8 @@
 # 神保町 · jinbocho.app
 
 A static site for browsing and searching book metadata, seeded with every book
-and periodical registered with the Hong Kong ISBN agency in 2025 — **10,912
-titles**.
+and periodical registered with the Hong Kong ISBN agency in 2024 and 2025 —
+**22,101 titles**.
 
 No framework, no npm dependencies, no server. A Node script imports datasets and
 the browser does the rest — reading plain JSON, or querying a SQLite database by
@@ -84,8 +84,7 @@ data for the ones that resolve. Results are cached in `cache/covers.json`
 (committed — it represents 15,996 requests), so re-runs only probe what is new.
 `npm run build` does it as part of the pipeline.
 
-**1,126 of 10,912 records have a real cover — 10%, or 13% of the records that
-carry an ISBN.** The rest get a generated cover built from the title and a
+**2,336 of 22,101 records have a real cover — 11%.** The rest get a generated cover built from the title and a
 colour seeded by the record id, so every book shows something and nothing
 renders broken.
 

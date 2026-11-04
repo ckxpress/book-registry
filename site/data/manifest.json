@@ -1,18 +1,184 @@
 {
-  "generatedAt": "2026-11-03T14:21:00.330Z",
-  "totalBooks": 10912,
+  "generatedAt": "2026-11-04T02:57:07.035Z",
+  "totalBooks": 22101,
   "datasets": [
     {
-      "id": "hkpl-2025",
-      "title": "Books Printed in Hong Kong — 2025",
-      "shortTitle": "Hong Kong 2025",
-      "description": "Every book and periodical registered with the Hong Kong ISBN agency (Books Registration Office) during 2025, published quarterly as A Catalogue of Books Printed in Hong Kong.",
-      "provider": "Leisure and Cultural Services Department — Books Registration Office, Hong Kong Public Libraries",
+      "id": "hkpl-2024",
+      "title": "香港印刷書刊目錄 — 2024",
+      "shortTitle": "香港 2024",
+      "description": "2024年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
       "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
       "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
-      "license": "Terms of use of DATA.GOV.HK",
+      "license": "DATA.GOV.HK 使用條款",
       "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
-      "region": "Hong Kong",
+      "region": "香港",
+      "year": 2024,
+      "adapter": "hkpl-bro",
+      "count": 11189,
+      "files": {
+        "index": [
+          "hkpl-2024.index.0.json",
+          "hkpl-2024.index.1.json",
+          "hkpl-2024.index.2.json",
+          "hkpl-2024.index.3.json"
+        ],
+        "full": [
+          "hkpl-2024.full.0.json",
+          "hkpl-2024.full.1.json",
+          "hkpl-2024.full.2.json",
+          "hkpl-2024.full.3.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "2024 Q1 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2024Q1e.csv",
+          "file": "",
+          "quarter": "2024 Q1",
+          "language": "en",
+          "count": 1635
+        },
+        {
+          "label": "2024 Q1 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2024Q1c.csv",
+          "file": "",
+          "quarter": "2024 Q1",
+          "language": "zh",
+          "count": 2151
+        },
+        {
+          "label": "2024 Q2 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2024Q2e.csv",
+          "file": "",
+          "quarter": "2024 Q2",
+          "language": "en",
+          "count": 1403
+        },
+        {
+          "label": "2024 Q2 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2024Q2c.csv",
+          "file": "",
+          "quarter": "2024 Q2",
+          "language": "zh",
+          "count": 1631
+        },
+        {
+          "label": "2024 Q3 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2024Q3e.csv",
+          "file": "",
+          "quarter": "2024 Q3",
+          "language": "en",
+          "count": 789
+        },
+        {
+          "label": "2024 Q3 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2024Q3c.csv",
+          "file": "",
+          "quarter": "2024 Q3",
+          "language": "zh",
+          "count": 986
+        },
+        {
+          "label": "2024 Q4 (English)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2024Q4e.csv",
+          "file": "",
+          "quarter": "2024 Q4",
+          "language": "en",
+          "count": 1116
+        },
+        {
+          "label": "2024 Q4 (Chinese)",
+          "url": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/BRO-PSI-CSV/catalogueHK2024Q4c.csv",
+          "file": "",
+          "quarter": "2024 Q4",
+          "language": "zh",
+          "count": 1478
+        }
+      ],
+      "stats": {
+        "withIsbn": 8533,
+        "classifications": 211,
+        "publishers": 2222,
+        "languages": {
+          "zh": 6246,
+          "en": 4943
+        },
+        "yearRange": [
+          2012,
+          2024
+        ],
+        "topPublishers": [
+          {
+            "name": "三聯書店(香港)有限公司",
+            "count": 656
+          },
+          {
+            "name": "Oxford University Press (China) Limited",
+            "count": 281
+          },
+          {
+            "name": "牛津大學出版社(中國)有限公司",
+            "count": 270
+          },
+          {
+            "name": "Inherit Books Publishing HK Co., Limited",
+            "count": 266
+          },
+          {
+            "name": "現代教育研究社有限公司",
+            "count": 235
+          }
+        ],
+        "topClassifications": [
+          {
+            "name": "Publications of Listed Companies",
+            "count": 2300
+          },
+          {
+            "name": "兒童及青少年讀物",
+            "count": 1141
+          },
+          {
+            "name": "教科書",
+            "count": 893
+          },
+          {
+            "name": "Books for Children and Youth",
+            "count": 807
+          },
+          {
+            "name": "Textbooks",
+            "count": 665
+          },
+          {
+            "name": "文學",
+            "count": 594
+          },
+          {
+            "name": "社會科學",
+            "count": 394
+          },
+          {
+            "name": "漫畫",
+            "count": 364
+          }
+        ]
+      },
+      "importedAt": "2026-11-04T02:57:07.035Z"
+    },
+    {
+      "id": "hkpl-2025",
+      "title": "香港印刷書刊目錄 — 2025",
+      "shortTitle": "香港 2025",
+      "description": "2025年內向香港書刊註冊組（ISBN 註冊機構）登記的全部書刊。",
+      "provider": "康樂及文化事務署書刊註冊組 · 香港公共圖書館",
+      "homepage": "https://data.gov.hk/en-data/dataset/hk-lcsd-lib-lib-bro",
+      "dataDictionary": "https://www.hkpl.gov.hk/en/common/attachments/about-us/services/book-registration/catalogueHK_datadic_en.pdf",
+      "license": "DATA.GOV.HK 使用條款",
+      "licenseUrl": "https://data.gov.hk/en/terms-and-conditions",
+      "region": "香港",
       "year": 2025,
       "adapter": "hkpl-bro",
       "count": 10912,
@@ -166,9 +332,9 @@
           }
         ]
       },
-      "importedAt": "2026-11-03T14:21:00.329Z"
+      "importedAt": "2026-11-04T02:57:06.379Z"
     }
   ],
-  "coversResolvedAt": "2026-11-03T16:06:18.496Z",
-  "coversFound": 1126
+  "coversResolvedAt": "2026-11-04T02:57:07.691Z",
+  "coversFound": 2336
 }
