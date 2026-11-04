@@ -123,8 +123,11 @@ a {
   flex: 0 0 auto;
 }
 .brand-mark {
-  font-size: 22px;
-  line-height: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: block;
+  flex: 0 0 auto;
 }
 .brand-text {
   display: flex;
