@@ -1291,6 +1291,22 @@
     return meta;
   }
 
+  /** Same link, built as HTML for the book page's tables and byline. */
+  function metaLinkHtml(text, href, label) {
+    return (
+      '<a class="meta-link" href="' + escapeAttr(href) + '" title="' + escapeAttr(label) + '">' +
+      escapeHtml(text) +
+      '</a>'
+    );
+  }
+
+  function authorHref(author) {
+    // Search the name as it is displayed and indexed: the catalogue stores it
+    // inverted ("Luk, Ming Man Liza") but the index holds the natural form, so
+    // searching the raw value finds nothing.
+    return searchHref(author.display || author.name);
+  }
+
   function metaLink(text, href, terms, label) {
     var link = document.createElement('a');
     link.className = 'meta-link';
@@ -1699,7 +1715,7 @@
     var ds = datasetById(book.dataset || row._ds) || {};
     var authors = (book.authors || []).map(function (a) {
       var name = a.display || a.name;
-      return '<a href="' + searchHref(a.name) + '">' + escapeHtml(name) + '</a>';
+      return metaLinkHtml(name, authorHref(a), '搜尋著者：' + name);
     });
 
     var out = [];
@@ -1743,7 +1759,13 @@
     row2(
       out,
       '著者',
-      (book.authors || []).map(function (a) { return a.display || a.name; }).join(' · ')
+      (book.authors || [])
+        .map(function (a) {
+          var name = a.display || a.name;
+          return metaLinkHtml(name, authorHref(a), '搜尋著者：' + name);
+        })
+        .join(' · '),
+      true
     );
     row2(out, '版次', book.edition);
     row2(out, '叢書', book.series ? [book.series.title, book.series.number].filter(Boolean).join(' ; ') : '');
@@ -1753,7 +1775,14 @@
     /* --- publication --- */
     out.push('<h2 class="section-title">出版資料</h2>');
     out.push('<table class="meta-table"><tbody>');
-    row2(out, '出版者', book.publisher);
+    row2(
+      out,
+      '出版者',
+      book.publisher
+        ? metaLinkHtml(book.publisher, '#/?publisher=' + encodeURIComponent(book.publisher), '瀏覽出版者：' + book.publisher)
+        : '',
+      true
+    );
     row2(out, '出版地', book.place);
     row2(out, '出版年份', book.dateRaw || (book.year ? String(book.year) : ''));
     if (book.copyright) {

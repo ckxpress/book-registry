@@ -731,10 +731,15 @@ mark {
 }
 .detail .byline a {
   color: var(--accent);
-  text-decoration: none;
 }
-.detail .byline a:hover {
-  text-decoration: underline;
+/* In the metadata tables the links sit in ordinary body text, so they need
+   the same underline the cards use rather than relying on colour alone. */
+.meta-table .meta-link {
+  color: var(--text);
+}
+.meta-table .meta-link:hover,
+.meta-table .meta-link:focus-visible {
+  color: var(--accent);
 }
 .lede {
   font-size: 15px;
