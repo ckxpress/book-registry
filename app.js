@@ -263,6 +263,7 @@
 
     initMenu();
     initSearchPlaceholder();
+    initCountPlacement();
 
     document.getElementById('theme-toggle').addEventListener('click', function () {
       var current = document.documentElement.getAttribute('data-theme');
@@ -2325,6 +2326,30 @@
     var h = 0;
     for (var i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) >>> 0;
     return h;
+  }
+
+  /**
+   * The result count belongs beside 篩選 on a narrow screen and beside the
+   * sort control on a wide one. It is moved rather than duplicated, so
+   * there is only ever one element to write the number into — `el.count`
+   * keeps pointing at the same node wherever it lands.
+   */
+  function initCountPlacement() {
+    var head = document.getElementById('browse-head');
+    var toolbar = document.querySelector('.toolbar');
+    if (!head || !toolbar || !el.count || !window.matchMedia) return;
+    var narrow = window.matchMedia('(max-width: 900px)');
+
+    function place() {
+      if (narrow.matches) {
+        if (el.count.parentNode !== head) head.appendChild(el.count);
+      } else if (el.count.parentNode !== toolbar) {
+        toolbar.insertBefore(el.count, toolbar.firstChild);
+      }
+    }
+    place();
+    if (narrow.addEventListener) narrow.addEventListener('change', place);
+    else if (narrow.addListener) narrow.addListener(place);
   }
 
   /**

@@ -100,9 +100,14 @@
     <main id="app">
       <!-- Browse view -->
       <div id="browse-view">
-        <button class="filters-toggle btn" id="filters-toggle" type="button" aria-expanded="false">
-          篩選 <span class="badge" id="filters-count" hidden>0</span>
-        </button>
+        <!-- Narrow screens only. The result count moves in here beside the
+             篩選 button; on a wide screen it stays in the toolbar next to
+             the sort control, and this whole row is hidden. -->
+        <div class="browse-head" id="browse-head">
+          <button class="filters-toggle btn" id="filters-toggle" type="button" aria-expanded="false">
+            篩選 <span class="badge" id="filters-count" hidden>0</span>
+          </button>
+        </div>
 
         <aside class="sidebar" id="sidebar" aria-label="篩選">
           <div class="sidebar-head">
