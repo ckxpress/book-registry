@@ -203,7 +203,7 @@
 
   function wireEvents() {
     var timer = null;
-    el.q.addEventListener('input', function () {
+    function scheduleSearch() {
       clearTimeout(timer);
       timer = setTimeout(function () {
         state.q = el.q.value.trim();
@@ -211,7 +211,14 @@
         pushRoute();
         render();
       }, 120);
+    }
+    el.q.addEventListener('input', function (e) {
+      // Skip the keystrokes an IME is still turning into a character —
+      // searching for the raw 倉頡 or pinyin letters finds nothing.
+      if (e.isComposing) return;
+      scheduleSearch();
     });
+    el.q.addEventListener('compositionend', scheduleSearch);
 
     document.getElementById('search-form').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -1520,7 +1527,41 @@
       var body = document.createElement('div');
       body.className = 'facet-body';
 
-      var query = (searches[facet.key] || '').toLowerCase();
+      var limit = facet.limit || 999;
+      var expanded = false;
+
+      // Only the options on show go into the DOM — the full list lives here,
+      // so searching can still reach all of them.
+      function paintOptions() {
+        var query = String(searches[facet.key] || '').trim().toLowerCase();
+        var matches = query
+          ? options.filter(function (entry) {
+              return displayName(facet, entry.value).toLowerCase().indexOf(query) !== -1;
+            })
+          : options;
+        var cap = query || expanded ? 60 : limit;
+
+        body.innerHTML = '';
+        matches.slice(0, cap).forEach(function (entry) {
+          body.appendChild(option(facet, entry, selected.has(entry.value)));
+        });
+
+        if (!matches.length) {
+          var none = document.createElement('p');
+          none.className = 'facet-empty';
+          none.textContent = '沒有符合的項目';
+          body.appendChild(none);
+        } else if (matches.length > cap) {
+          var rest = document.createElement('p');
+          rest.className = 'facet-empty';
+          rest.textContent = '另有 ' + fmt(matches.length - cap) + ' 項，請縮窄關鍵字';
+          body.appendChild(rest);
+        }
+        if (more) more.hidden = !!query || expanded || options.length <= limit;
+      }
+
+      var more = null;
+
       if (facet.search) {
         var input = document.createElement('input');
         input.className = 'facet-search';
@@ -1528,44 +1569,39 @@
         input.dataset.key = facet.key;
         input.placeholder = '篩選' + facet.label + '…';
         input.value = searches[facet.key] || '';
-        input.addEventListener('input', function () {
+
+        // Only the option list is repainted, never this input. Rebuilding the
+        // sidebar on each keystroke destroyed the element an IME was composing
+        // into, so 倉頡 or pinyin committed the raw Latin keys instead of the
+        // character.
+        input.addEventListener('input', function (e) {
           searches[facet.key] = input.value;
-          var focusKey = facet.key;
-          renderFacets();
-          var next = el.facets.querySelector('.facet-search[data-key="' + focusKey + '"]');
-          if (next) { next.value = input.value; next.focus(); }
+          if (e.isComposing) return; // mid-character: wait for the IME
+          paintOptions();
         });
+        input.addEventListener('compositionend', function () {
+          searches[facet.key] = input.value;
+          paintOptions();
+        });
+
         details.appendChild(input); // body is appended after this, keeping order
       }
 
-      var visible = options.filter(function (entry) {
-        if (!query) return true;
-        return displayName(facet, entry.value).toLowerCase().indexOf(query) !== -1;
-      });
-
-      var limit = facet.limit || 999;
-      var expanded = details.dataset.expanded === '1';
-      var list = expanded || query ? visible : visible.slice(0, limit);
-
-      list.forEach(function (entry) {
-        body.appendChild(option(facet, entry, selected.has(entry.value)));
-      });
-
       details.appendChild(body);
 
-      if (!query && visible.length > list.length) {
-        var more = document.createElement('button');
+      if (options.length > limit) {
+        more = document.createElement('button');
         more.className = 'linkish facet-more';
         more.type = 'button';
-        more.textContent = '顯示其餘 ' + (visible.length - list.length) + ' 項';
+        more.textContent = '顯示更多';
         more.addEventListener('click', function () {
-          visible.slice(list.length).forEach(function (entry) {
-            body.appendChild(option(facet, entry, selected.has(entry.value)));
-          });
-          more.remove();
+          expanded = true;
+          paintOptions();
         });
         details.appendChild(more);
       }
+
+      paintOptions();
 
       el.facets.appendChild(details);
     });
