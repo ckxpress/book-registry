@@ -66,12 +66,33 @@
           <kbd class="hint">/</kbd>
         </form>
 
+        <!-- One set of controls, laid out two ways: an inline row on a wide
+             screen, a dropdown behind the ☰ on a narrow one. Same elements
+             either way, so the shelf badge and the install button have only
+             one place to live. -->
         <div class="topbar-actions">
-          <a class="btn ghost" href="#/shelf" id="shelf-link">我的書架 <span class="badge" id="shelf-count" hidden>0</span></a>
-          <a class="btn ghost" href="#/about">資料說明</a>
-          <button class="btn icon" id="theme-toggle" type="button" title="切換主題" aria-label="切換主題">
-            <span aria-hidden="true">◐</span>
+          <button
+            class="btn icon menu-toggle"
+            id="menu-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="menu-panel"
+            aria-haspopup="true"
+            aria-label="選單"
+            title="選單"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></svg>
+            <span class="menu-dot" id="menu-dot" hidden></span>
           </button>
+
+          <div class="menu-panel" id="menu-panel">
+            <a class="btn ghost" href="#/shelf" id="shelf-link">我的書架 <span class="badge" id="shelf-count" hidden>0</span></a>
+            <a class="btn ghost" href="#/about">資料說明</a>
+            <button class="btn icon" id="theme-toggle" type="button" title="切換主題" aria-label="切換主題">
+              <span aria-hidden="true">◐</span>
+              <span class="menu-label">切換主題</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>

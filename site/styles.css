@@ -201,6 +201,30 @@ a {
   flex: 0 0 auto;
 }
 
+/* Wide screens: no hamburger, the panel is just the row of buttons. */
+.menu-toggle {
+  display: none;
+}
+.menu-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.menu-panel {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.menu-label {
+  display: none;
+}
+.menu-dot {
+  display: none;
+}
+
 /* ---------- buttons ---------- */
 .btn {
   font: inherit;
@@ -936,14 +960,86 @@ a.tag-link:focus-visible {
 @media (max-width: 900px) {
   .topbar-inner {
     flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+  /* The whole wordmark goes: on a narrow screen the header is the search
+     box and the ☰, nothing else. Every other view carries its own
+     ← 返回 link, so none of them depended on the brand as the way home. */
+  .brand {
+    display: none;
   }
   .search {
-    order: 3;
+    order: 2;
+    flex: 1 1 auto;
     max-width: none;
-    flex-basis: 100%;
+    min-width: 0;
+    margin: 0;
   }
-  .brand {
-    margin-right: auto;
+  .topbar-actions {
+    order: 3;
+    position: relative;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .menu-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 70;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    min-width: 196px;
+    padding: 6px;
+    background: var(--bg-elev);
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .menu-panel.open {
+    display: flex;
+  }
+  /* Every row the same: plain text, flush left. The glyphs are dropped
+     rather than kept, because only two of the four have one and the labels
+     would step in and out. */
+  .menu-panel .btn,
+  .menu-panel .btn.icon {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: start;
+    padding: 11px 12px;
+    border-radius: 8px;
+    background: transparent;
+    border-color: transparent;
+    color: var(--text);
+  }
+  .menu-panel .btn:hover {
+    background: var(--bg-sunken);
+  }
+  .menu-panel .btn svg,
+  .menu-panel .btn > [aria-hidden='true'] {
+    display: none;
+  }
+  .menu-label {
+    display: inline;
+  }
+  /* The shelf count lives inside the closed menu, so mark the ☰ instead. */
+  .menu-dot {
+    display: block;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
   }
   #browse-view {
     grid-template-columns: minmax(0, 1fr);
@@ -1399,6 +1495,12 @@ a.tag-link:focus-visible {
   .install-btn,
   .install-nudge {
     display: none !important;
+  }
+  /* The OS already shows the name and icon — on the home screen, in the
+     app switcher, in the Dock, in the window title. Repeating them in the
+     top bar is clutter. */
+  .brand {
+    display: none;
   }
   .topbar {
     padding-top: env(safe-area-inset-top);
