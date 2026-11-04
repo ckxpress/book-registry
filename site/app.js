@@ -900,12 +900,14 @@
         var where = sqlWhere(facet.key);
         var expr = SQL_FACET[facet.key];
 
-        // Nothing narrows this facet, so the answer is the build-time table —
-        // a few indexed rows instead of aggregating the whole catalogue.
-        if (!where.params.length) {
+        // Either nothing narrows this facet, or only a language does — both
+        // were counted at build time. A few indexed rows instead of
+        // aggregating the catalogue over the network.
+        var scope = precomputedScope(facet.key);
+        if (scope !== null) {
           return SqliteSource.query(
-            'SELECT value AS v, n FROM facet_counts WHERE facet = ? ORDER BY n DESC, value LIMIT ?',
-            [facet.key, FACET_LIMIT]
+            'SELECT value AS v, n FROM facet_counts WHERE scope = ? AND facet = ? ORDER BY n DESC, value LIMIT ?',
+            [scope, facet.key, FACET_LIMIT]
           ).then(function (list) {
             return { key: facet.key, list: list.map(toOption) };
           });
@@ -962,6 +964,34 @@
   }
 
   /** WHERE clause for the active filters and query, optionally skipping one facet. */
+  /**
+   * Which build-time scope answers this facet, or null if nothing does.
+   *
+   * '' is the whole catalogue. A language code means every other filter is
+   * idle and that one language is selected — the state the site opens in,
+   * and the reason the scoped rows exist at all. Anything else (a search
+   * term, a publisher, two languages at once) has to be counted live.
+   */
+  function precomputedScope(skipFacet) {
+    if (matchExpression(state.q)) return null;
+
+    var scope = '';
+    var usable = true;
+
+    FACETS.forEach(function (facet) {
+      if (!usable || facet.key === skipFacet) return;
+      var set = state.filters[facet.key];
+      if (!set || !set.size) return;
+      if (facet.key === 'language' && set.size === 1) {
+        set.forEach(function (value) { scope = value; });
+      } else {
+        usable = false;
+      }
+    });
+
+    return usable ? scope : null;
+  }
+
   function sqlWhere(skipFacet) {
     var clauses = [];
     var params = [];
