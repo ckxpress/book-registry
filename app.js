@@ -261,6 +261,9 @@
       e.currentTarget.setAttribute('aria-expanded', String(open));
     });
 
+    initMenu();
+    initSearchPlaceholder();
+
     document.getElementById('theme-toggle').addEventListener('click', function () {
       var current = document.documentElement.getAttribute('data-theme');
       var next = current === 'dark' ? 'light' : current === 'light' ? '' : prefersDark() ? 'light' : 'dark';
@@ -633,6 +636,10 @@
     var n = Shelf.size();
     el.shelfCount.hidden = n === 0;
     el.shelfCount.textContent = String(n);
+    // On a narrow screen the count is shut inside the menu, so carry the
+    // signal out to the ☰ as a dot.
+    var dot = document.getElementById('menu-dot');
+    if (dot) dot.hidden = n === 0;
   }
 
   /**
@@ -2318,6 +2325,68 @@
     var h = 0;
     for (var i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) >>> 0;
     return h;
+  }
+
+  /**
+   * The ☰ takes a bite out of the search box on a narrow screen, which left
+   * the full placeholder cut off mid-word. Shorter wording there instead.
+   */
+  function initSearchPlaceholder() {
+    if (!el.q || !window.matchMedia) return;
+    var narrow = window.matchMedia('(max-width: 900px)');
+    var long = el.q.getAttribute('placeholder');
+    var short = '搜尋書名、著者、ISBN…';
+
+    function apply() {
+      el.q.setAttribute('placeholder', narrow.matches ? short : long);
+    }
+    apply();
+    if (narrow.addEventListener) narrow.addEventListener('change', apply);
+    else if (narrow.addListener) narrow.addListener(apply);
+  }
+
+  /**
+   * The narrow-screen ☰. The panel is the same markup the wide layout shows
+   * inline, so there is nothing to open or close above 900px — the toggle is
+   * simply not displayed there, and a stray `open` class would do nothing.
+   */
+  function initMenu() {
+    var toggle = document.getElementById('menu-toggle');
+    var panel = document.getElementById('menu-panel');
+    if (!toggle || !panel) return;
+
+    function setOpen(open) {
+      panel.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!panel.classList.contains('open'));
+    });
+
+    // Anything chosen inside closes it — the theme toggle included, since
+    // leaving the menu hanging over the page after a tap feels broken.
+    panel.addEventListener('click', function (e) {
+      if (e.target.closest('a, button')) setOpen(false);
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!panel.contains(e.target) && e.target !== toggle) setOpen(false);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && panel.classList.contains('open')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Any route change at all, including the back button — the panel should
+    // never be left hanging over a view the reader has already moved on from.
+    window.addEventListener('hashchange', function () {
+      setOpen(false);
+    });
   }
 
   function prefersDark() {

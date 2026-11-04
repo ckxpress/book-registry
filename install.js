@@ -64,7 +64,10 @@
   /* ---------------- the top-bar button ---------------- */
 
   function mountButton() {
-    var actions = document.querySelector('.topbar-actions');
+    // The menu panel, not the action bar: on a wide screen it lays its
+    // children out inline anyway, and on a narrow one this puts 安裝 inside
+    // the ☰ with the rest.
+    var actions = document.getElementById('menu-panel') || document.querySelector('.topbar-actions');
     if (!actions || document.getElementById('install-btn')) return;
 
     btn = document.createElement('button');
@@ -76,6 +79,7 @@
       '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
       '<path d="M12 3v11"/><path d="M8 11l4 4 4-4"/><path d="M4 19h16"/></svg>' +
       '<span>安裝</span>';
+    btn.setAttribute('aria-label', '安裝應用程式');
     btn.addEventListener('click', function () {
       install('button');
     });
