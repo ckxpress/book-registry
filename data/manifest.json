@@ -450,5 +450,17 @@
     }
   ],
   "coversResolvedAt": "2026-11-04T06:05:43.261Z",
-  "coversFound": 2555
+  "coversFound": 2555,
+  "db": {
+    "file": "books.db",
+    "bytes": 60060672,
+    "pageSize": 1024,
+    "pages": 58653,
+    "probe": {
+      "rowid": 1,
+      "id": "hkpl-2024:2024-09845"
+    },
+    "builtAt": "2026-11-04T16:48:42.134Z",
+    "url": "https://db.jimbocho.app/books.db"
+  }
 }
