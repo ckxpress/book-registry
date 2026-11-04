@@ -1588,18 +1588,18 @@
       "importedAt": "2026-11-04T06:00:41.997Z"
     }
   ],
-  "coversResolvedAt": "2026-11-04T06:05:43.261Z",
-  "coversFound": 2555,
+  "coversResolvedAt": "2026-11-04T20:09:30.215Z",
+  "coversFound": 10148,
   "db": {
     "file": "books.db",
-    "bytes": 60060672,
+    "bytes": 278445056,
     "pageSize": 1024,
-    "pages": 58653,
+    "pages": 271919,
     "probe": {
       "rowid": 1,
-      "id": "hkpl-2024:2024-09845"
+      "id": "hkpl-2017:2017-09285"
     },
-    "builtAt": "2026-11-04T16:48:42.134Z",
+    "builtAt": "2026-11-04T20:10:16.345Z",
     "url": "https://db.jimbocho.app/books.db"
   }
 }

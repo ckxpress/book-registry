@@ -819,7 +819,7 @@
         }
       });
     },
-    page: function (offset, limit) {
+    page: function (offset, limit, knownTotal) {
       var where = sqlWhere(null);
       var order = sqlOrder();
       var columns =
@@ -838,7 +838,9 @@
           ' ORDER BY bm25(books_fts) LIMIT ? OFFSET ?) h JOIN books b ON b.rowid = h.rowid';
         return Promise.all([
           SqliteSource.query(sql, [where.match, limit, offset]),
-          SqliteSource.query('SELECT COUNT(*) AS n FROM books_fts WHERE books_fts MATCH ?', [where.match]),
+          knownTotal !== undefined
+            ? Promise.resolve([{ n: knownTotal }])
+            : SqliteSource.query('SELECT COUNT(*) AS n FROM books_fts WHERE books_fts MATCH ?', [where.match]),
         ]).then(function (res) {
           return { rows: res[0].map(mapSqlRow), total: res[1][0].n };
         });
@@ -847,8 +849,22 @@
       sql = 'SELECT ' + columns + ' FROM ' + where.from + where.sql + ' ORDER BY ' + order + ' LIMIT ? OFFSET ?';
 
       var counting;
-      if (!where.params.length) {
+      var countScope = precomputedScope(null);
+      if (knownTotal !== undefined) {
+        counting = Promise.resolve([{ n: knownTotal }]); // appending: the total cannot have changed
+      } else if (!where.params.length) {
         counting = Promise.resolve([{ n: totalBooks }]); // unfiltered: already known
+      } else if (countScope) {
+        // A single language is the common case — it is the default view — and
+        // COUNT(*) there walks every index entry for that language: about a
+        // megabyte over range requests at a hundred thousand books, growing
+        // with the catalogue. The same number was counted at build time.
+        counting = SqliteSource.query(
+          "SELECT n FROM facet_counts WHERE scope = '' AND facet = 'language' AND value = ? LIMIT 1",
+          [countScope]
+        ).then(function (res) {
+          return res.length ? res : SqliteSource.query('SELECT COUNT(*) AS n FROM ' + where.from + where.sql, where.params);
+        });
       } else if (where.onlyQuery) {
         // Counting a plain search needs the FTS index alone — joining `books`
         // would pull a page per matching row across the network for nothing.
@@ -1135,7 +1151,7 @@
     var token = renderToken;
     SqliteSource._busy = true;
     return source
-      .page(results.length, PAGE_SIZE)
+      .page(results.length, PAGE_SIZE, totalResults)
       .then(function (res) {
         SqliteSource._busy = false;
         if (token !== renderToken || !res.rows.length) return;

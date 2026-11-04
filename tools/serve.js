@@ -95,8 +95,12 @@ const server = http.createServer((req, res) => {
         const name = path.basename(file);
         rangeBytes[name] = (rangeBytes[name] || 0) + (end - start + 1);
         rangeCount[name] = (rangeCount[name] || 0) + 1;
+        // The offset matters as much as the size: a page number maps back to
+        // a table or index via `dbstat`, which is how a read-ahead ramp is
+        // traced to the query that caused it.
         console.log(
           '  range ' + name + '  ' + String(Math.round((end - start + 1) / 1024)).padStart(5) + ' KiB' +
+            '  @page ' + String(Math.floor(start / 1024) + 1).padStart(7) +
             '   total ' + (rangeBytes[name] / 1048576).toFixed(2) + ' MB in ' + rangeCount[name] + ' requests'
         );
       }
