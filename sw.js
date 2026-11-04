@@ -1,4 +1,4 @@
-/* 神保町 jinbocho.app — service worker.
+/* 神保町 jimbocho.app — service worker.
  *
  * Deliberately network-first for everything the app is made of. A cache-first
  * worker would be faster, but this site rebuilds its whole data set on every
@@ -9,7 +9,7 @@
  */
 'use strict';
 
-var CACHE = 'jinbocho-v1';
+var CACHE = 'jimbocho-v1';
 var NET_TIMEOUT = 4000;
 
 /* Enough to open the app and show the shelf with no network at all. The data

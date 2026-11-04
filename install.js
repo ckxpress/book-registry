@@ -1,4 +1,4 @@
-/* 神保町 jinbocho.app — "add to home screen / dock" encouragement.
+/* 神保町 jimbocho.app — "add to home screen / dock" encouragement.
  *
  * Two different worlds to serve:
  *   Chrome, Edge, Samsung, Brave  — fire `beforeinstallprompt`, so we can
@@ -147,7 +147,7 @@
         'Android 版 Firefox：開啟右上角選單，選「安裝」',
         '桌面版 Firefox 暫未支援安裝網頁應用程式',
       ],
-      note: '想在電腦上安裝，可用 Chrome、Edge 或 Safari 開啟 jinbocho.app。',
+      note: '想在電腦上安裝，可用 Chrome、Edge 或 Safari 開啟 jimbocho.app。',
     },
     other: {
       title: '安裝應用程式',
