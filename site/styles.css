@@ -1219,3 +1219,191 @@ a.tag-link:focus-visible {
   color: var(--accent-text);
   font-weight: 500;
 }
+
+/* ---------- install to home screen / dock ---------- */
+
+.install-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+}
+.install-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.install-btn:hover {
+  background: var(--accent-soft);
+}
+
+/* The second-visit banner. Sits above the iOS home indicator rather than
+   under it, which is why the inset is added to the padding. */
+.install-nudge {
+  position: fixed;
+  z-index: 60;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  margin: 0 auto;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 14px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  background: var(--bg-elev);
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.install-nudge.in {
+  opacity: 1;
+  transform: none;
+}
+.install-nudge img {
+  border-radius: 9px;
+  flex: 0 0 auto;
+}
+.in-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.in-text strong {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.in-text span {
+  font-size: 12.5px;
+  color: var(--text-soft);
+}
+.install-nudge .in-go {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 500;
+  flex: 0 0 auto;
+}
+.install-nudge .in-x {
+  padding: 6px 8px;
+  font-size: 13px;
+  flex: 0 0 auto;
+}
+
+/* Safari's instruction sheet. */
+.install-sheet {
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--bg-elev);
+  color: var(--text);
+  padding: 22px 24px;
+  width: min(400px, calc(100vw - 32px));
+  box-shadow: var(--shadow);
+}
+.install-sheet::backdrop {
+  background: rgba(16, 14, 10, 0.44);
+}
+.is-head {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.is-head img {
+  border-radius: 11px;
+  flex: 0 0 auto;
+}
+.is-head h3 {
+  margin: 0;
+  font-size: 17px;
+}
+.is-lead {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+.is-steps {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.is-steps li {
+  display: flex;
+  gap: 11px;
+  align-items: baseline;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.is-steps b {
+  flex: 0 0 auto;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  margin-top: 1px;
+}
+.is-glyph {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: -2px;
+  margin: 0 1px;
+  color: var(--accent);
+}
+.is-note {
+  margin: 16px 0 0;
+  font-size: 12.5px;
+  color: var(--text-faint);
+  line-height: 1.55;
+}
+.install-sheet menu {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 0 0;
+  padding: 0;
+}
+.install-sheet .btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 500;
+}
+
+/* Running as an installed app: the install affordances are pointless, and the
+   top bar wants the extra room under the status bar. */
+@media (display-mode: standalone), (display-mode: minimal-ui), (display-mode: window-controls-overlay) {
+  .install-btn,
+  .install-nudge {
+    display: none !important;
+  }
+  .topbar {
+    padding-top: env(safe-area-inset-top);
+  }
+  .footer {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+}

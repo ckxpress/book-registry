@@ -241,9 +241,68 @@ cp site/icons/icon-180.png site/apple-touch-icon.png
 cp site/icons/icon-32.png  site/favicon.png
 ```
 
-The panel colour `#BE4E30` is the `theme_color` in `site.webmanifest` and the
-`theme-color` meta, so the browser chrome matches on Android and in installed
-windows.
+`icon-maskable-512.png` is a separate build for Android's adaptive masks,
+which crop to a circle inscribed in the middle 80%. The artwork is scaled to
+410px and padded back out to 512 with the same `#BE4E30`, so the mask only ever
+eats panel colour:
+
+```bash
+sips -Z 410 site/icons/icon-1600.png --out /tmp/inner.png
+sips -p 512 512 --padColor BE4E30 /tmp/inner.png --out site/icons/icon-maskable-512.png
+```
+
+The panel colour `#BE4E30` is the manifest's `theme_color` and
+`background_color`, so the Android splash screen is the same terracotta the
+icon sits on. The `theme-color` **meta** tags are deliberately different — see
+below.
+
+## Installing it as an app
+
+The site is a progressive web app: it can be added to a phone's home screen or
+a Mac's Dock and then opens in its own window, with no browser chrome.
+
+`site/sw.js` is the service worker, and it is **network-first for everything**.
+A cache-first worker would load faster, but this project regenerates its whole
+data set on every import, and a worker that served last week's `app.js` against
+this week's `manifest.json` would break the page in a way an ordinary visitor
+has no way to clear. So every request tries the network first and falls back to
+the cache after four seconds or on failure. The cache is there for the MTR
+tunnel, not for speed. Verified: with the dev server stopped outright, the app
+still opens and renders all 25,385 books.
+
+Only same-origin requests are cached. Cover thumbnails come from Google and
+arrive as opaque responses, which some browsers charge several megabytes each
+against the storage quota — not worth it for a thumbnail. Range requests are
+passed straight through, because putting a 206 into the Cache API corrupts it
+and that is how the SQLite backend reads the database.
+
+`site/install.js` does the asking, and the two browser families need opposite
+handling:
+
+- **Chromium** (Chrome, Edge, Brave, Samsung) fires `beforeinstallprompt`. That
+  event is stashed, Chrome's own mini-infobar is suppressed, and the real
+  install dialog opens on a tap of our button instead.
+- **Safari** has no API at all, on either iOS or macOS — Apple's choice. All
+  that can be done is tell the visitor which menu to open, so the sheet names
+  the actual menu items: 「分享」→「加入主畫面」on iOS, 「檔案」→「加入 Dock…」
+  on macOS Sonoma or later.
+
+The nagging is kept in check: nothing is shown when already running installed
+(`display-mode: standalone`), the banner waits for the second visit and never
+returns once dismissed, and the top-bar 安裝 button is always there for anyone
+who wants it sooner.
+
+Two more details worth knowing:
+
+- The `theme-color` metas track the **top bar** (`#ffffff` / `#1e1e18`), not the
+  brand terracotta, so in an installed window the status bar blends into the
+  page instead of sitting on it as a stripe. A browser uses the first
+  `theme-color` whose `media` matches, so the only way to express "the visitor
+  overrode the system theme" is to give both tags the same colour — which is
+  what `syncThemeColor()` in `app.js` does.
+- `screenshots` in the manifest are what make Chrome show a rich install dialog
+  with a preview rather than a bare one-line prompt. Their declared `sizes`
+  must match the files exactly or Chrome silently ignores them.
 
 ## Deploying
 
@@ -402,6 +461,9 @@ tools/lib/             CSV parser, downloader/cache, field matching,
 site/                  index.html + styles.css + app.js, no framework
 site/tokenize.js       search tokenizer, shared with the build
 site/schema.js         facet SQL, shared with the build
+site/sw.js             service worker: network-first, offline fallback
+site/install.js        add-to-home-screen / add-to-Dock prompting
+site/site.webmanifest  app name, icons, shortcuts, install screenshots
 site/vendor/           sql.js-httpvfs (MIT), vendored — no CDN at runtime
 site/data/             generated: manifest.json + shards + books.db (git-tracked)
 cache/                 downloaded source files (git-ignored)

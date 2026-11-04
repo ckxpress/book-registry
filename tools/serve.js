@@ -16,6 +16,10 @@ const TYPES = {
   '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  // GitHub Pages serves these two; match it so a manifest or icon problem
+  // shows up here rather than only after a deploy.
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
+  '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',

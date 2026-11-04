@@ -11,9 +11,22 @@
     <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
     <link rel="manifest" href="site.webmanifest" />
-    <meta name="theme-color" content="#BE4E30" />
+
+    <!-- Installed-app behaviour. The theme colour tracks the top bar rather
+         than the brand terracotta, so the status bar blends into the page
+         instead of sitting on it as a stripe. -->
+    <meta id="tc-light" name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta id="tc-dark" name="theme-color" media="(prefers-color-scheme: dark)" content="#1e1e18" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="神保町" />
+    <meta name="application-name" content="神保町" />
+
+    <script defer src="install.js"></script>
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="神保町" />

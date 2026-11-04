@@ -1,16 +1,88 @@
 {
+  "id": "/",
   "name": "神保町 jinbocho.app",
   "short_name": "神保町",
   "description": "瀏覽及搜尋香港書刊資料，建立自己的書架並標示二手售價。",
   "lang": "zh-Hant-HK",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#14140f",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "orientation": "any",
+  "background_color": "#BE4E30",
   "theme_color": "#BE4E30",
+  "categories": [
+    "books",
+    "education",
+    "utilities"
+  ],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "我的書架",
+      "short_name": "書架",
+      "description": "這部裝置上已標示擁有的書刊",
+      "url": "./#/shelf",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "資料說明",
+      "short_name": "說明",
+      "description": "資料來源與涵蓋範圍",
+      "url": "./#/about",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/wide.jpg",
+      "sizes": "800x500",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "瀏覽及篩選香港書刊目錄"
+    },
+    {
+      "src": "screenshots/narrow.jpg",
+      "sizes": "555x1200",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "在手機上瀏覽書刊"
+    }
   ]
 }
