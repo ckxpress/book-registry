@@ -2327,6 +2327,28 @@
   function applyTheme(theme) {
     if (theme === 'dark' || theme === 'light') document.documentElement.setAttribute('data-theme', theme);
     else document.documentElement.removeAttribute('data-theme');
+    syncThemeColor(theme);
+  }
+
+  /**
+   * Keep the status-bar / title-bar colour matched to the top bar. It matters
+   * once the app is installed, where that strip is part of the window rather
+   * than part of the browser.
+   *
+   * Two media-scoped <meta theme-color> tags cover the system-driven case with
+   * no script at all. A browser uses the first one whose media matches, so the
+   * only way to express "the visitor overrode the system" is to give both tags
+   * the same colour; clearing the override puts each back to its own.
+   */
+  var THEME_COLOR = { light: '#ffffff', dark: '#1e1e18' };
+
+  function syncThemeColor(theme) {
+    var light = document.getElementById('tc-light');
+    var dark = document.getElementById('tc-dark');
+    if (!light || !dark) return;
+    var forced = theme === 'dark' || theme === 'light' ? THEME_COLOR[theme] : null;
+    light.setAttribute('content', forced || THEME_COLOR.light);
+    dark.setAttribute('content', forced || THEME_COLOR.dark);
   }
 
   function setViewButtons() {
