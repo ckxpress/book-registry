@@ -1152,23 +1152,36 @@
     if (pending) pending.then(function () { requestAnimationFrame(maybeLoadMore); });
   }
 
+  /**
+   * A card is a container rather than one big link, so the author and
+   * publisher can be real links to their own listings. The title link is
+   * stretched over the whole card in CSS, which keeps "click anywhere" while
+   * leaving the inner links clickable, focusable and openable in a new tab —
+   * none of which works with anchors nested inside an anchor.
+   */
   function card(row, terms) {
-    var a = document.createElement('a');
+    var a = document.createElement('article');
     a.className = 'card';
-    a.href = '#/book/' + encodeURIComponent(row.id);
 
-    var cover = coverEl(row);
-    // One control per card: the grid gets it on the cover, the list gets the
+    a.appendChild(coverEl(row));
+
+    // One control per card: the grid gets it over the cover, the list gets the
     // labelled one beside the text, where the thumbnail is too small for it.
-    if (state.view !== 'list') cover.appendChild(ownButton(row.id, 'icon', row));
-    a.appendChild(cover);
+    // It hangs off the card rather than the cover, because the cover picks up
+    // a transform on hover, and a transform traps z-index in its own stacking
+    // context — which put the button under the card's click overlay.
+    if (state.view !== 'list') a.appendChild(ownButton(row.id, 'icon', row));
 
     var body = document.createElement('div');
     body.className = 'card-body';
 
     var title = document.createElement('h3');
     title.className = 'card-title';
-    title.innerHTML = highlight(displayTitle(row) || '無題', terms);
+    var titleLink = document.createElement('a');
+    titleLink.className = 'card-link';
+    titleLink.href = '#/book/' + encodeURIComponent(row.id);
+    titleLink.innerHTML = highlight(displayTitle(row) || '無題', terms);
+    title.appendChild(titleLink);
     body.appendChild(title);
 
     var other = altTitle(row);
@@ -1186,11 +1199,7 @@
       body.appendChild(sub);
     }
 
-    var meta = document.createElement('p');
-    meta.className = 'card-meta';
-    var authors = (row.authors || []).join(', ');
-    meta.innerHTML = [authors ? highlight(authors, terms) : '', joinMeta(row)].filter(Boolean).join('<br>');
-    body.appendChild(meta);
+    body.appendChild(metaLine(row, terms));
 
     if (state.view === 'list') {
       var tags = document.createElement('div');
@@ -1255,6 +1264,40 @@
     b.setAttribute('aria-pressed', String(owned));
     b.setAttribute('aria-label', label);
     b.title = label;
+  }
+
+  /** Author and publisher as links to their own listings. */
+  function metaLine(row, terms) {
+    var meta = document.createElement('p');
+    meta.className = 'card-meta';
+
+    (row.authors || []).forEach(function (name, i) {
+      if (i) meta.appendChild(document.createTextNode('、'));
+      meta.appendChild(metaLink(name, searchHref(name), terms, '搜尋著者：' + name));
+    });
+
+    if ((row.authors || []).length) meta.appendChild(document.createElement('br'));
+
+    if (row.publisher) {
+      // The publisher is a facet, so this filters exactly rather than searching.
+      meta.appendChild(
+        metaLink(row.publisher, '#/?publisher=' + encodeURIComponent(row.publisher), terms, '瀏覽出版者：' + row.publisher)
+      );
+    }
+    if (row.year) {
+      if (row.publisher) meta.appendChild(document.createTextNode(' · '));
+      meta.appendChild(document.createTextNode(String(row.year)));
+    }
+    return meta;
+  }
+
+  function metaLink(text, href, terms, label) {
+    var link = document.createElement('a');
+    link.className = 'meta-link';
+    link.href = href;
+    link.innerHTML = highlight(text, terms);
+    link.title = label;
+    return link;
   }
 
   function tag(text) {

@@ -450,17 +450,49 @@ a {
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 9px;
   text-decoration: none;
   color: inherit;
 }
+
+/* The title link covers the card, so clicking anywhere opens the book — but
+   it sits below the author, publisher and own controls, which stay clickable
+   in their own right. */
+.card-link {
+  color: inherit;
+  text-decoration: none;
+}
+.card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.card-meta a,
+.price-tag,
+.tagrow,
+.own {
+  position: relative;
+  z-index: 1;
+}
+
+.meta-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.meta-link:hover {
+  color: var(--accent);
+  border-bottom-color: currentColor;
+}
 .card:hover .cover {
   transform: translateY(-3px);
   box-shadow: var(--shadow);
 }
-.card:hover .card-title {
+.card:hover .card-title a {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -939,7 +971,7 @@ mark {
   position: absolute;
   top: 7px;
   right: 7px;
-  z-index: 2;
+  z-index: 3;
   width: 30px;
   height: 30px;
   padding: 0;
