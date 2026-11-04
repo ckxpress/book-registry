@@ -476,35 +476,70 @@
    */
   var Shelf = {
     key: 'shelf.owned',
-    _set: null,
+    _items: null, // id -> { p: asking price or null, at: when added }
 
     all: function () {
-      if (Shelf._set) return Shelf._set;
-      var ids = [];
+      if (Shelf._items) return Shelf._items;
+      var items = {};
       try {
-        ids = JSON.parse(localStorage.getItem(Shelf.key) || '[]');
+        var raw = JSON.parse(localStorage.getItem(Shelf.key) || 'null');
+        if (Array.isArray(raw)) {
+          // v1 kept a plain list of ids, before shelves carried a price.
+          raw.forEach(function (id) { if (typeof id === 'string') items[id] = { p: null, at: null }; });
+        } else if (raw && raw.items) {
+          items = raw.items;
+        }
       } catch (err) {
-        ids = [];
+        items = {};
       }
-      Shelf._set = new Set(Array.isArray(ids) ? ids : []);
-      return Shelf._set;
+      Shelf._items = items;
+      return items;
     },
 
     has: function (id) {
-      return Shelf.all().has(id);
+      return Object.prototype.hasOwnProperty.call(Shelf.all(), id);
     },
 
-    toggle: function (id) {
-      var set = Shelf.all();
-      if (set.has(id)) set.delete(id);
-      else set.add(id);
+    get: function (id) {
+      return Shelf.all()[id] || null;
+    },
+
+    price: function (id) {
+      var entry = Shelf.get(id);
+      return entry && typeof entry.p === 'number' ? entry.p : null;
+    },
+
+    add: function (id, price) {
+      Shelf.all()[id] = { p: typeof price === 'number' ? price : null, at: new Date().toISOString() };
       Shelf.save();
-      return set.has(id);
+    },
+
+    setPrice: function (id, price) {
+      var entry = Shelf.get(id);
+      if (!entry) return;
+      entry.p = typeof price === 'number' ? price : null;
+      Shelf.save();
+    },
+
+    remove: function (id) {
+      delete Shelf.all()[id];
+      Shelf.save();
+    },
+
+    ids: function () {
+      return Object.keys(Shelf.all());
+    },
+
+    total: function () {
+      return Shelf.ids().reduce(function (sum, id) {
+        var p = Shelf.price(id);
+        return sum + (p || 0);
+      }, 0);
     },
 
     save: function () {
       try {
-        localStorage.setItem(Shelf.key, JSON.stringify([...Shelf.all()]));
+        localStorage.setItem(Shelf.key, JSON.stringify({ v: 2, items: Shelf.all() }));
       } catch (err) {
         // Private browsing, or storage full. Say so rather than pretending.
         alert('無法儲存書架：瀏覽器拒絕寫入本機儲存空間。');
@@ -513,9 +548,70 @@
     },
 
     size: function () {
-      return Shelf.all().size;
+      return Shelf.ids().length;
     },
   };
+
+  /**
+   * Asks what the book should sell for, pre-filled with its catalogue price.
+   * Returns the price, or undefined if the reader backed out — null means
+   * they deliberately left it blank.
+   */
+  function askPrice(opts) {
+    return new Promise(function (resolve) {
+      var dlg = document.getElementById('price-dialog');
+      if (!dlg) {
+        dlg = document.createElement('dialog');
+        dlg.id = 'price-dialog';
+        dlg.className = 'price-dialog';
+        document.body.appendChild(dlg);
+      }
+
+      var original = typeof opts.original === 'number' ? opts.original : null;
+      var current = typeof opts.current === 'number' ? opts.current : null;
+      var value = current !== null ? current : original;
+
+      dlg.innerHTML =
+        '<form method="dialog">' +
+        '<h3>' + (opts.editing ? '修改售價' : '加入我的書架') + '</h3>' +
+        '<p class="pd-book">' + escapeHtml(opts.title || '') + '</p>' +
+        '<label class="pd-field"><span>二手售價</span>' +
+        '<span class="pd-input"><i>HK$</i>' +
+        '<input type="number" id="pd-price" min="0" step="1" inputmode="decimal" ' +
+        'value="' + (value === null ? '' : value) + '" placeholder="未定價"></span></label>' +
+        '<p class="pd-hint">' +
+        (original !== null ? '原價 ' + money(original, opts.currency || 'HKD') + '，可自行調整。' : '目錄沒有記錄原價。') +
+        '留空表示暫不標價。</p>' +
+        '<menu>' +
+        '<button value="cancel" class="btn">取消</button>' +
+        '<button value="ok" class="btn primary">' + (opts.editing ? '儲存' : '加入書架') + '</button>' +
+        '</menu></form>';
+
+      var input = dlg.querySelector('#pd-price');
+      var settled = false;
+
+      function finish(ok) {
+        if (settled) return;
+        settled = true;
+        dlg.removeEventListener('close', onClose);
+        if (!ok) return resolve(undefined);
+        var raw = input.value.trim();
+        if (raw === '') return resolve(null);
+        var n = Number(raw);
+        resolve(isNaN(n) || n < 0 ? null : n);
+      }
+
+      function onClose() {
+        // Esc, or the backdrop — treated as backing out.
+        finish(dlg.returnValue === 'ok');
+      }
+
+      dlg.addEventListener('close', onClose);
+      dlg.showModal();
+      input.focus();
+      input.select();
+    });
+  }
 
   function updateShelfCount() {
     var n = Shelf.size();
@@ -535,30 +631,42 @@
       var at = id.indexOf(':');
       var ds = at === -1 ? '' : id.slice(0, at);
       var ref = at === -1 ? id : id.slice(at + 1);
-      (byDataset[ds] = byDataset[ds] || []).push(ref);
+      var price = Shelf.price(id);
+      // "ref" on its own, or "ref:price" — a shared shelf is a sale list.
+      (byDataset[ds] = byDataset[ds] || []).push(price === null ? ref : ref + ':' + price);
     });
     var parts = Object.keys(byDataset).map(function (ds) {
       return ds + '=' + byDataset[ds].join(',');
     });
-    return base64url(unescape(encodeURIComponent('1|' + parts.join(';'))));
+    return base64url(unescape(encodeURIComponent('2|' + parts.join(';'))));
   }
 
   function decodeShelf(code) {
+    var out = { ids: [], prices: {} };
     try {
       var text = decodeURIComponent(escape(unbase64url(code)));
-      if (text.indexOf('1|') !== 0) return [];
-      var ids = [];
+      var version = text.slice(0, 2);
+      if (version !== '1|' && version !== '2|') return out;
       text.slice(2).split(';').forEach(function (chunk) {
         var at = chunk.indexOf('=');
         if (at === -1) return;
         var ds = chunk.slice(0, at);
-        chunk.slice(at + 1).split(',').forEach(function (ref) {
-          if (ref) ids.push(ds ? ds + ':' + ref : ref);
+        chunk.slice(at + 1).split(',').forEach(function (part) {
+          if (!part) return;
+          // v2 appends ":price"; v1 links carry the reference alone.
+          var bits = part.split(':');
+          var ref = bits[0];
+          var id = ds ? ds + ':' + ref : ref;
+          out.ids.push(id);
+          if (bits.length > 1 && bits[1] !== '') {
+            var n = Number(bits[1]);
+            if (!isNaN(n)) out.prices[id] = n;
+          }
         });
       });
-      return ids;
+      return out;
     } catch (err) {
-      return [];
+      return out;
     }
   }
 
@@ -1052,7 +1160,7 @@
     var cover = coverEl(row);
     // One control per card: the grid gets it on the cover, the list gets the
     // labelled one beside the text, where the thumbnail is too small for it.
-    if (state.view !== 'list') cover.appendChild(ownButton(row.id, 'icon'));
+    if (state.view !== 'list') cover.appendChild(ownButton(row.id, 'icon', row));
     a.appendChild(cover);
 
     var body = document.createElement('div');
@@ -1094,7 +1202,7 @@
       body.appendChild(tags);
     }
 
-    if (state.view === 'list') body.appendChild(ownButton(row.id, 'inline'));
+    if (state.view === 'list') body.appendChild(ownButton(row.id, 'inline', row));
 
     a.appendChild(body);
     return a;
@@ -1108,7 +1216,7 @@
    * below the text it sat at the bottom of a card, after the publisher line,
    * where nobody found it.
    */
-  function ownButton(id, mode) {
+  function ownButton(id, mode, row) {
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'own own-' + mode + (Shelf.has(id) ? ' owned' : '');
@@ -1117,11 +1225,23 @@
     b.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
-      Shelf.toggle(id);
-      b.classList.toggle('owned');
-      paintOwn(b, mode);
-      // Keep the shelf honest if the reader is looking at it.
-      if (!el.shelf.hidden) renderShelf();
+
+      if (Shelf.has(id)) {
+        Shelf.remove(id);
+        b.classList.remove('owned');
+        paintOwn(b, mode);
+        if (!el.shelf.hidden) renderShelf();
+        return;
+      }
+
+      // Adding asks what it should sell for, starting from the catalogue price.
+      askPrice({ title: displayTitle(row), original: row.price, currency: row.currency }).then(function (price) {
+        if (price === undefined) return; // backed out
+        Shelf.add(id, price);
+        b.classList.add('owned');
+        paintOwn(b, mode);
+        if (!el.shelf.hidden) renderShelf();
+      });
     });
     return b;
   }
@@ -1497,7 +1617,17 @@
       var host = el.detail.querySelector('.detail-cover');
       if (host) host.replaceWith(bigCover(book, book));
       var ownHost = el.detail.querySelector('#detail-own');
-      if (ownHost) ownHost.replaceWith(ownButton(book.id, 'long'));
+      if (ownHost) {
+        ownHost.replaceWith(
+          ownButton(book.id, 'long', {
+            id: book.id,
+            title: book.title,
+            parallelTitle: book.parallelTitle,
+            price: book.price && typeof book.price.amount === 'number' ? book.price.amount : null,
+            currency: book.price ? book.price.currency : 'HKD',
+          })
+        );
+      }
       document.title = (displayTitle(book) || '書刊') + ' — 香港書刊目錄';
     });
   }
@@ -1677,7 +1807,9 @@
   function renderShelf() {
     var params = new URLSearchParams((location.hash.split('?')[1] || ''));
     var shared = params.get('s');
-    var ids = shared ? decodeShelf(shared) : [...Shelf.all()];
+    var decoded = shared ? decodeShelf(shared) : null;
+    var ids = shared ? decoded.ids : Shelf.ids();
+    var sharedPrices = shared ? decoded.prices : null;
     var mine = !shared;
 
     var out = [];
@@ -1697,7 +1829,13 @@
       return;
     }
 
-    out.push('<p class="shelf-count">共 <strong>' + fmt(ids.length) + '</strong> 本</p>');
+    var priced = mine ? ids.filter(function (id) { return Shelf.price(id) !== null; }).length : sharedPrices ? Object.keys(sharedPrices).length : 0;
+    var total = mine ? Shelf.total() : Object.keys(sharedPrices || {}).reduce(function (n, k) { return n + (sharedPrices[k] || 0); }, 0);
+    out.push(
+      '<p class="shelf-count">共 <strong>' + fmt(ids.length) + '</strong> 本' +
+        (priced ? ' · 已標價 <strong>' + fmt(priced) + '</strong> 本，合計 <strong>' + money(total, 'HKD') + '</strong>' : '') +
+        '</p>'
+    );
     if (mine) {
       out.push(
         '<div class="shelf-actions">' +
@@ -1723,11 +1861,51 @@
         return;
       }
       var frag = document.createDocumentFragment();
-      rows.forEach(function (row) { frag.appendChild(card(row, [])); });
+      rows.forEach(function (row) {
+        var el2 = card(row, []);
+        el2.appendChild(priceTag(row, mine, sharedPrices));
+        frag.appendChild(el2);
+      });
       grid.appendChild(frag);
     });
 
     if (mine) wireShelfActions(ids);
+  }
+
+  /** The asking price under a book on the shelf — editable when it is yours. */
+  function priceTag(row, mine, sharedPrices) {
+    var price = mine ? Shelf.price(row.id) : sharedPrices && typeof sharedPrices[row.id] === 'number' ? sharedPrices[row.id] : null;
+    var wrap = document.createElement('div');
+    wrap.className = 'price-tag';
+
+    var label = document.createElement('span');
+    label.className = 'price-value' + (price === null ? ' unpriced' : '');
+    label.textContent = price === null ? '未定價' : money(price, 'HKD');
+    wrap.appendChild(label);
+
+    if (!mine) return wrap;
+
+    var edit = document.createElement('button');
+    edit.type = 'button';
+    edit.className = 'price-edit';
+    edit.textContent = '改價';
+    edit.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      askPrice({
+        title: displayTitle(row),
+        original: row.price,
+        currency: row.currency,
+        current: price,
+        editing: true,
+      }).then(function (next) {
+        if (next === undefined) return;
+        Shelf.setPrice(row.id, next);
+        renderShelf();
+      });
+    });
+    wrap.appendChild(edit);
+    return wrap;
   }
 
   function wireShelfActions(ids) {
@@ -1742,7 +1920,19 @@
     });
 
     document.getElementById('shelf-export').addEventListener('click', function () {
-      var blob = new Blob([JSON.stringify({ version: 1, owned: ids }, null, 2)], { type: 'application/json' });
+      var blob = new Blob(
+        [
+          JSON.stringify(
+            {
+              version: 2,
+              owned: ids.map(function (id) { return { id: id, price: Shelf.price(id) }; }),
+            },
+            null,
+            2
+          ),
+        ],
+        { type: 'application/json' }
+      );
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = 'my-bookshelf.json';
@@ -1760,8 +1950,10 @@
           var incoming = Array.isArray(data) ? data : data.owned;
           if (!Array.isArray(incoming)) throw new Error('格式不符');
           // Merge rather than replace: an import should not silently drop books.
-          incoming.forEach(function (id) { if (typeof id === 'string') Shelf.all().add(id); });
-          Shelf.save();
+          incoming.forEach(function (entry) {
+            if (typeof entry === 'string') { if (!Shelf.has(entry)) Shelf.add(entry, null); }
+            else if (entry && entry.id && !Shelf.has(entry.id)) Shelf.add(entry.id, entry.price);
+          });
           renderShelf();
         } catch (err) {
           alert('無法匯入：' + err.message);

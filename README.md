@@ -111,8 +111,14 @@ one or two lookups that mostly failed.
 
 ## The reader's bookshelf
 
-Any book can be marked **＋ 我有** from a card or its page, and 我的書架 lists
-what the reader owns.
+Any book can be marked **＋ 我有** from the corner of its cover, and 我的書架
+lists what the reader owns.
+
+Adding one asks what it should sell for second-hand, pre-filled with the
+catalogue price where the record has one (2,243 records are unpriced annual
+reports and the like, so the field can be left blank — those show as 未定價).
+The price is editable from the shelf, which totals what has been priced, and it
+travels with the share link, since a shared shelf is effectively a sale list.
 
 **There are no accounts.** The site is static files on GitHub Pages — there is
 no server to authenticate against and nowhere to keep a profile — so the shelf
