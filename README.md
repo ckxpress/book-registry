@@ -278,7 +278,14 @@ npm run build
 ```
 
 That runs the import and then the database build. `npm run build:db` alone
-rebuilds only the database. It needs the `sqlite3` CLI with FTS5 — macOS ships
+rebuilds only the database.
+
+**`site/data/books.db` is not committed.** It is derived from the shards, it is
+~45 MB, and git would keep every rebuild of it forever. Run `npm run build:db`
+to produce it locally; the deploy only publishes what is committed, so the
+database is absent from the published site until you host it deliberately —
+which for a catalogue large enough to need it means object storage anyway, not
+Pages. It needs the `sqlite3` CLI with FTS5 — macOS ships
 with it, `apt install sqlite3` elsewhere — and it checks before writing
 anything. Delete `books.db` and remove the `db` key from the manifest to go
 back to the JSON path.
