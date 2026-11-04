@@ -36,6 +36,9 @@ const DB = path.join(DATA_DIR, 'books.db');
 // so one request still covers several pages.
 const PAGE_SIZE = 1024;
 
+// Matches PAGE_SIZE in site/app.js — the first screenful the browser renders.
+const FIRST_PAGE_ROWS = 60;
+
 const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
 
 main();
@@ -117,6 +120,18 @@ function main() {
     builtAt: new Date().toISOString(),
   };
   if (url) manifest.db.url = url;
+
+  // The landing view is the same for every first-time reader, and answering it
+  // from the database costs scattered range requests that SQLite must issue one
+  // after another — it cannot ask for a page until it has read the page that
+  // points at it. Serial round trips, so the wait is latency times depth, and
+  // no amount of edge caching removes it.
+  //
+  // So the landing view is answered here instead, at build time, into a file
+  // the site serves and the service worker caches like any other asset. First
+  // paint then needs the database not at all; it is opened in the background
+  // for the first search or filter.
+  manifest.firstPage = writeFirstPage();
   fs.writeFileSync(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 
   console.log(
@@ -353,4 +368,76 @@ function str(value) {
 function pad(text, width) {
   const s = String(text);
   return s.length >= width ? s : s + ' '.repeat(width - s.length);
+}
+
+/**
+ * Precomputes the rows, totals and facet counts for the views a reader can
+ * land on without touching anything: the whole catalogue, and each single
+ * language on its own (the site defaults to Chinese).
+ *
+ * Columns are emitted under their database names so the browser can hand them
+ * to the same mapping function it uses for a real query result — one code path
+ * for both, so a precomputed card cannot render differently from a queried one.
+ */
+function writeFirstPage() {
+  const COLUMNS =
+    'b.id, b.dataset, b.title, b.subtitle, b.authors, b.publisher, b.year, b.isbn,' +
+    ' b.classification, b.language, b.series, b.ref, b.src, b.price, b.currency,' +
+    ' b.forsale, b.cover, b.parallel_title';
+  const ORDER = "b.cover = '', b.zh_first, b.title_display";
+
+  const languages = json("SELECT value FROM facet_counts WHERE scope = '' AND facet = 'language' ORDER BY n DESC")
+    .map((r) => r.value);
+
+  const scopes = {};
+  for (const scope of [''].concat(languages)) {
+    const where = scope ? ' WHERE b.language = ' + quote(scope) : '';
+    const rows = json(
+      'SELECT ' + COLUMNS + ' FROM books b' + where + ' ORDER BY ' + ORDER + ' LIMIT ' + FIRST_PAGE_ROWS
+    );
+    // Each facet is counted against the *other* active filters, so its options
+    // stay meaningful — the browser's own rule. Inside a single language that
+    // means every facet is counted within it, except `language` itself, which
+    // is counted across the whole catalogue so the other languages are still
+    // offered and reachable.
+    const within = (facet) => (facet === 'language' ? '' : scope);
+    const counts = json(
+      'SELECT scope, facet, value, n FROM facet_counts WHERE scope IN (' + quote(scope) + ", '')" +
+        ' ORDER BY facet, n DESC, value'
+    );
+
+    const facets = {};
+    for (const row of counts) {
+      if (row.scope !== within(row.facet)) continue;
+      if (!facets[row.facet]) facets[row.facet] = [];
+      if (facets[row.facet].length < FACET_LIMIT) facets[row.facet].push({ v: row.value, n: row.n });
+    }
+
+    const total = scope
+      ? json('SELECT n FROM facet_counts WHERE scope = \'\' AND facet = \'language\' AND value = ' + quote(scope))[0].n
+      : json("SELECT SUM(n) AS n FROM facet_counts WHERE scope = '' AND facet = 'language'")[0].n;
+
+    scopes[scope] = { total: total, rows: rows, facets: facets };
+  }
+
+  const out = { rows: FIRST_PAGE_ROWS, builtAt: new Date().toISOString(), scopes: scopes };
+  const file = 'firstpage.json';
+  fs.writeFileSync(path.join(DATA_DIR, file), JSON.stringify(out) + '\n');
+
+  const size = fs.statSync(path.join(DATA_DIR, file)).size;
+  console.log(
+    '  Landing view precomputed → ' + file + ', ' + (size / 1024).toFixed(0) + ' KB, ' +
+      Object.keys(scopes).length + ' scopes (no range requests for first paint)'
+  );
+  return { file: file, rows: FIRST_PAGE_ROWS, scopes: Object.keys(scopes) };
+}
+
+/** Runs a query and parses sqlite3's own JSON output, so types survive. */
+function json(sql) {
+  const out = execFileSync('sqlite3', ['-json', DB, sql], { maxBuffer: 1 << 28 }).toString().trim();
+  return out ? JSON.parse(out) : [];
+}
+
+function quote(value) {
+  return "'" + String(value).replace(/'/g, "''") + "'";
 }
