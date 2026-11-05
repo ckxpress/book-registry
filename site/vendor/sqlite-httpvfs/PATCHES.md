@@ -20,4 +20,21 @@ database is built, so the site passes it as `databaseLengthBytes`. Hosts that
 do return `content-length` are unaffected — the value is simply used instead
 of being rediscovered.
 
+## sqlite.worker.js — forward `maxReadSpeed` to the lazy file
+
+```diff
+- logPageReads:!0,maxReadHeads:3,requestLimiter:i}
++ logPageReads:!0,maxReadHeads:3,maxReadSpeed:e.maxReadSpeed,requestLimiter:i}
+```
+
+`LazyUint8Array` already reads `maxReadSpeed` — it is how far the VFS may run
+ahead once reads look sequential, defaulting to 5 MiB — but the worker builds
+the lazy file from a fixed set of options and never passes it on, so the
+default could not be changed.
+
+The default is far too generous for this database. Fetching a few hundred
+scattered rows in ascending rowid order looks sequential to the heuristic, so
+it prefetched megabytes of neighbouring pages no query had asked for: of a
+38 MB search at 288,230 books, 35 MB was this overshoot.
+
 Re-apply this after any upgrade of the vendored files.

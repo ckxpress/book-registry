@@ -840,6 +840,208 @@
           "period": "2026-11"
         }
       ]
+    },
+    {
+      "id": "ncl-2025",
+      "title": "臺灣出版新書預告書訊 — 2025",
+      "shortTitle": "臺灣 2025",
+      "adapter": "ncl-isbn",
+      "description": "2025年各出版者向國家圖書館國際標準書號中心申請 ISBN 的新書預告書目。資料為出版前申請紀錄，出版日為預訂日期。",
+      "provider": "國家圖書館 國際標準書號中心",
+      "homepage": "https://data.gov.tw/dataset/6730",
+      "dataDictionary": "https://isbn.ncl.edu.tw/NEW_ISBNNet/",
+      "license": "政府資料開放授權條款－第1版",
+      "licenseUrl": "https://data.gov.tw/license",
+      "region": "Taiwan",
+      "currency": "TWD",
+      "year": 2025,
+      "sources": [
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202501_isbn.csv",
+          "altUrls": [],
+          "label": "2025-01",
+          "language": "",
+          "period": "2025-01"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202502_isbn.csv",
+          "altUrls": [],
+          "label": "2025-02",
+          "language": "",
+          "period": "2025-02"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202503_isbn.csv",
+          "altUrls": [],
+          "label": "2025-03",
+          "language": "",
+          "period": "2025-03"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202504_isbn.csv",
+          "altUrls": [],
+          "label": "2025-04",
+          "language": "",
+          "period": "2025-04"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202505_isbn.csv",
+          "altUrls": [],
+          "label": "2025-05",
+          "language": "",
+          "period": "2025-05"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202506_isbn.csv",
+          "altUrls": [],
+          "label": "2025-06",
+          "language": "",
+          "period": "2025-06"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202507_isbn.csv",
+          "altUrls": [],
+          "label": "2025-07",
+          "language": "",
+          "period": "2025-07"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202508_isbn.csv",
+          "altUrls": [],
+          "label": "2025-08",
+          "language": "",
+          "period": "2025-08"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202509_isbn.csv",
+          "altUrls": [],
+          "label": "2025-09",
+          "language": "",
+          "period": "2025-09"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202510_isbn.csv",
+          "altUrls": [],
+          "label": "2025-10",
+          "language": "",
+          "period": "2025-10"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202511_isbn.csv",
+          "altUrls": [],
+          "label": "2025-11",
+          "language": "",
+          "period": "2025-11"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202512_isbn.csv",
+          "altUrls": [],
+          "label": "2025-12",
+          "language": "",
+          "period": "2025-12"
+        }
+      ]
+    },
+    {
+      "id": "ncl-2024",
+      "title": "臺灣出版新書預告書訊 — 2024",
+      "shortTitle": "臺灣 2024",
+      "adapter": "ncl-isbn",
+      "description": "2024年各出版者向國家圖書館國際標準書號中心申請 ISBN 的新書預告書目。資料為出版前申請紀錄，出版日為預訂日期。",
+      "provider": "國家圖書館 國際標準書號中心",
+      "homepage": "https://data.gov.tw/dataset/6730",
+      "dataDictionary": "https://isbn.ncl.edu.tw/NEW_ISBNNet/",
+      "license": "政府資料開放授權條款－第1版",
+      "licenseUrl": "https://data.gov.tw/license",
+      "region": "Taiwan",
+      "currency": "TWD",
+      "year": 2024,
+      "sources": [
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202401_isbn.csv",
+          "altUrls": [],
+          "label": "2024-01",
+          "language": "",
+          "period": "2024-01"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202402_isbn.csv",
+          "altUrls": [],
+          "label": "2024-02",
+          "language": "",
+          "period": "2024-02"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202403_isbn.csv",
+          "altUrls": [],
+          "label": "2024-03",
+          "language": "",
+          "period": "2024-03"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202404_isbn.csv",
+          "altUrls": [],
+          "label": "2024-04",
+          "language": "",
+          "period": "2024-04"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202405_isbn.csv",
+          "altUrls": [],
+          "label": "2024-05",
+          "language": "",
+          "period": "2024-05"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202406_isbn.csv",
+          "altUrls": [],
+          "label": "2024-06",
+          "language": "",
+          "period": "2024-06"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202407_isbn.csv",
+          "altUrls": [],
+          "label": "2024-07",
+          "language": "",
+          "period": "2024-07"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202408_isbn.csv",
+          "altUrls": [],
+          "label": "2024-08",
+          "language": "",
+          "period": "2024-08"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202409_isbn.csv",
+          "altUrls": [],
+          "label": "2024-09",
+          "language": "",
+          "period": "2024-09"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202410_isbn.csv",
+          "altUrls": [],
+          "label": "2024-10",
+          "language": "",
+          "period": "2024-10"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202411_isbn.csv",
+          "altUrls": [],
+          "label": "2024-11",
+          "language": "",
+          "period": "2024-11"
+        },
+        {
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202412_isbn.csv",
+          "altUrls": [],
+          "label": "2024-12",
+          "language": "",
+          "period": "2024-12"
+        }
+      ]
     }
   ]
 }

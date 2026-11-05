@@ -798,6 +798,13 @@
                   // cannot drift apart. Several pages per request: round trips
                   // cost far more than the extra bytes.
                   requestChunkSize: db.chunkBytes || 4096,
+                  // How far the VFS may run ahead once it decides reads look
+                  // sequential. Its default is 5 MiB, and the heuristic
+                  // misfires badly here: fetching a few hundred scattered rows
+                  // in ascending rowid order looks sequential to it, so it
+                  // prefetched megabytes of neighbouring pages that no query
+                  // wanted — 35 MB of a 38 MB search.
+                  maxReadSpeed: db.maxReadBytes || 524288,
                   // Some static hosts (GitHub Pages among them) answer HEAD
                   // without content-length, leaving the library unable to
                   // discover the file size. The manifest records it exactly.
@@ -887,13 +894,14 @@
       } else if (!where.params.length) {
         counting = Promise.resolve([{ n: totalBooks }]); // unfiltered: already known
       } else if (countScope) {
-        // A single language is the common case — it is the default view — and
-        // COUNT(*) there walks every index entry for that language: about a
-        // megabyte over range requests at a hundred thousand books, growing
-        // with the catalogue. The same number was counted at build time.
+        // One language, one dataset or one year — the views a reader lands on
+        // or clicks first. COUNT(*) there walks every index entry in the slice,
+        // which grows with the catalogue, and the count is the scope facet's
+        // own tally in the unnarrowed scope, already worked out at build time.
+        var at = countScope.indexOf(':');
         counting = SqliteSource.query(
-          "SELECT n FROM facet_counts WHERE scope = '' AND facet = 'language' AND value = ? LIMIT 1",
-          [countScope]
+          "SELECT n FROM facet_counts WHERE scope = '' AND facet = ? AND value = ? LIMIT 1",
+          [countScope.slice(0, at), countScope.slice(at + 1)]
         ).then(function (res) {
           return res.length ? res : SqliteSource.query('SELECT COUNT(*) AS n FROM ' + where.from + where.sql, where.params);
         });
@@ -1036,8 +1044,17 @@
     if (state.q || state.sort !== 'relevance') return null;
     var scope = precomputedScope(null);
     if (scope === null) return null;
-    return firstPage.scopes[scope] || null;
+    // firstpage.json only carries the whole catalogue and the single-language
+    // views, keyed by the bare language, since those are the only ones a reader
+    // can land on without clicking. Anything else comes from the database.
+    if (scope === '') return firstPage.scopes[''] || null;
+    if (scope.indexOf('language:') !== 0) return null;
+    return firstPage.scopes[scope.slice('language:'.length)] || null;
   }
+
+  // The facets the builder precomputes a scope for. Their values select large
+  // slices, so counting one live means reading every matching row.
+  var SCOPE_FACETS = ['language', 'dataset', 'year'];
 
   function precomputedScope(skipFacet) {
     if (matchExpression(state.q)) return null;
@@ -1049,8 +1066,8 @@
       if (!usable || facet.key === skipFacet) return;
       var set = state.filters[facet.key];
       if (!set || !set.size) return;
-      if (facet.key === 'language' && set.size === 1) {
-        set.forEach(function (value) { scope = value; });
+      if (SCOPE_FACETS.indexOf(facet.key) !== -1 && set.size === 1 && !scope) {
+        set.forEach(function (value) { scope = facet.key + ':' + value; });
       } else {
         usable = false;
       }

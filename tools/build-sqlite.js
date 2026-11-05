@@ -59,8 +59,41 @@ const PAGE_SIZE = 4096;
 // Past 32 KiB the request count barely moves while the bytes climb steeply.
 const CHUNK_SIZE = PAGE_SIZE * 8;
 
+/**
+ * How far the VFS may run ahead once it decides reads look sequential.
+ *
+ * Its own default is 5 MiB, and the heuristic misfires badly on this access
+ * pattern: fetching a few hundred scattered rows in ascending rowid order
+ * looks sequential to it, so it prefetches megabytes of neighbouring pages no
+ * query asked for. At 288,230 books a search read 37.9 MB, of which about
+ * 35 MB was that overshoot; capped here it is nearer 7 MB.
+ *
+ * 256 KiB rather than a tuned figure on purpose. Repeated runs of the same
+ * search at the same setting came back 4.9, 8.1 and 8.1 MB — the VFS keeps
+ * three read heads and which one serves a page depends on interleaving — so
+ * anything finer than "much smaller than 5 MiB" would be tuning to noise.
+ */
+const MAX_READ_BYTES = 262144;
+
 // Matches PAGE_SIZE in site/app.js — the first screenful the browser renders.
 const FIRST_PAGE_ROWS = 60;
+
+/**
+ * The facets the builder works out counts for at build time, so the common
+ * views never aggregate over the network.
+ *
+ * A facet_counts `scope` is '' for the whole catalogue, or "<facet>:<value>"
+ * for a view narrowed by exactly one facet. Only facets whose values select
+ * large slices are worth a scope — a language, a dataset (a year of one
+ * country) and a year each run to tens of thousands of rows, and aggregating
+ * one live means reading every matching row off the table: filtering to one
+ * dataset of 62,326 cost 15 MB before this. The rest (publisher,
+ * classification, 發佈期間…) select small enough slices to count live.
+ *
+ * Declared here with the other top-level constants because main() runs as this
+ * module loads, before anything declared further down is initialised.
+ */
+const SCOPE_FACETS = ['language', 'dataset', 'year'];
 
 const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
 
@@ -154,6 +187,7 @@ function main() {
     md5: digest,
     pageSize: PAGE_SIZE,
     chunkBytes: CHUNK_SIZE,
+    maxReadBytes: MAX_READ_BYTES,
     pages: Number(pages),
     probe: { rowid: 1, id: probeId },
     builtAt: new Date().toISOString(),
@@ -325,21 +359,25 @@ function precomputedFacets() {
     );
   }
 
-  for (const key of Object.keys(SQL_FACET)) {
-    // The language facet is never narrowed by a language filter — the reader
-    // has to be able to see the other languages to switch to one — so the
-    // client only ever reads it from the '' scope.
-    if (key === 'language') continue;
-    const expr = SQL_FACET[key].replace(/\bb\./g, '');
-    lines.push(
-      'INSERT INTO facet_counts(scope, facet, value, n)\n' +
-        'SELECT scope, facet, value, n FROM (\n' +
-        "  SELECT language AS scope, '" + key + "' AS facet, " + expr + ' AS value, COUNT(*) AS n,\n' +
-        '         ROW_NUMBER() OVER (PARTITION BY language ORDER BY COUNT(*) DESC) AS rk\n' +
-        '  FROM books WHERE ' + expr + " <> '' AND language <> ''\n" +
-        '  GROUP BY language, value\n' +
-        ') WHERE rk <= ' + FACET_LIMIT + ';'
-    );
+  for (const scopeFacet of SCOPE_FACETS) {
+    const scopeExpr = SQL_FACET[scopeFacet].replace(/\bb\./g, '');
+    for (const key of Object.keys(SQL_FACET)) {
+      // A facet is never narrowed by a filter on itself — the reader has to be
+      // able to see the other values to switch to one — so for that facet the
+      // client reads the '' scope instead.
+      if (key === scopeFacet) continue;
+      const expr = SQL_FACET[key].replace(/\bb\./g, '');
+      lines.push(
+        'INSERT INTO facet_counts(scope, facet, value, n)\n' +
+          'SELECT scope, facet, value, n FROM (\n' +
+          "  SELECT '" + scopeFacet + ":' || " + scopeExpr + " AS scope, '" + key + "' AS facet,\n" +
+          '         ' + expr + ' AS value, COUNT(*) AS n,\n' +
+          '         ROW_NUMBER() OVER (PARTITION BY ' + scopeExpr + ' ORDER BY COUNT(*) DESC) AS rk\n' +
+          '  FROM books WHERE ' + expr + " <> '' AND " + scopeExpr + " <> ''\n" +
+          '  GROUP BY ' + scopeExpr + ', value\n' +
+          ') WHERE rk <= ' + FACET_LIMIT + ';'
+      );
+    }
   }
 
   lines.push('CREATE INDEX idx_facet ON facet_counts(scope, facet, n DESC);');
@@ -375,6 +413,19 @@ function finalise() {
     // that facet applied.
     "CREATE INDEX idx_browse ON books(cover = '', zh_first, title_display);",
     "CREATE INDEX idx_browse_lang ON books(language, cover = '', zh_first, title_display);",
+
+    // The same problem returns for any filter that selects a large slice: the
+    // leading column has to be in the index, or SQLite reads every matching
+    // row and sorts them. Measured at 288,230 books, filtering to one dataset
+    // of 62,326 cost 15 MB and twenty-three requests to show sixty books.
+    //
+    // Only the facets whose values select tens of thousands of rows need this.
+    // A dataset is a whole year of one country, a year likewise, and the
+    // largest classifications run to 19,000; the biggest single publisher is
+    // 8,226, which sorts cheaply enough not to be worth another index.
+    "CREATE INDEX idx_browse_dataset ON books(dataset, cover = '', zh_first, title_display);",
+    "CREATE INDEX idx_browse_year ON books(year, cover = '', zh_first, title_display);",
+    "CREATE INDEX idx_browse_class ON books(classification, cover = '', zh_first, title_display);",
 
     // Every facet column in one index, so counting a facet against the other
     // active filters never has to fetch a row. The precomputed table only
@@ -443,9 +494,10 @@ function writeFirstPage() {
     // means every facet is counted within it, except `language` itself, which
     // is counted across the whole catalogue so the other languages are still
     // offered and reachable.
-    const within = (facet) => (facet === 'language' ? '' : scope);
+    const scopeKey = scope ? 'language:' + scope : '';
+    const within = (facet) => (facet === 'language' ? '' : scopeKey);
     const counts = json(
-      'SELECT scope, facet, value, n FROM facet_counts WHERE scope IN (' + quote(scope) + ", '')" +
+      'SELECT scope, facet, value, n FROM facet_counts WHERE scope IN (' + quote(scopeKey) + ", '')" +
         ' ORDER BY facet, n DESC, value'
     );
 
