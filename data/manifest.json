@@ -1592,15 +1592,16 @@
   "coversFound": 10148,
   "db": {
     "file": "books.db",
-    "bytes": 278445056,
-    "pageSize": 1024,
-    "pages": 271919,
+    "bytes": 286355456,
+    "pageSize": 4096,
+    "chunkBytes": 32768,
+    "pages": 69911,
     "probe": {
       "rowid": 1,
       "id": "hkpl-2017:2017-09285"
     },
-    "builtAt": "2026-11-04T23:48:29.471Z",
-    "url": "https://db.jimbocho.app/books.db"
+    "builtAt": "2026-11-05T00:05:52.733Z",
+    "url": "https://db.jimbocho.app/books-4k.db"
   },
   "firstPage": {
     "file": "firstpage.json",
