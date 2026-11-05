@@ -32,9 +32,26 @@ const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'site', 'data');
 const DB = path.join(DATA_DIR, 'books.db');
 
-// Small pages keep each range request tight; the client asks for 4 KB chunks,
-// so one request still covers several pages.
-const PAGE_SIZE = 1024;
+// The page size decides how deep the B-trees are and how many rows share a
+// page, and over range requests both land on the serial request count — the
+// thing that actually costs time, because SQLite cannot ask for a page until
+// it has read the page pointing at it. 1 KiB pages put ~3 books on a page, so
+// sixty scattered rows meant sixty round trips; 4 KiB puts ~13 on a page and
+// shortens every descent.
+const PAGE_SIZE = 4096;
+
+// How much the browser fetches per request. Larger than a page, so one request
+// covers several: round trips cost far more than the extra bytes, so this is
+// tuned for the fewest requests that does not start wasting whole megabytes.
+// Measured on a search for 香港, at 4 KiB pages:
+//
+//    8 KiB chunk → 103 requests, 3.02 MB
+//   16 KiB chunk →  85 requests, 3.46 MB
+//   32 KiB chunk →  69 requests, 4.11 MB   ← here
+//   64 KiB chunk →  60 requests, 5.93 MB
+//
+// Past 32 KiB the request count barely moves while the bytes climb steeply.
+const CHUNK_SIZE = PAGE_SIZE * 8;
 
 // Matches PAGE_SIZE in site/app.js — the first screenful the browser renders.
 const FIRST_PAGE_ROWS = 60;
@@ -115,6 +132,7 @@ function main() {
     file: 'books.db',
     bytes: size,
     pageSize: PAGE_SIZE,
+    chunkBytes: CHUNK_SIZE,
     pages: Number(pages),
     probe: { rowid: 1, id: probeId },
     builtAt: new Date().toISOString(),

@@ -794,7 +794,10 @@
                   // storage such as R2 or S3 — for hosts that will not serve
                   // byte ranges of a binary file untouched. It needs CORS.
                   url: db.url ? db.url : abs(DATA + db.file),
-                  requestChunkSize: 4096, // several 1 KB pages per request
+                  // Set by the builder alongside the page size, so the two
+                  // cannot drift apart. Several pages per request: round trips
+                  // cost far more than the extra bytes.
+                  requestChunkSize: db.chunkBytes || 4096,
                   // Some static hosts (GitHub Pages among them) answer HEAD
                   // without content-length, leaving the library unable to
                   // discover the file size. The manifest records it exactly.
