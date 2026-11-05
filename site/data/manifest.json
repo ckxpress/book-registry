@@ -2983,17 +2983,17 @@
   "coversFound": 10148,
   "db": {
     "file": "books.db",
-    "bytes": 710651904,
-    "md5": "c71a9148fa1eac5196def9e84662273d",
+    "bytes": 749707264,
+    "md5": "f49423e0025818f8468e17a8cfaee291",
     "pageSize": 4096,
     "chunkBytes": 32768,
-    "pages": 173499,
+    "maxReadBytes": 262144,
+    "pages": 183034,
     "probe": {
       "rowid": 1,
       "id": "ncl-2024:9786269600564"
     },
-    "builtAt": "2026-11-05T04:56:25.452Z",
-    "maxReadBytes": 262144
+    "builtAt": "2026-11-05T07:47:32.895Z"
   },
   "firstPage": {
     "file": "firstpage.json",
@@ -3003,12 +3003,12 @@
       "zh",
       "en",
       "ja",
-      "es",
       "fr",
-      "ko",
-      "id",
-      "vi",
       "de",
+      "es",
+      "ko",
+      "vi",
+      "id",
       "th"
     ]
   }

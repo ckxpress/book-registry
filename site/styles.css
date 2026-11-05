@@ -179,6 +179,52 @@ a {
   stroke-linecap: round;
   pointer-events: none;
 }
+/* While a query is in flight. The magnifier becomes a spinner in place, so the
+   signal appears where the reader is already looking — a query against the
+   database costs dozens of serial round trips and can take seconds, and the
+   grid still holds the previous results until it answers. */
+.search.busy .search-icon {
+  display: none;
+}
+.search-spinner {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  margin-top: -8px;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--focus);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  pointer-events: none;
+  display: none;
+}
+.search.busy .search-spinner {
+  display: block;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Respect a reader who has asked for less motion: still show the state, but
+   as a steady ring rather than a spinning one. */
+@media (prefers-reduced-motion: reduce) {
+  .search-spinner {
+    animation: none;
+    border-top-color: var(--focus);
+    opacity: 0.8;
+  }
+  .skeleton {
+    animation: none;
+  }
+}
+
+.count.searching {
+  color: var(--text-faint);
+}
+
 .hint {
   position: absolute;
   right: 12px;

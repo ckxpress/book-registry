@@ -436,6 +436,21 @@ function finalise() {
     // Covered, the same work is a walk over a 2 MB index.
     'CREATE INDEX idx_facets_all ON books(language, publisher, year, classification, dataset, src, forsale, isbn);',
     'COMMIT;',
+
+    // Merge the FTS index into a single segment.
+    //
+    // Not the same thing as `PRAGMA optimize`, which only refreshes the query
+    // planner's statistics. FTS5 writes a new b-tree segment per batch of
+    // inserts, and a term lookup has to visit every one of them: this index
+    // was left with 7,881 segment blocks, so searching a rare term meant
+    // dozens of scattered reads before any result was touched. Over range
+    // requests each of those is a round trip, which is the whole cost — a
+    // search returning four books still took 53 requests.
+    //
+    // Cheap to do here and never again: the database is built once and only
+    // ever read.
+    "INSERT INTO books_fts(books_fts) VALUES('optimize');",
+
     'VACUUM;',
     'PRAGMA optimize;',
     '',

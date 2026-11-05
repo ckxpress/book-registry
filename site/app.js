@@ -24,6 +24,7 @@
   var totalBooks = 0;
   var firstPage = null;      // precomputed landing views, keyed by language scope
   var sourcePrepared = null; // the open-the-backend promise, created once
+  var searchingTimer = null; // delays the skeleton so a fast query cannot flash it
   var totalResults = 0;
   var source = null; // JsonSource or SqliteSource, chosen by the manifest
   var renderToken = 0; // guards against out-of-order async renders
@@ -48,6 +49,8 @@
     footer: document.getElementById('footer-text'),
     filtersCount: document.getElementById('filters-count'),
     sentinel: document.getElementById('sentinel'),
+    search: document.getElementById('search-form'),
+    results: document.getElementById('results'),
     shelf: document.getElementById('shelf-view'),
     shelfCount: document.getElementById('shelf-count'),
   };
@@ -1194,6 +1197,37 @@
 
   /* ---------------- render: browse ---------------- */
 
+  /**
+   * Shows that a query is in flight.
+   *
+   * A query the build step did not precompute costs dozens of serial range
+   * requests — SQLite cannot ask for a page until it has read the page that
+   * points at it — so a search can take seconds, and until it answers the grid
+   * still holds the *previous* results. Without this the site looks like it
+   * ignored the keystroke.
+   *
+   * The skeleton waits a moment before appearing, so a fast answer does not
+   * flash an empty grid on its way past.
+   */
+  function setSearching(on) {
+    clearTimeout(searchingTimer);
+    el.search.classList.toggle('busy', !!on);
+    el.results.setAttribute('aria-busy', on ? 'true' : 'false');
+
+    if (!on) {
+      el.count.classList.remove('searching');
+      return;
+    }
+    searchingTimer = setTimeout(function () {
+      if (!el.search.classList.contains('busy')) return;
+      el.count.textContent = '搜尋中…';
+      el.count.classList.add('searching');
+      el.empty.hidden = true;
+      el.grid.innerHTML = '';
+      showSkeleton();
+    }, 150);
+  }
+
   function render() {
     var token = ++renderToken;
     state.page = 1;
@@ -1202,6 +1236,7 @@
     // costs no round trips, so the landing view appears with the page.
     var pre = prerendered();
     if (pre) {
+      setSearching(false);
       results = pre.rows.map(mapSqlRow);
       totalResults = pre.total;
       renderCount();
@@ -1212,12 +1247,15 @@
       return Promise.resolve();
     }
 
+    setSearching(true);
+
     return ensureSource()
       .then(function () {
         return source.page(0, PAGE_SIZE);
       })
       .then(function (res) {
         if (token !== renderToken) return null;
+        setSearching(false);
         results = res.rows;
         totalResults = res.total;
         renderCount();
@@ -1232,6 +1270,7 @@
       })
       .catch(function (err) {
         if (token !== renderToken) return;
+        setSearching(false);
         el.grid.innerHTML = '';
         el.empty.hidden = false;
         el.empty.innerHTML = '<h3>查詢失敗</h3><p>' + escapeHtml(err.message) + '</p>';
