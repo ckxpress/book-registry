@@ -15,7 +15,12 @@
  * then applies byte ranges to the *compressed* stream. Point the site at
  * object storage instead, once:
  *
- *   npm run build:db -- --db-url https://db.example.com/books.db
+ *   npm run build:db -- --db-url https://db.example.com/
+ *
+ * A URL ending in "/" is treated as a base, and each build appends the
+ * database's own content hash — books-8b4c50cb.db — so a rebuilt database never
+ * reuses a name, and no stale CDN cache entry can shadow it. Pass a full URL
+ * instead to pin one exact name.
  *
  * The URL is remembered in the manifest, so later rebuilds need no flag.
  * `--db-url ""` clears it and goes back to serving books.db beside the site.
@@ -24,6 +29,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
+const crypto = require('crypto');
 
 const { indexTokens } = require('./lib/tokenize');
 const { SQL_FACET, FACET_LIMIT } = require('../site/schema.js');
@@ -126,11 +132,26 @@ function main() {
   // from the site, so re-running the build must not quietly point the app
   // back at a books.db that was never deployed.
   const previousUrl = manifest.db && manifest.db.url;
-  const url = dbUrlArg === undefined ? previousUrl : dbUrlArg || undefined;
+  const configured = dbUrlArg === undefined ? previousUrl : dbUrlArg || undefined;
+
+  // The content hash goes in the object name. Two things make this worth the
+  // trouble: the edge cache outlives the object (a Cache Rule holds a deleted
+  // or replaced file for as long as its TTL, so reusing one name can serve old
+  // bytes under a new manifest's byte length for weeks), and the site and the
+  // database deploy separately, so the running site must keep reading the
+  // object it was built against until the new one is live.
+  //
+  // A url ending in "/" is a base to append the hashed name to; a full url is
+  // used exactly as given, so an existing setup keeps working.
+  const digest = crypto.createHash('md5').update(fs.readFileSync(DB)).digest('hex');
+  const url = configured && configured.endsWith('/')
+    ? configured + 'books-' + digest.slice(0, 8) + '.db'
+    : configured;
 
   manifest.db = {
     file: 'books.db',
     bytes: size,
+    md5: digest,
     pageSize: PAGE_SIZE,
     chunkBytes: CHUNK_SIZE,
     pages: Number(pages),
@@ -158,7 +179,11 @@ function main() {
   );
   if (url) {
     console.log('  Served from ' + url);
-    console.log('  Upload the new file there, or the site keeps reading the old one.');
+    console.log(
+      '  Upload site/data/books.db as "' + url.slice(url.lastIndexOf('/') + 1) +
+        '", or the site keeps reading the old one.'
+    );
+    console.log('  md5 ' + digest + ' — R2 shows this as the object\'s etag.');
   } else {
     console.log('  Served from the site itself — note GitHub Pages cannot do this correctly.');
   }

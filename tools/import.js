@@ -9,6 +9,7 @@
  *   node tools/import.js --refresh             ignore the download cache
  *   node tools/import.js --list                show what is registered / imported
  *   node tools/import.js --add-hkpl-year 2026  register + import another HK catalogue year
+ *   node tools/import.js --add-ncl-year 2026   register + import a Taiwan NCL year
  *   node tools/import.js --file books.csv --id my-shelf --title "My shelf"
  *   node tools/import.js --url https://host/books.csv --id x --title "X" [--adapter generic-csv]
  *
@@ -26,8 +27,12 @@ const REGISTRY = path.join(ROOT, 'datasets.json');
 const DATA_DIR = path.join(ROOT, 'site', 'data');
 const SHARD_SIZE = 3000;
 
+/** The earliest month isbn.ncl.edu.tw still serves. Probed, not documented. */
+const NCL_FIRST_YEAR = 2024;
+
 const ADAPTERS = {
   'hkpl-bro': require('./adapters/hkpl-bro'),
+  'ncl-isbn': require('./adapters/ncl-isbn'),
   'generic-csv': require('./adapters/generic-csv'),
   json: require('./adapters/json'),
 };
@@ -52,6 +57,14 @@ async function main() {
 
   if (args.options['add-hkpl-year']) {
     const dataset = hkplYearDataset(args.options['add-hkpl-year']);
+    upsertDataset(registry, dataset);
+    writeRegistry(registry);
+    console.log('Registered dataset "' + dataset.id + '" in datasets.json');
+    return importDatasets(registry, [dataset.id], args);
+  }
+
+  if (args.options['add-ncl-year']) {
+    const dataset = await nclYearDataset(args.options['add-ncl-year']);
     upsertDataset(registry, dataset);
     writeRegistry(registry);
     console.log('Registered dataset "' + dataset.id + '" in datasets.json');
@@ -126,14 +139,13 @@ async function importDataset(dataset, args) {
       // quarters legitimately do not exist yet. Only a missing file is
       // skipped; anything else still stops the import.
       if (/HTTP 404/.test(err.message)) {
-        // A missing file means two very different things. A quarter that has
-        // not ended yet simply is not out. A quarter long past is not coming:
-        // HKPL's CSV archive only reaches back so far — 2019 and earlier are
-        // absent entirely — and saying "not published yet" about 2018 reads
-        // as "try again later", which is wrong.
+        // A missing file means two very different things. A period that has
+        // not ended yet simply is not out. A period long past is not coming:
+        // both archives only reach back so far — HKPL to 2017 Q1, the NCL to
+        // 2024-01 — and saying "not published yet" about 2018 reads as "try
+        // again later", which is wrong.
         console.log(
-          '  ' + pad(source.label || source.url, 26) +
-            (quarterHasEnded(source.quarter) ? '   not in HKPL\'s archive — skipped' : '   not published yet — skipped')
+          '  ' + pad(source.label || source.url, 26) + '   ' + missingReason(source) + ' — skipped'
         );
         continue;
       }
@@ -350,11 +362,36 @@ function byTitle(a, b) {
 /* ---------- dataset definitions ---------- */
 
 /** True once the quarter ("2019 Q1") is over, so a missing file is final. */
-function quarterHasEnded(label) {
-  const m = /^(\d{4}) Q([1-4])$/.exec(String(label || ''));
-  if (!m) return false;
-  const endsAfter = new Date(Date.UTC(Number(m[1]), Number(m[2]) * 3, 1));
-  return Date.now() >= endsAfter.getTime();
+/**
+ * Why a file is not there, which is two quite different things. A period that
+ * has not ended, or ended recently, simply is not out: both publishers lag,
+ * the NCL by a month or more. A period long past is not coming — the archives
+ * only reach back so far, HKPL to 2017 Q1 and the NCL to 2024-01 — and saying
+ * "not published yet" about 2018 reads as "try again later", which is wrong.
+ */
+function missingReason(source) {
+  const ended = periodEndedAt(source.quarter || source.period);
+  if (ended === null) return 'not available';
+  const LAG_DAYS = 75;
+  const settled = ended + LAG_DAYS * 86400000 < Date.now();
+  return settled ? 'not in the archive' : 'not published yet';
+}
+
+/**
+ * When the period this source covers ended, in epoch milliseconds, or null if
+ * the label says nothing. "2025 Q3" for the quarterly Hong Kong catalogue,
+ * "2026-01" for the monthly Taiwan one.
+ */
+function periodEndedAt(label) {
+  const text = String(label || '');
+
+  const quarter = /^(\d{4}) Q([1-4])$/.exec(text);
+  if (quarter) return Date.UTC(Number(quarter[1]), Number(quarter[2]) * 3, 1);
+
+  const month = /^(\d{4})-(\d{2})$/.exec(text);
+  if (month) return Date.UTC(Number(month[1]), Number(month[2]), 1);
+
+  return null;
 }
 
 function hkplYearDataset(yearArg) {
@@ -413,6 +450,103 @@ function hkplYearDataset(yearArg) {
     year: year,
     sources: sources,
   };
+}
+
+/**
+ * 臺灣出版新書預告書訊, a year of it — the National Central Library's monthly
+ * feed of ISBN applications, dataset 6730 on data.gov.tw.
+ *
+ * Two awkward facts shape this. The listing is a rolling twelve months, and
+ * the newer months are served from www.ncl.edu.tw under opaque UUIDs that
+ * cannot be derived from a date — so the addresses have to be read from the
+ * catalogue rather than constructed. The older months keep a predictable name
+ * on isbn.ncl.edu.tw and, usefully, stay reachable long after they drop out of
+ * the listing: everything from 2024-01 is still served, nothing before it.
+ *
+ * So: ask the API for the months it knows, and fall back to the predictable
+ * form for any month of the year it no longer lists. The resolved addresses are
+ * written into datasets.json, which is what makes a re-import reproducible once
+ * a month has aged out of the catalogue.
+ */
+async function nclYearDataset(yearArg) {
+  const year = Number(String(yearArg).trim());
+  if (!/^\d{4}$/.test(String(year))) throw new Error('--add-ncl-year expects a 4-digit year');
+  if (year < NCL_FIRST_YEAR) {
+    throw new Error(
+      'The NCL feed only reaches back to ' + NCL_FIRST_YEAR + '-01; ' + year + ' is not published.'
+    );
+  }
+
+  const listed = await nclListedMonths();
+  const now = new Date();
+  const sources = [];
+
+  for (let month = 1; month <= 12; month++) {
+    const key = year + '-' + String(month).padStart(2, '0');
+    // Months that have not started yet are left out entirely, rather than
+    // registered and then reported missing on every future import.
+    if (Date.UTC(year, month - 1, 1) > now.getTime()) continue;
+
+    const stamp = String(year) + String(month).padStart(2, '0');
+    const predictable = 'https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/' + stamp + '_isbn.csv';
+    const fromApi = listed.get(key);
+
+    sources.push({
+      url: fromApi || predictable,
+      // Either address may be the live one; try both before calling it missing.
+      altUrls: fromApi && fromApi !== predictable ? [predictable] : [],
+      label: key,
+      language: '',
+      period: key,
+    });
+  }
+
+  if (!sources.length) throw new Error('No months of ' + year + ' have begun yet.');
+
+  return {
+    id: 'ncl-' + year,
+    title: '臺灣出版新書預告書訊 — ' + year,
+    shortTitle: '臺灣 ' + year,
+    adapter: 'ncl-isbn',
+    description:
+      year + '年各出版者向國家圖書館國際標準書號中心申請 ISBN 的新書預告書目。' +
+      '資料為出版前申請紀錄，出版日為預訂日期。',
+    provider: '國家圖書館 國際標準書號中心',
+    homepage: 'https://data.gov.tw/dataset/6730',
+    dataDictionary: 'https://isbn.ncl.edu.tw/NEW_ISBNNet/',
+    license: '政府資料開放授權條款－第1版',
+    licenseUrl: 'https://data.gov.tw/license',
+    region: 'Taiwan',
+    currency: 'TWD',
+    year: year,
+    sources: sources,
+  };
+}
+
+/**
+ * The month -> URL map the catalogue currently advertises, keyed "2026-01".
+ * Descriptions carry the ROC year ("提供115年1月份…"), which is the AD year
+ * less 1911. A catalogue that cannot be reached is not fatal: every month of
+ * 2024 and 2025, and the earlier months of this year, have a predictable
+ * address to fall back on.
+ */
+async function nclListedMonths() {
+  const api = 'https://data.gov.tw/api/v2/rest/dataset/6730';
+  const out = new Map();
+  try {
+    const res = await download(api, { refresh: true });
+    const body = JSON.parse(res.body.toString('utf8'));
+    for (const item of (body.result && body.result.distribution) || []) {
+      const url = item.resourceDownloadUrl;
+      const m = /(\d{2,3})年(\d{1,2})月/.exec(item.resourceDescription || '');
+      if (!url || !m) continue;
+      const key = Number(m[1]) + 1911 + '-' + String(Number(m[2])).padStart(2, '0');
+      out.set(key, url);
+    }
+  } catch (err) {
+    console.log('  (could not read data.gov.tw: ' + err.message + ' — using predictable URLs)');
+  }
+  return out;
 }
 
 function adHocDataset(args) {
@@ -533,6 +667,7 @@ function usage() {
       '',
       'Add more data:',
       '  node tools/import.js --add-hkpl-year 2026',
+      '  node tools/import.js --add-ncl-year 2026',
       '  node tools/import.js --file books.csv  --id my-shelf --title "My shelf"',
       '  node tools/import.js --url  https://host/books.json --id x --title "X"',
       '',

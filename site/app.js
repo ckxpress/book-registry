@@ -60,7 +60,7 @@
     { key: 'language', label: '語言', get: function (r) { return r.language; }, name: languageName, open: true },
     { key: 'publisher', label: '出版者', get: function (r) { return r.publisher; }, search: true, limit: 8, open: true },
     { key: 'year', label: '出版年份', get: function (r) { return r.year ? String(r.year) : ''; }, limit: 10, sort: 'key-desc', open: true },
-    { key: 'source', label: '發佈季度', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
+    { key: 'source', label: '發佈期間', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
     { key: 'classification', label: '類別', get: function (r) { return r.classification; }, search: true, limit: 10 },
     { key: 'dataset', label: '資料集', get: function (r) { return r._ds; }, name: datasetName, hideIfSingle: true },
     {
@@ -1940,7 +1940,7 @@
       out.push(link('https://openlibrary.org/isbn/' + book.isbn, 'Open Library'));
       out.push(link('https://www.google.com/search?q=' + encodeURIComponent('ISBN ' + book.isbn), '網上搜尋'));
     }
-    out.push(link('https://www.hkpl.gov.hk/en/search?q=' + encodeURIComponent(book.title || ''), '香港公共圖書館'));
+    out.push(catalogueLink(book));
     out.push('</div>');
     out.push('</div></div>');
 
@@ -2055,7 +2055,7 @@
     row2(out, '參考編號', book.ref);
     row2(out, '順序編號', book.serial);
     if (book.source) {
-      row2(out, '發佈季度', book.source.label || book.source.quarter);
+      row2(out, '發佈期間', book.source.label || book.source.quarter || book.source.period);
       if (book.source.url) row2(out, '來源檔案', '<a href="' + escapeAttr(book.source.url) + '" rel="noreferrer">' + escapeHtml(fileName(book.source.url)) + '</a>', true);
       if (book.source.file) row2(out, 'Source file', '<code>' + escapeHtml(book.source.file) + '</code>', true);
     }
@@ -2373,10 +2373,55 @@
     return source ? source.label || source.quarter || parts[1] : value;
   }
 
+  // The Hong Kong catalogue is Chinese and English only; the Taiwan feed adds
+  // the language a translation was written in, so the facet is no longer a
+  // two-value one.
+  var LANGUAGE_NAMES = {
+    zh: '中文',
+    en: '英文',
+    ja: '日文',
+    ko: '韓文',
+    fr: '法文',
+    de: '德文',
+    es: '西班牙文',
+    vi: '越南文',
+    th: '泰文',
+    id: '印尼文',
+  };
+
+  /**
+   * The library catalogue worth searching depends on where the book was
+   * registered: a Taiwanese ISBN application is not in Hong Kong's public
+   * library, and sending a reader there finds nothing.
+   */
+  function catalogueLink(book) {
+    // A grid row carries the dataset as `_ds`; a full record, which is what
+    // the detail view has, carries it as `dataset`.
+    var dataset = datasetOf(book.dataset || book._ds);
+    var region = dataset && dataset.region;
+    if (region === 'Taiwan' || /臺灣|台灣/.test(String(region || ''))) {
+      return link(
+        'https://isbn.ncl.edu.tw/NEW_ISBNNet/main_DisplayBookList.php?Pfile=&FM=1&Ptype=001&searchtext=' +
+          encodeURIComponent(book.title || ''),
+        '全國新書資訊網'
+      );
+    }
+    return link(
+      'https://www.hkpl.gov.hk/en/search?q=' + encodeURIComponent(book.title || ''),
+      '香港公共圖書館'
+    );
+  }
+
+  function datasetOf(id) {
+    if (!manifest || !manifest.datasets) return null;
+    for (var i = 0; i < manifest.datasets.length; i++) {
+      if (manifest.datasets[i].id === id) return manifest.datasets[i];
+    }
+    return null;
+  }
+
   function languageName(code) {
-    if (code === 'zh') return '中文';
-    if (code === 'en') return '英文';
-    return code || '';
+    return LANGUAGE_NAMES[code] || code || '';
   }
 
   function displayName(facet, value) {

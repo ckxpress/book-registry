@@ -1,7 +1,212 @@
 {
-  "generatedAt": "2026-11-04T17:46:48.529Z",
-  "totalBooks": 118422,
+  "generatedAt": "2026-11-05T01:04:11.524Z",
+  "totalBooks": 164588,
   "datasets": [
+    {
+      "id": "ncl-2026",
+      "title": "臺灣出版新書預告書訊 — 2026",
+      "shortTitle": "臺灣 2026",
+      "description": "2026年各出版者向國家圖書館國際標準書號中心申請 ISBN 的新書預告書目。資料為出版前申請紀錄，出版日為預訂日期。",
+      "provider": "國家圖書館 國際標準書號中心",
+      "homepage": "https://data.gov.tw/dataset/6730",
+      "dataDictionary": "https://isbn.ncl.edu.tw/NEW_ISBNNet/",
+      "license": "政府資料開放授權條款－第1版",
+      "licenseUrl": "https://data.gov.tw/license",
+      "region": "Taiwan",
+      "year": 2026,
+      "adapter": "ncl-isbn",
+      "count": 46166,
+      "files": {
+        "index": [
+          "ncl-2026.index.0.json",
+          "ncl-2026.index.1.json",
+          "ncl-2026.index.2.json",
+          "ncl-2026.index.3.json",
+          "ncl-2026.index.4.json",
+          "ncl-2026.index.5.json",
+          "ncl-2026.index.6.json",
+          "ncl-2026.index.7.json",
+          "ncl-2026.index.8.json",
+          "ncl-2026.index.9.json",
+          "ncl-2026.index.10.json",
+          "ncl-2026.index.11.json",
+          "ncl-2026.index.12.json",
+          "ncl-2026.index.13.json",
+          "ncl-2026.index.14.json",
+          "ncl-2026.index.15.json"
+        ],
+        "full": [
+          "ncl-2026.full.0.json",
+          "ncl-2026.full.1.json",
+          "ncl-2026.full.2.json",
+          "ncl-2026.full.3.json",
+          "ncl-2026.full.4.json",
+          "ncl-2026.full.5.json",
+          "ncl-2026.full.6.json",
+          "ncl-2026.full.7.json",
+          "ncl-2026.full.8.json",
+          "ncl-2026.full.9.json",
+          "ncl-2026.full.10.json",
+          "ncl-2026.full.11.json",
+          "ncl-2026.full.12.json",
+          "ncl-2026.full.13.json",
+          "ncl-2026.full.14.json",
+          "ncl-2026.full.15.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "2026-01",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202601_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 4524
+        },
+        {
+          "label": "2026-02",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202602_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 3088
+        },
+        {
+          "label": "2026-03",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202603_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5728
+        },
+        {
+          "label": "2026-04",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202604_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5787
+        },
+        {
+          "label": "2026-05",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/90706411-13fd-4bfc-b3f1-ba83142a243c",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5431
+        },
+        {
+          "label": "2026-06",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/e7328d32-8d7b-4bef-8f0a-b9f53cb50aa8",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5329
+        },
+        {
+          "label": "2026-07",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/40d82eb1-2d73-4e67-8aee-29360a32ddcf",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5928
+        },
+        {
+          "label": "2026-08",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/e9b82fd2-6cf4-4bb3-88e2-2a5a09e84e28",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5274
+        },
+        {
+          "label": "2026-09",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/f145757e-9367-4e8c-bcb2-3ed630a7c0b9",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5077
+        }
+      ],
+      "stats": {
+        "withIsbn": 46166,
+        "classifications": 18,
+        "publishers": 3756,
+        "languages": {
+          "es": 21,
+          "zh": 44757,
+          "vi": 3,
+          "en": 1265,
+          "ja": 81,
+          "id": 1,
+          "ko": 6,
+          "de": 2,
+          "fr": 5
+        },
+        "yearRange": [
+          2021,
+          2027
+        ],
+        "topPublishers": [
+          {
+            "name": "東立",
+            "count": 2038
+          },
+          {
+            "name": "青文",
+            "count": 1575
+          },
+          {
+            "name": "臺灣角川",
+            "count": 1421
+          },
+          {
+            "name": "說頻文化",
+            "count": 1020
+          },
+          {
+            "name": "時報文化",
+            "count": 914
+          }
+        ],
+        "topClassifications": [
+          {
+            "name": "漫畫書",
+            "count": 7607
+          },
+          {
+            "name": "人文史地",
+            "count": 6107
+          },
+          {
+            "name": "小說",
+            "count": 5906
+          },
+          {
+            "name": "兒童讀物",
+            "count": 5173
+          },
+          {
+            "name": "社會科學",
+            "count": 3857
+          },
+          {
+            "name": "考試用書",
+            "count": 3233
+          },
+          {
+            "name": "文學",
+            "count": 2216
+          },
+          {
+            "name": "心理勵志",
+            "count": 2088
+          }
+        ]
+      },
+      "importedAt": "2026-11-05T01:04:11.523Z"
+    },
     {
       "id": "hkpl-2017",
       "title": "香港印刷書刊目錄 — 2017",
@@ -1592,16 +1797,17 @@
   "coversFound": 10148,
   "db": {
     "file": "books.db",
-    "bytes": 286355456,
+    "bytes": 391188480,
+    "md5": "fa746a1c91beebb2fc1b162c290d32a2",
     "pageSize": 4096,
     "chunkBytes": 32768,
-    "pages": 69911,
+    "pages": 95505,
     "probe": {
       "rowid": 1,
-      "id": "hkpl-2017:2017-09285"
+      "id": "ncl-2026:9786267986585"
     },
-    "builtAt": "2026-11-05T00:05:52.733Z",
-    "url": "https://db.jimbocho.app/books-4k.db"
+    "builtAt": "2026-11-05T01:06:30.053Z",
+    "url": "https://db.jimbocho.app/books-fa746a1c.db"
   },
   "firstPage": {
     "file": "firstpage.json",
@@ -1609,7 +1815,14 @@
     "scopes": [
       "",
       "zh",
-      "en"
+      "en",
+      "ja",
+      "es",
+      "ko",
+      "fr",
+      "vi",
+      "de",
+      "id"
     ]
   }
 }
