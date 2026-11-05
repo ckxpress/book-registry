@@ -10,6 +10,7 @@
  *   node tools/import.js --list                show what is registered / imported
  *   node tools/import.js --add-hkpl-year 2026  register + import another HK catalogue year
  *   node tools/import.js --add-ncl-year 2026   register + import a Taiwan NCL year
+ *   node tools/import.js --add-openlibrary-hk  register + import pre-2017 HK from Open Library
  *   node tools/import.js --file books.csv --id my-shelf --title "My shelf"
  *   node tools/import.js --url https://host/books.csv --id x --title "X" [--adapter generic-csv]
  *
@@ -30,9 +31,13 @@ const SHARD_SIZE = 3000;
 /** The earliest month isbn.ncl.edu.tw still serves. Probed, not documented. */
 const NCL_FIRST_YEAR = 2024;
 
+/** Editions per Open Library query.json page. */
+const OL_PAGE = 500;
+
 const ADAPTERS = {
   'hkpl-bro': require('./adapters/hkpl-bro'),
   'ncl-isbn': require('./adapters/ncl-isbn'),
+  'openlibrary-editions': require('./adapters/openlibrary-editions'),
   'generic-csv': require('./adapters/generic-csv'),
   json: require('./adapters/json'),
 };
@@ -65,6 +70,14 @@ async function main() {
 
   if (args.options['add-ncl-year']) {
     const dataset = await nclYearDataset(args.options['add-ncl-year']);
+    upsertDataset(registry, dataset);
+    writeRegistry(registry);
+    console.log('Registered dataset "' + dataset.id + '" in datasets.json');
+    return importDatasets(registry, [dataset.id], args);
+  }
+
+  if (args.flags['add-openlibrary-hk']) {
+    const dataset = await openLibraryHkDataset();
     upsertDataset(registry, dataset);
     writeRegistry(registry);
     console.log('Registered dataset "' + dataset.id + '" in datasets.json');
@@ -160,6 +173,13 @@ async function importDataset(dataset, args) {
 
     const kept = parsed.filter((r) => r.title);
     for (const rec of kept) {
+      // A source that lists the same record twice — Open Library returns an
+      // edition once per spelling of its place — asks for it to be dropped by a
+      // field it can be identified by, rather than kept as a second copy.
+      if (dataset.dedupeBy && rec[dataset.dedupeBy] && seen.has(rec.id)) {
+        seen.set(rec.id, (seen.get(rec.id) || 0) + 1);
+        continue;
+      }
       // Ids must be unique across the whole dataset; the odd upstream row has
       // a blank reference number.
       const count = (seen.get(rec.id) || 0) + 1;
@@ -549,6 +569,151 @@ async function nclListedMonths() {
   return out;
 }
 
+/**
+ * Hong Kong editions from Open Library — the pre-2017 years no registry covers.
+ *
+ * The one crowd-sourced source here, so it stays a dataset of its own and is
+ * never merged into the registry datasets. See the adapter for why this uses
+ * the older `query.json` rather than `search.json`.
+ *
+ * Place is free text upstream, so the same city is spelled several ways and
+ * each has to be asked for separately. Sizes are probed rather than assumed:
+ * the API reports no total, so the only way to know how many pages to ask for
+ * is to walk the offset until it comes back empty. An edition listed under two
+ * spellings arrives twice, which `dedupeBy` then drops.
+ */
+async function openLibraryHkDataset() {
+  const places = ['Hong Kong', 'Hongkong', 'Kowloon', 'Hong Kong, China', '香港', 'Hong Kong SAR'];
+  const sources = [];
+
+  await assertOpenLibraryFilters();
+
+  for (const place of places) {
+    const depth = await openLibraryDepth(place);
+    if (!depth) {
+      console.log('  ' + pad(place, 22) + '   no editions — skipped');
+      continue;
+    }
+    const pages = Math.ceil(depth / OL_PAGE) + 1; // +1 for growth since probing
+    console.log('  ' + pad(place, 22) + '   about ' + depth.toLocaleString('en-US') + ' editions, ' + pages + ' pages');
+    for (let i = 0; i < pages; i++) {
+      sources.push({
+        url: openLibraryUrl(place, i * OL_PAGE),
+        label: place + ' +' + i * OL_PAGE,
+        language: '',
+        // query.json does not echo the field it filtered on, so the place the
+        // records came from is recorded here.
+        place: place,
+      });
+    }
+  }
+
+  if (!sources.length) throw new Error('Open Library returned no Hong Kong editions.');
+
+  return {
+    id: 'ol-hk',
+    title: '香港書刊 — Open Library',
+    shortTitle: 'OL 香港',
+    adapter: 'openlibrary-editions',
+    description:
+      'Open Library 收錄的香港出版書刊（2017 年前）。此資料集由公眾協作編輯，並非官方書刊註冊紀錄，' +
+      '完整度與準確度不及其他資料集：約四分之一有國際標準書號，絕大部分沒有封面。',
+    provider: 'Open Library · Internet Archive',
+    homepage: 'https://openlibrary.org/',
+    dataDictionary: 'https://openlibrary.org/dev/docs/api/search',
+    license: 'Open Data Commons Attribution License / CC0 (see openlibrary.org)',
+    licenseUrl: 'https://openlibrary.org/developers/licensing',
+    region: 'Hong Kong',
+    crowdsourced: true,
+    dedupeBy: 'ref',
+    sources: sources,
+  };
+}
+
+/**
+ * A query.json URL for one page of one place.
+ *
+ * `publish_places` must NOT appear among the requested fields. In this API a
+ * field is requested by naming it with an empty value, so asking for it also
+ * sets it to empty — which silently clears the filter and returns arbitrary
+ * editions. Asked for both ways, "Hong Kong SAR" returns 500 rows of British
+ * parliamentary debates; asked for correctly, it returns its 6. The filtered
+ * field is not echoed back, so the place is carried on the source instead.
+ */
+function openLibraryUrl(place, offset) {
+  const fields = [
+    'title', 'subtitle', 'by_statement', 'isbn_13', 'isbn_10', 'publishers',
+    'publish_date', 'languages', 'number_of_pages',
+    'pagination', 'subjects', 'series', 'edition_name', 'covers',
+  ];
+  const params = new URLSearchParams();
+  params.set('type', '/type/edition');
+  params.set('publish_places', place);
+  params.set('limit', String(OL_PAGE));
+  if (offset) params.set('offset', String(offset));
+  for (const field of fields) params.append(field, '');
+  return 'https://openlibrary.org/query.json?' + params.toString();
+}
+
+/**
+ * Proves the place filter is actually being applied before importing tens of
+ * thousands of records on the strength of it.
+ *
+ * This exists because the filter once silently stopped working and the import
+ * reported success: 33,500 records, every page exactly full, not one of them
+ * from Hong Kong. The tell was that a spelling with six editions returned a
+ * full page, so that is what this checks — ask for the smallest spelling and
+ * refuse to continue if it comes back full.
+ */
+async function assertOpenLibraryFilters() {
+  const canary = 'Hong Kong SAR';
+  const res = await download(openLibraryUrl(canary, 0), { refresh: true });
+  const rows = JSON.parse(res.body.toString('utf8'));
+  if (!Array.isArray(rows)) throw new Error('Open Library: expected an array from query.json');
+  if (rows.length >= OL_PAGE) {
+    throw new Error(
+      'Open Library is ignoring the publish_places filter — "' + canary + '" returned a full page of ' +
+        rows.length + ' records. Importing would fill the dataset with books from everywhere. ' +
+        'Check that publish_places is not also in the requested field list.'
+    );
+  }
+}
+
+/**
+ * Roughly how many editions a place has, by doubling the offset until the API
+ * returns nothing. Coarse on purpose — it only has to decide a page count, and
+ * each probe is a request against someone else's server.
+ */
+async function openLibraryDepth(place) {
+  let reached = 0;
+  let offset = 1;
+  while (offset <= 65536) {
+    const url = 'https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=' +
+      encodeURIComponent(place) + '&limit=1&offset=' + offset;
+    let rows;
+    try {
+      const res = await download(url, { refresh: true });
+      rows = JSON.parse(res.body.toString('utf8'));
+    } catch (err) {
+      break;
+    }
+    if (!Array.isArray(rows) || !rows.length) break;
+    reached = offset;
+    offset *= 2;
+  }
+  // offset 0 is the first record, so a place with any at all reaches at least 1.
+  if (!reached) {
+    try {
+      const res = await download(openLibraryUrl(place, 0), { refresh: true });
+      const rows = JSON.parse(res.body.toString('utf8'));
+      return Array.isArray(rows) ? rows.length : 0;
+    } catch (err) {
+      return 0;
+    }
+  }
+  return reached * 2;
+}
+
 function adHocDataset(args) {
   const target = args.options.file || args.options.url;
   const id = args.options.id || slugify(path.basename(target).replace(/\.[a-z]+$/i, ''));
@@ -668,6 +833,7 @@ function usage() {
       'Add more data:',
       '  node tools/import.js --add-hkpl-year 2026',
       '  node tools/import.js --add-ncl-year 2026',
+      '  node tools/import.js --add-openlibrary-hk',
       '  node tools/import.js --file books.csv  --id my-shelf --title "My shelf"',
       '  node tools/import.js --url  https://host/books.json --id x --title "X"',
       '',

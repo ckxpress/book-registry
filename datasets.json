@@ -1042,6 +1042,515 @@
           "period": "2024-12"
         }
       ]
+    },
+    {
+      "id": "ol-hk",
+      "title": "香港書刊 — Open Library",
+      "shortTitle": "OL 香港",
+      "adapter": "openlibrary-editions",
+      "description": "Open Library 收錄的香港出版書刊（2017 年前）。此資料集由公眾協作編輯，並非官方書刊註冊紀錄，完整度與準確度不及其他資料集：約四分之一有國際標準書號，絕大部分沒有封面。",
+      "provider": "Open Library · Internet Archive",
+      "homepage": "https://openlibrary.org/",
+      "dataDictionary": "https://openlibrary.org/dev/docs/api/search",
+      "license": "Open Data Commons Attribution License / CC0 (see openlibrary.org)",
+      "licenseUrl": "https://openlibrary.org/developers/licensing",
+      "region": "Hong Kong",
+      "crowdsourced": true,
+      "dedupeBy": "ref",
+      "sources": [
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +0",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=1000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +1000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=1500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +1500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=2000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +2000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=2500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +2500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=3000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +3000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=3500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +3500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=4000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +4000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=4500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +4500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=5000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +5000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=5500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +5500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=6000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +6000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=6500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +6500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=7000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +7000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=7500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +7500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=8000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +8000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=8500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +8500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=9000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +9000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=9500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +9500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=10000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +10000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=10500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +10500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=11000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +11000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=11500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +11500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=12000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +12000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=12500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +12500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=13000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +13000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=13500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +13500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=14000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +14000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=14500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +14500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=15000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +15000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=15500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +15500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=16000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +16000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=16500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +16500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=17000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +17000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=17500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +17500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=18000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +18000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=18500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +18500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=19000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +19000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=19500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +19500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=20000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +20000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=20500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +20500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=21000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +21000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=21500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +21500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=22000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +22000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=22500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +22500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=23000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +23000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=23500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +23500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=24000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +24000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=24500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +24500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=25000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +25000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=25500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +25500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=26000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +26000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=26500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +26500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=27000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +27000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=27500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +27500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=28000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +28000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=28500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +28500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=29000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +29000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=29500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +29500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=30000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +30000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=30500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +30500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=31000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +31000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=31500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +31500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=32000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +32000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=32500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +32500",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=33000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong +33000",
+          "language": "",
+          "place": "Hong Kong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hongkong +0",
+          "language": "",
+          "place": "Hongkong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hongkong +500",
+          "language": "",
+          "place": "Hongkong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=1000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hongkong +1000",
+          "language": "",
+          "place": "Hongkong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=1500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hongkong +1500",
+          "language": "",
+          "place": "Hongkong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=2000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hongkong +2000",
+          "language": "",
+          "place": "Hongkong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=2500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hongkong +2500",
+          "language": "",
+          "place": "Hongkong"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Kowloon&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Kowloon +0",
+          "language": "",
+          "place": "Kowloon"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Kowloon&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Kowloon +500",
+          "language": "",
+          "place": "Kowloon"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Kowloon&limit=500&offset=1000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Kowloon +1000",
+          "language": "",
+          "place": "Kowloon"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong%2C+China&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong, China +0",
+          "language": "",
+          "place": "Hong Kong, China"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong%2C+China&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong, China +500",
+          "language": "",
+          "place": "Hong Kong, China"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=%E9%A6%99%E6%B8%AF&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "香港 +0",
+          "language": "",
+          "place": "香港"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=%E9%A6%99%E6%B8%AF&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "香港 +500",
+          "language": "",
+          "place": "香港"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong+SAR&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong SAR +0",
+          "language": "",
+          "place": "Hong Kong SAR"
+        },
+        {
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong+SAR&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "label": "Hong Kong SAR +500",
+          "language": "",
+          "place": "Hong Kong SAR"
+        }
+      ]
     }
   ]
 }
