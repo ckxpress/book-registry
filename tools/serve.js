@@ -9,6 +9,32 @@ const http = require('http');
 const zlib = require('zlib');
 
 const ROOT = path.join(__dirname, '..', 'site');
+
+/**
+ * A SQLite file states its own page size in bytes 16-17 of the header, so the
+ * log never has to be kept in step with the build by hand. Cached per file;
+ * anything that is not a database logs in 4 KiB units, which is only a label.
+ */
+const pageSizes = {};
+function dbPageSize(file) {
+  if (pageSizes[file]) return pageSizes[file];
+  let size = 4096;
+  try {
+    const fd = fs.openSync(file, 'r');
+    const head = Buffer.alloc(18);
+    fs.readSync(fd, head, 0, 18, 0);
+    fs.closeSync(fd);
+    if (head.slice(0, 15).toString('latin1') === 'SQLite format 3') {
+      const stated = head.readUInt16BE(16);
+      // 1 is how the format spells 65536.
+      size = stated === 1 ? 65536 : stated;
+    }
+  } catch (err) {
+    /* fall back to 4 KiB */
+  }
+  pageSizes[file] = size;
+  return size;
+}
 const PORT = Number(process.env.PORT || argValue('--port') || 8080);
 
 const TYPES = {
@@ -97,10 +123,14 @@ const server = http.createServer((req, res) => {
         rangeCount[name] = (rangeCount[name] || 0) + 1;
         // The offset matters as much as the size: a page number maps back to
         // a table or index via `dbstat`, which is how a read-ahead ramp is
-        // traced to the query that caused it.
+        // traced to the query that caused it. The divisor has to be the
+        // database's real page size, not a fixed 1 KiB — the build moved to
+        // 4096-byte pages, which silently made every offset printed here four
+        // times too large, and so pointed at pages past the end of the file.
+        const pageSize = dbPageSize(file);
         console.log(
           '  range ' + name + '  ' + String(Math.round((end - start + 1) / 1024)).padStart(5) + ' KiB' +
-            '  @page ' + String(Math.floor(start / 1024) + 1).padStart(7) +
+            '  @page ' + String(Math.floor(start / pageSize) + 1).padStart(7) +
             '   total ' + (rangeBytes[name] / 1048576).toFixed(2) + ' MB in ' + rangeCount[name] + ' requests'
         );
       }

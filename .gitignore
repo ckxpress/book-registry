@@ -13,5 +13,8 @@ site/data/books.db
 # wrangler keeps a local simulation of R2 here — 57 MB of books.db copy
 .wrangler/
 
-# The 4 KiB-page database, copied here only to upload it to R2 by hand.
-books-4k.db
+# The database under its content-hashed object name, linked here only to
+# upload it to R2 by hand — the dashboard takes the object key from the
+# filename, and the hash in that name is what keeps a stale edge-cache entry
+# from shadowing a rebuild.
+books-*.db

@@ -2979,21 +2979,22 @@
       "importedAt": "2026-11-05T06:51:55.204Z"
     }
   ],
-  "coversResolvedAt": "2026-11-04T20:09:30.215Z",
-  "coversFound": 10148,
+  "coversResolvedAt": "2026-11-05T20:01:24.467Z",
+  "coversFound": 56509,
   "db": {
     "file": "books.db",
-    "bytes": 749707264,
-    "md5": "f49423e0025818f8468e17a8cfaee291",
+    "bytes": 763928576,
+    "md5": "4cf9a7be0347ea8a37c09fb9df662b00",
     "pageSize": 4096,
     "chunkBytes": 32768,
     "maxReadBytes": 262144,
-    "pages": 183034,
+    "pages": 186506,
     "probe": {
       "rowid": 1,
       "id": "ncl-2024:9786269600564"
     },
-    "builtAt": "2026-11-05T07:47:32.895Z"
+    "builtAt": "2026-11-05T20:02:55.126Z",
+    "url": "https://db.jimbocho.app/books-4cf9a7be.db"
   },
   "firstPage": {
     "file": "firstpage.json",
