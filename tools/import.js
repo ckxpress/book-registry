@@ -38,6 +38,8 @@ const ADAPTERS = {
   'hkpl-bro': require('./adapters/hkpl-bro'),
   'ncl-isbn': require('./adapters/ncl-isbn'),
   'openlibrary-editions': require('./adapters/openlibrary-editions'),
+  'ncl-nbinet': require('./adapters/ncl-nbinet'),
+  'ncl-holdings': require('./adapters/ncl-holdings'),
   'generic-csv': require('./adapters/generic-csv'),
   json: require('./adapters/json'),
 };

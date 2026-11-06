@@ -1018,7 +1018,10 @@
           ' WHERE b.id = ? LIMIT 1',
         [id]
       ).then(function (res) {
-        return res.length ? mergeRecord(res[0]) : null;
+        if (!res.length) return null;
+        return inflateDoc(res[0].doc).then(function (doc) {
+          return mergeRecord(res[0], doc);
+        });
       });
     },
     byIds: function (ids) {
@@ -1210,8 +1213,45 @@
    * amount where a tenth of priced books have only "Unpriced"). The fallbacks
    * below are for a record that predates the blob carrying them.
    */
-  function mergeRecord(r) {
-    var rec = JSON.parse(r.doc || '{}');
+  /**
+   * The docs blob is a deflated, positionally-encoded record — see
+   * site/doc-codec.js for why, and for the field order.
+   *
+   * Raw deflate, which DecompressionStream reads natively, so there is no
+   * library to ship. Where the browser lacks it, or the row turns out to be
+   * plain JSON from an older build, the detail view falls back rather than
+   * failing: it then shows what the `books` row holds, which is most of the
+   * page.
+   */
+  function inflateDoc(value) {
+    if (value === null || value === undefined || value === '') return Promise.resolve({});
+
+    // An older database stored JSON text here.
+    if (typeof value === 'string') {
+      try {
+        return Promise.resolve(decodeDoc(JSON.parse(value)));
+      } catch (err) {
+        return Promise.resolve({});
+      }
+    }
+
+    if (typeof DecompressionStream !== 'function' || typeof Response !== 'function') {
+      return Promise.resolve({});
+    }
+
+    try {
+      var stream = new Blob([value]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      return new Response(stream)
+        .text()
+        .then(function (text) { return decodeDoc(JSON.parse(text)); })
+        .catch(function () { return {}; });
+    } catch (err) {
+      return Promise.resolve({});
+    }
+  }
+
+  function mergeRecord(r, doc) {
+    var rec = doc || {};
 
     rec.id = r.id;
     rec.dataset = r.dataset;
@@ -1437,11 +1477,24 @@
       });
   }
 
+  /**
+   * 筆書目, not 本.
+   *
+   * The catalogue is sixteen datasets held side by side rather than merged,
+   * because provenance matters and a bad import has to be removable. So the
+   * same book can be counted more than once: 446,090 records carry 335,148
+   * distinct ISBN-13s, and a title registered for an ISBN, then catalogued by
+   * the national library, then held by a university appears three times.
+   *
+   * "本" claims a number of books. "筆書目" says what this actually is — a
+   * number of bibliographic records — which is both true and the thing a
+   * reader of a union catalogue would expect.
+   */
   function renderCount() {
     el.count.innerHTML =
       totalResults === totalBooks
-        ? '共 <strong>' + fmt(totalBooks) + '</strong> 本'
-        : '<strong>' + fmt(totalResults) + '</strong> 本（全部 ' + fmt(totalBooks) + ' 本）';
+        ? '共 <strong>' + fmt(totalBooks) + '</strong> 筆書目'
+        : '<strong>' + fmt(totalResults) + '</strong> 筆（全部 ' + fmt(totalBooks) + ' 筆書目）';
   }
 
   function renderGrid(append, from) {

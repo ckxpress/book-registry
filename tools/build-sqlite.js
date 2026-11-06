@@ -32,6 +32,8 @@ const { execFileSync, spawnSync } = require('child_process');
 const crypto = require('crypto');
 
 const { indexTokens } = require('./lib/tokenize');
+const { encodeDoc } = require('./lib/doc-codec');
+const zlib = require('zlib');
 const { SQL_FACET, FACET_LIMIT } = require('../site/schema.js');
 
 const ROOT = path.join(__dirname, '..');
@@ -358,9 +360,22 @@ function insertBook(rowid, rec, ds) {
 
   return (
     'INSERT INTO books VALUES (' + values.join(',') + ');\n' +
-    'INSERT INTO docs VALUES (' + rowid + ',' + str(JSON.stringify(thinDoc(rec))) + ');\n' +
+    'INSERT INTO docs VALUES (' + rowid + ',' + blob(thinDoc(rec)) + ');\n' +
     'INSERT INTO books_fts(rowid, search) VALUES (' + rowid + ',' + str(tokens) + ');\n'
   );
+}
+
+/**
+ * The docs payload: field names replaced by position, then deflated, and
+ * written as a SQL blob literal. 393 bytes a row becomes 269.
+ *
+ * Raw deflate rather than zlib- or gzip-wrapped, because that is what the
+ * browser's DecompressionStream('deflate-raw') reads, and the header would be
+ * pure overhead on payloads this small.
+ */
+function blob(rec) {
+  const json = Buffer.from(JSON.stringify(encodeDoc(rec)), 'utf8');
+  return "X'" + zlib.deflateRawSync(json, { level: 9 }).toString('hex') + "'";
 }
 
 function hasCjk(text) {
@@ -446,11 +461,13 @@ function finalise() {
     '',
     precomputedFacets(),
     // Facet counting is GROUP BY, so every facet column needs an index.
-    'CREATE INDEX idx_dataset ON books(dataset);',
-    'CREATE INDEX idx_language ON books(language);',
-    'CREATE INDEX idx_class ON books(classification);',
+    // Four single-column indexes used to sit here, on dataset, language,
+    // classification and year. Each is the leading column of a composite that
+    // already exists — idx_browse_dataset, idx_browse_lang, idx_browse_class,
+    // idx_browse_year, and idx_src for dataset — and SQLite will use a
+    // composite's prefix perfectly well. They cost 23.7 MB to duplicate
+    // structures the file already carried.
     'CREATE INDEX idx_publisher ON books(publisher);',
-    'CREATE INDEX idx_year ON books(year);',
     'CREATE INDEX idx_src ON books(dataset, src);',
     'CREATE INDEX idx_forsale ON books(forsale);',
     'CREATE INDEX idx_isbn ON books(isbn);',
@@ -491,7 +508,12 @@ function finalise() {
     // reading thousands of scattered rows out of a 55 MB file — one click
     // measured 8.06 MB of range traffic, including a single 4 MB read.
     // Covered, the same work is a walk over a 2 MB index.
-    'CREATE INDEX idx_facets_all ON books(language, publisher, year, classification, dataset, src, forsale, isbn);',
+    // idx_facets_all was here: a 29.3 MB covering index over eight columns,
+    // for a full-scan GROUP BY that counted facets. Nothing issues that shape
+    // any more — browsing reads the precomputed facet_counts table, and a
+    // search drives the counts from the FTS hits by rowid. It was created
+    // after facet_counts had already been computed, so it never helped the
+    // build either.
     'COMMIT;',
 
     // Merge the FTS index into a single segment.

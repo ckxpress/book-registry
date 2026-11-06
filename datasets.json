@@ -1551,6 +1551,44 @@
           "place": "Hong Kong SAR"
         }
       ]
+    },
+    {
+      "id": "ncl-holdings",
+      "title": "國家圖書館館藏書目資訊",
+      "shortTitle": "國家圖書館館藏書目資訊",
+      "adapter": "ncl-holdings",
+      "description": "",
+      "provider": "",
+      "currency": "",
+      "homepage": "",
+      "license": "",
+      "region": "",
+      "sources": [
+        {
+          "file": "sources/ncl/ncl-aleph.csv",
+          "label": "ncl-aleph.csv",
+          "language": ""
+        }
+      ]
+    },
+    {
+      "id": "ncl-nbinet",
+      "title": "全國圖書書目資訊網 NBINet 圖書聯合目錄",
+      "shortTitle": "全國圖書書目資訊網 NBINet 圖書聯合目錄",
+      "adapter": "ncl-nbinet",
+      "description": "",
+      "provider": "",
+      "currency": "",
+      "homepage": "",
+      "license": "",
+      "region": "",
+      "sources": [
+        {
+          "file": "sources/ncl/nbidata_115Q3.csv",
+          "label": "nbidata_115Q3.csv",
+          "language": ""
+        }
+      ]
     }
   ]
 }

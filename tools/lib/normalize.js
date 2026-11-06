@@ -154,10 +154,26 @@ function parseSeries(raw) {
 }
 
 /** Person names in the source are inverted ("Cheung, Ysabelle"). */
+/**
+ * Names in library records are inverted — "Grove, Jairus Victor" — and read
+ * better the other way round. But only *personal* names are inverted that way.
+ * A corporate or conference heading uses commas for something else entirely:
+ *
+ *   Asian Criminology Conference (3rd : 2011 : Taipei, Taiwan)
+ *
+ * Flipping that on its comma produced "Taiwan) Asian Criminology Conference
+ * (3rd : 2011 : Taipei". So a heading carrying a parenthesis, or a word that
+ * only an organisation has, is left exactly as catalogued. That is also the
+ * better outcome for a personal name given with a romanised form in brackets,
+ * "咚東 (Dong Dong)", which should not be reordered either.
+ */
+const CORPORATE = /[()（）]|\b(conference|society|meeting|association|committee|institute|university|college|school|museum|library|company|corporation|council|foundation|symposium|workshop|congress|dept|department|ltd|inc)\b|大學|公司|學會|協會|研究所|研究院|工作室|委員會|基金會|出版社|圖書館|博物館|事務所/i;
+
 function displayName(name) {
   const text = clean(name);
   if (!text) return '';
   if (/[㐀-鿿]/.test(text)) return text;
+  if (CORPORATE.test(text)) return text;
   const parts = text.split(',');
   if (parts.length === 2 && parts[1].trim() && parts[1].length < 40) {
     return trimEnd(parts[1]) + ' ' + trimEnd(parts[0]);
