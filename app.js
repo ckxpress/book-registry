@@ -291,7 +291,18 @@
     document.getElementById('filters-toggle').addEventListener('click', function (e) {
       var open = el.sidebar.classList.toggle('open');
       e.currentTarget.setAttribute('aria-expanded', String(open));
+      // Opening the panel is the request for its counts.
+      if (open) ensureFacets();
     });
+
+    // Widening past 900px puts the sidebar back on screen without anyone
+    // touching the toggle, so the counts have to be fetched then too.
+    if (window.matchMedia) {
+      var wide = window.matchMedia('(max-width: 900px)');
+      var onWidth = function () { if (!wide.matches) ensureFacets(); };
+      if (wide.addEventListener) wide.addEventListener('change', onWidth);
+      else if (wide.addListener) wide.addListener(onWidth);
+    }
 
     initMenu();
     initSearchPlaceholder();
@@ -1243,6 +1254,7 @@
       renderChips();
       renderGrid(false);
       renderFacets(unpackFacets(pre.facets));
+      facetCounts.fresh = true;
       requestAnimationFrame(maybeLoadMore);
       return Promise.resolve();
     }
@@ -1261,12 +1273,12 @@
         renderCount();
         renderChips();
         renderGrid(false);
-        return source.facets();
-      })
-      .then(function (counts) {
-        if (token !== renderToken || !counts) return;
-        renderFacets(counts);
+        // Unblocked here rather than after the facet query. The two are
+        // independent, and gating the next page on 82 extra range requests
+        // made a long list feel stuck part-way down.
         requestAnimationFrame(maybeLoadMore);
+        facetCounts.fresh = false;
+        return ensureFacets(token);
       })
       .catch(function (err) {
         if (token !== renderToken) return;
@@ -1274,6 +1286,68 @@
         el.grid.innerHTML = '';
         el.empty.hidden = false;
         el.empty.innerHTML = '<h3>查詢失敗</h3><p>' + escapeHtml(err.message) + '</p>';
+      });
+  }
+
+  /**
+   * Facet counts for the panel, computed only while the panel is on screen.
+   *
+   * For a plain search they are the expensive half of the work: measured over
+   * 香港文學, 344 hits, the results take 95 range requests and the facets
+   * another 82, because the query fetches each matching row once per facet and
+   * each of those fetches drags its neighbouring pages along. Below 900px the
+   * panel is `display: none` until 篩選 is tapped, so that was most of a
+   * search spent on a list nobody had asked to see.
+   *
+   * Nothing is approximated: when the panel opens, the same query runs and the
+   * same counts appear. Browsing is untouched — those counts come from the
+   * precomputed `facet_counts` table and cost a single lookup.
+   */
+  var facetCounts = { fresh: false, running: false };
+
+  /**
+   * Above 900px the sidebar is laid out inline and always on screen; below it
+   * is hidden until the toggle adds `open`. Asking the stylesheet's own
+   * breakpoint keeps the two from drifting apart.
+   */
+  function sidebarVisible() {
+    if (!el.sidebar) return false;
+    if (!window.matchMedia || !window.matchMedia('(max-width: 900px)').matches) return true;
+    return el.sidebar.classList.contains('open');
+  }
+
+  function ensureFacets(token) {
+    if (facetCounts.fresh || facetCounts.running) return Promise.resolve();
+    if (token !== undefined && token !== renderToken) return Promise.resolve();
+
+    if (!sidebarVisible()) {
+      // Drop what the panel is holding. Those numbers were counted against a
+      // different result set, and leaving them in place would have the panel
+      // assert, for as long as the recount takes after it is opened, that this
+      // search has the previous one's languages and publishers. The panel is
+      // display:none at this point, so there is nothing to see happen.
+      renderFacets._counts = null;
+      el.facets.innerHTML = '';
+      return Promise.resolve();
+    }
+
+    facetCounts.running = true;
+    el.facets.setAttribute('aria-busy', 'true');
+    if (!renderFacets._counts) el.facets.innerHTML = '<p class="facets-pending">計算篩選項…</p>';
+
+    var at = renderToken;
+    return ensureSource()
+      .then(function () { return source.facets(); })
+      .then(function (counts) {
+        facetCounts.running = false;
+        el.facets.removeAttribute('aria-busy');
+        if (at !== renderToken || !counts) return;
+        facetCounts.fresh = true;
+        renderFacets(counts);
+      })
+      .catch(function () {
+        facetCounts.running = false;
+        el.facets.removeAttribute('aria-busy');
       });
   }
 
