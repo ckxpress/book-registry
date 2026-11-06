@@ -56,9 +56,6 @@ jobs:
     # why cover_limit exists: it caps one run, and the cache is committed, so
     # the next run picks up where this one stopped.
     timeout-minutes: 330
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - uses: actions/checkout@v4
@@ -122,10 +119,10 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # Publish only after the database is in R2 and verified. The manifest
-      # advertises that object's exact byte length, and the startup probe only
-      # reads one row near the head of the file, so a site published ahead of
-      # its database fails silently at the facet tables in the tail.
+      # Publish only after the database is in R2. The manifest advertises that
+      # object's exact byte length, and publish-dir.sh refuses to assemble a
+      # site whose database is not being served — the one failure here that
+      # otherwise surfaces weeks later as wrong facet counts in the tail.
       - name: Assemble the publishable site
         if: inputs.publish
         run: sh tools/publish-dir.sh _site
@@ -137,10 +134,6 @@ jobs:
         if: inputs.publish
         with:
           path: _site
-
-      - id: deployment
-        if: inputs.publish
-        uses: actions/deploy-pages@v4
 
       - name: Summary
         if: always()
@@ -161,3 +154,48 @@ jobs:
               "
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # A job of its own purely so the `github-pages` environment gates the
+  # deployment and nothing else. Declared on the rebuild job, it gated the
+  # whole pipeline: the first CI run was refused in one second by a leftover
+  # branch protection rule, before fetching a single byte — and a
+  # `publish: false` run, which deploys nothing, would have been refused too.
+  publish:
+    needs: rebuild
+    if: inputs.publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Only once the site is actually live. Every rebuild writes a new object,
+  # because the name carries the database's content hash — and a CI build and a
+  # laptop build of identical data hash differently, since sqlite versions pack
+  # pages differently. Roughly 450 MB would accumulate per run.
+  prune:
+    needs: publish
+    if: inputs.publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The rebuild job pushed the new manifest; this needs that version to
+          # know which object is live.
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq rclone
+
+      - name: Prune superseded database objects
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: sh tools/prune-r2.sh --confirm

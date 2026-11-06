@@ -230,4 +230,14 @@ reading the old object until the new one is up, and no stale edge-cache entry
 can shadow it.
 
 `.github/workflows/rebuild.yml` does all of it from the Actions tab, which is
-how the project is driven without a computer.
+how the project is driven without a computer. It runs as three jobs —
+`rebuild`, then `publish`, then `prune` — so that only the deployment is gated
+on the `github-pages` environment, and so superseded database objects are
+removed only once the new one is actually live.
+
+Every rebuild writes a new R2 object, because the name carries the database's
+content hash, and a CI build hashes differently from a laptop build of the same
+data: sqlite packs pages differently between versions. `tools/prune-r2.sh`
+keeps the live object and one rollback. On its own it lists and deletes
+nothing; `--confirm` is what deletes, and it refuses outright if it cannot tell
+which object the manifest names.
