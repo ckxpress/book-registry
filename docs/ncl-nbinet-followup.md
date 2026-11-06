@@ -1,70 +1,76 @@
-# Follow-up to the NCL: the open-data files we cannot reach
+# Asking the NCL for the archived bibliographic files
 
-A short addendum to [`ncl-data-request.md`](ncl-data-request.md), which has
-already been sent. Send it as a reply on that thread.
+Two letters, to two people, about two datasets. Both are follow-ups to
+[`ncl-data-request.md`](ncl-data-request.md), which went to the ISBN centre
+about a third dataset.
 
-**What changed.** The National Central Library already publishes, on
-data.gov.tw, free and openly-licensed bulk files that are far better than the
-pre-publication feed the first letter asked about:
+**What we have.** A friend in Taiwan downloaded the two current files for us,
+because `www.ncl.edu.tw` answers this address with 503 and the whole host is
+unreachable from here:
 
-| id | dataset | licence |
-|---|---|---|
-| **7502** | 全國圖書書目資訊網(NBINet) — the union catalogue | OGDL v1.0, 免費 |
-| **27311** | 國家圖書館館藏書目資訊 — the library's own holdings | OGDL v1.0, 免費 |
-| 37878 | 臺灣華文電子書庫書目資料 | OGDL v1.0, 免費 |
-| 7503 | 漢學出版品書目資料 | OGDL v1.0, 免費 |
+| file | records | Taiwan imprints | Chinese-character titles |
+|---|---|---|---|
+| `nbidata_115Q3.csv` (7502, NBINet 115年第3季) | 18,519 | 96% | **99.1%** |
+| `ncl-aleph.csv` (27311, 113年度新增書目) | 118,154 | 45% | 72.3% |
 
-NBINet is the one that matters: "國家圖書館及各類型合作單位陸續提供之書目及館藏
-資料、國際標準書號中心新書書目、漢學研究中心藏書目錄" — real catalogue records
-from eighty-odd libraries, with titles in Chinese characters rather than
-romanisation, reaching back decades.
+Both are free under the Open Government Data License v1.0. The NBINet file is
+the best-quality Taiwanese bibliographic data this project has seen — against
+4% Chinese-character titles in the Open Library set, 99.1% here.
 
-**The obstacle is no longer permission; it is that the files will not
-download.** All four live on `www.ncl.edu.tw`, which returns
-`503 Service Temporarily Unavailable` to us — the whole host, not just those
-paths. `isbn.ncl.edu.tw` works normally, so it is specific to that server.
+**What we are asking for, and why it is a small ask.** Each dataset publishes
+only its current file and overwrites it: 7502 offers 115年第3季 and nothing
+earlier, 27311 offers 113年度 alone. 7502 has been listed since 2013 and 27311
+since 2016, so roughly fifty quarterly files and nine annual ones have been
+published and replaced. Those files existed; they are simply no longer served.
+Asking for the archive is asking for copies of things already published under
+an open licence, not for anything new to be made.
 
-So this letter is narrow: the data is already open, and we are asking whether
-the download URLs still work and, if not, how else to get the files. That is a
-much easier thing to answer than a request for new infrastructure.
+**Contacts, from each dataset's own page.** All on 02-23619132:
 
-**On NBINet's other interface.** The union catalogue's own search system is now
-Ex Libris Primo, whose only machine-readable path (`/primaws`) is marked
-`Disallow` in `robots.txt`. This project has not harvested it and will not, and
-the letter says so — because it is true, and because it is the clearest
-evidence that the data would be handled the way they would want.
+- **鄭小姐** ext 189 — dataset 7502, NBINet
+- **向先生** ext 631 — dataset 27311, 館藏書目資訊
+- 陳小姐 ext 728 — dataset 6730, ISBN centre (already written to)
 
-Not sent by Claude. Check it reads the way you want, add your name, send it.
+Send each letter to the person for that dataset.
+
+**On NBINet's other interface.** The union catalogue's search system is now Ex
+Libris Primo, whose only machine-readable path (`/primaws`) is `Disallow` in
+`robots.txt`. This project has not harvested it and will not, and both letters
+say so — it is true, and it is the clearest evidence the data would be handled
+the way they would want.
+
+Not sent by Claude. Check they read the way you want, add your name, send them.
 
 ---
 
 ## Draft (Traditional Chinese)
 
-**主旨：Re: 詢問「臺灣出版新書預告書訊」2024 年 1 月以前的歷史月檔 — 補充（NBINet 開放資料檔無法下載）**
+### 給 鄭小姐（資料集 7502，NBINet）
 
-陳小姐 您好：
+**主旨：詢問「全國圖書書目資訊網(NBINet)」歷季書目檔案**
 
-接續前一封信，有一項補充，或許比原先的詢問更容易處理。
+鄭小姐 您好：
 
-我後來在政府資料開放平臺上查到，貴館其實已經發布了數個以「政府資料開放授權條款－
-第 1 版」免費開放的書目資料集，其中幾項對本專案特別重要：
+我是一個非商業的開放資料小專案「神保町」（jimbocho.app）的維護者，網站把香港與
+臺灣的書刊書目整理成可瀏覽、可檢索的目錄，目前約收錄 31 萬筆。
 
-- 資料集 **7502**「全國圖書書目資訊網（NBINet）」
-- 資料集 **27311**「國家圖書館館藏書目資訊」
-- 資料集 **37878**「臺灣華文電子書庫書目資料」
-- 資料集 **7503**「漢學出版品書目資料」
+近日取得了貴館發布於政府資料開放平臺的資料集 7502「全國圖書書目資訊網（NBINet）」
+最新一季檔案（NBINet圖書聯合目錄 115 年第 3 季，nbidata_115Q3.csv，18,519 筆）。
+資料品質非常好 —— 其中 96% 為臺灣出版品，99% 的題名為中文字（而非拼音轉寫），
+這對中文檢索而言至關重要。非常感謝貴館持續發布這份資料。
 
-問題在於：上述資料集的下載網址都位於 `www.ncl.edu.tw`，而該主機目前對本端連線
-一律回應 `503 Service Temporarily Unavailable`（並非僅限上述路徑，首頁亦同）。
-相對地，`isbn.ncl.edu.tw` 一切正常，因此應屬該台伺服器的個別狀況。
+想請教的是歷季檔案：該資料集頁面每次僅提供最新一季，前一季的檔案即不再保留連結。
+依上架日期（2013 年 12 月）推算，過去約已發布五十餘季。
 
-想請教：
+1. 歷季的 NBINet 書目檔（例如 103 年第 1 季至 115 年第 2 季）是否仍有保存？
+   可否提供批次下載，或以其他方式提供一份？
+2. 若逐季檔案不便提供，是否有涵蓋全部書目的單一彙整檔？
+3. 這份季檔的收錄範圍為何？是「該季新增編目紀錄」，或是某種其他的擷取方式？
+   了解這點有助於我們正確標示資料性質，避免誤導讀者。
 
-1. 這幾個資料集的下載連結目前是否仍然有效？是否曾更換網址？
-2. 若 `www.ncl.edu.tw` 的檔案服務暫時不穩定，是否有其他取得方式
-   （例如另一主機、FTP、或由貴館直接提供一份）？
-3. 7502（NBINet）的檔案大致為多大、涵蓋多少筆書目、更新頻率為何？
-   資料集頁面標示為「不定期更新」，想了解實際情形以便安排同步。
+另需說明一事：本專案自海外連線時，`www.ncl.edu.tw` 一律回應
+`503 Service Temporarily Unavailable`（首頁亦同；`isbn.ncl.edu.tw` 則正常），
+因此上述檔案是請臺灣的友人代為下載。若貴館知悉該情形或有其他下載管道，也煩請告知。
 
 另想說明一事：NBINet 聯合目錄的新系統（Ex Libris Primo）其機器可讀介面路徑
 `/primaws` 在 `robots.txt` 中標示為 Disallow，因此本專案**並未、也不會**以程式
@@ -86,39 +92,40 @@ jimbocho.app
 
 ## Draft (English)
 
-**Subject: Re: Access to pre-2024 monthly files of 臺灣出版新書預告書訊 —
-NBINet open data will not download**
+### To 鄭小姐 (dataset 7502, NBINet)
 
-Dear Ms Chen,
+**Subject: Archived quarterly files of 全國圖書書目資訊網 (NBINet)**
 
-Following on from my earlier message, with something that may be easier to
-resolve than the original request.
+Dear Ms Cheng,
 
-I have since found that the library already publishes several bibliographic
-datasets on data.gov.tw, free and under the Open Government Data License v1.0.
-Four matter a great deal to this project:
+I maintain a small non-commercial open-data project, 神保町 (jimbocho.app),
+which turns Hong Kong and Taiwan book metadata into a browsable, searchable
+catalogue — about 310,000 records at present.
 
-- **7502** 全國圖書書目資訊網 (NBINet)
-- **27311** 國家圖書館館藏書目資訊
-- **37878** 臺灣華文電子書庫書目資料
-- **7503** 漢學出版品書目資料
+I have recently obtained the current file from your dataset 7502, 全國圖書書目
+資訊網 (NBINet): NBINet圖書聯合目錄 115年第3季, `nbidata_115Q3.csv`, 18,519
+records. The quality is excellent — 96% Taiwanese imprints, and 99% of titles
+in Chinese characters rather than romanisation, which matters enormously for
+searching in Chinese. Thank you for publishing it.
 
-The difficulty is that every one of those download URLs sits on
-`www.ncl.edu.tw`, and that host currently returns
-`503 Service Temporarily Unavailable` to us — the whole server, its homepage
-included, not only those paths. `isbn.ncl.edu.tw` works normally, so this looks
-specific to that machine.
+My question is about the earlier quarters. The dataset page offers only the
+most recent one, and the previous quarter's file is no longer linked. Going by
+the listing date of December 2013, some fifty quarterly files have been
+published over the years.
 
-Could you tell me:
+1. Are the earlier NBINet quarterly files retained, and could they be made
+   available in bulk, or sent?
+2. If quarter-by-quarter is awkward, is there a single consolidated file
+   covering the whole catalogue?
+3. What does each quarterly file actually contain — newly catalogued records
+   for that quarter, or some other selection? Knowing this would let me
+   describe the data accurately rather than guess.
 
-1. Whether those download links are still current, or whether the URLs have
-   changed?
-2. If the file service on `www.ncl.edu.tw` is unreliable at present, whether
-   there is another way to obtain them — a different host, FTP, or a copy sent
-   directly?
-3. Roughly how large the NBINet file (7502) is, how many records it holds, and
-   how often it is refreshed? The dataset page says "不定期更新", and knowing the
-   real cadence would help me schedule synchronisation politely.
+One practical note: from outside Taiwan, `www.ncl.edu.tw` returns
+`503 Service Temporarily Unavailable` to us for everything, its homepage
+included, while `isbn.ncl.edu.tw` works normally. A friend in Taiwan
+downloaded the file on our behalf. If you are aware of that, or there is
+another route, I would be glad to know.
 
 One thing I should state plainly: the NBINet union catalogue's new discovery
 system (Ex Libris Primo) marks its machine-readable path `/primaws` as
