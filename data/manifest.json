@@ -1,7 +1,658 @@
 {
-  "generatedAt": "2026-11-04T17:46:48.529Z",
-  "totalBooks": 118422,
+  "generatedAt": "2026-11-05T06:51:55.205Z",
+  "totalBooks": 309418,
   "datasets": [
+    {
+      "id": "ncl-2024",
+      "title": "臺灣出版新書預告書訊 — 2024",
+      "shortTitle": "臺灣 2024",
+      "description": "2024年各出版者向國家圖書館國際標準書號中心申請 ISBN 的新書預告書目。資料為出版前申請紀錄，出版日為預訂日期。",
+      "provider": "國家圖書館 國際標準書號中心",
+      "homepage": "https://data.gov.tw/dataset/6730",
+      "dataDictionary": "https://isbn.ncl.edu.tw/NEW_ISBNNet/",
+      "license": "政府資料開放授權條款－第1版",
+      "licenseUrl": "https://data.gov.tw/license",
+      "region": "Taiwan",
+      "year": 2024,
+      "adapter": "ncl-isbn",
+      "count": 62326,
+      "files": {
+        "index": [
+          "ncl-2024.index.0.json",
+          "ncl-2024.index.1.json",
+          "ncl-2024.index.2.json",
+          "ncl-2024.index.3.json",
+          "ncl-2024.index.4.json",
+          "ncl-2024.index.5.json",
+          "ncl-2024.index.6.json",
+          "ncl-2024.index.7.json",
+          "ncl-2024.index.8.json",
+          "ncl-2024.index.9.json",
+          "ncl-2024.index.10.json",
+          "ncl-2024.index.11.json",
+          "ncl-2024.index.12.json",
+          "ncl-2024.index.13.json",
+          "ncl-2024.index.14.json",
+          "ncl-2024.index.15.json",
+          "ncl-2024.index.16.json",
+          "ncl-2024.index.17.json",
+          "ncl-2024.index.18.json",
+          "ncl-2024.index.19.json",
+          "ncl-2024.index.20.json"
+        ],
+        "full": [
+          "ncl-2024.full.0.json",
+          "ncl-2024.full.1.json",
+          "ncl-2024.full.2.json",
+          "ncl-2024.full.3.json",
+          "ncl-2024.full.4.json",
+          "ncl-2024.full.5.json",
+          "ncl-2024.full.6.json",
+          "ncl-2024.full.7.json",
+          "ncl-2024.full.8.json",
+          "ncl-2024.full.9.json",
+          "ncl-2024.full.10.json",
+          "ncl-2024.full.11.json",
+          "ncl-2024.full.12.json",
+          "ncl-2024.full.13.json",
+          "ncl-2024.full.14.json",
+          "ncl-2024.full.15.json",
+          "ncl-2024.full.16.json",
+          "ncl-2024.full.17.json",
+          "ncl-2024.full.18.json",
+          "ncl-2024.full.19.json",
+          "ncl-2024.full.20.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "2024-01",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202401_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 4914
+        },
+        {
+          "label": "2024-02",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202402_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 3797
+        },
+        {
+          "label": "2024-03",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202403_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5434
+        },
+        {
+          "label": "2024-04",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202404_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5168
+        },
+        {
+          "label": "2024-05",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202405_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5917
+        },
+        {
+          "label": "2024-06",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202406_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 4838
+        },
+        {
+          "label": "2024-07",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202407_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5191
+        },
+        {
+          "label": "2024-08",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202408_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5775
+        },
+        {
+          "label": "2024-09",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202409_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5118
+        },
+        {
+          "label": "2024-10",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202410_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5024
+        },
+        {
+          "label": "2024-11",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202411_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5653
+        },
+        {
+          "label": "2024-12",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202412_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5497
+        }
+      ],
+      "stats": {
+        "withIsbn": 62326,
+        "classifications": 0,
+        "publishers": 4562,
+        "languages": {
+          "zh": 60875,
+          "en": 1089,
+          "de": 7,
+          "ja": 103,
+          "ko": 10,
+          "id": 6,
+          "fr": 13,
+          "es": 14,
+          "vi": 3
+        },
+        "yearRange": [
+          2006,
+          2030
+        ],
+        "topPublishers": [
+          {
+            "name": "東立",
+            "count": 3327
+          },
+          {
+            "name": "臺灣角川",
+            "count": 1742
+          },
+          {
+            "name": "青文",
+            "count": 1577
+          },
+          {
+            "name": "說頻文化",
+            "count": 1380
+          },
+          {
+            "name": "時報文化",
+            "count": 1343
+          }
+        ],
+        "topClassifications": []
+      },
+      "importedAt": "2026-11-05T04:48:19.654Z"
+    },
+    {
+      "id": "ncl-2025",
+      "title": "臺灣出版新書預告書訊 — 2025",
+      "shortTitle": "臺灣 2025",
+      "description": "2025年各出版者向國家圖書館國際標準書號中心申請 ISBN 的新書預告書目。資料為出版前申請紀錄，出版日為預訂日期。",
+      "provider": "國家圖書館 國際標準書號中心",
+      "homepage": "https://data.gov.tw/dataset/6730",
+      "dataDictionary": "https://isbn.ncl.edu.tw/NEW_ISBNNet/",
+      "license": "政府資料開放授權條款－第1版",
+      "licenseUrl": "https://data.gov.tw/license",
+      "region": "Taiwan",
+      "year": 2025,
+      "adapter": "ncl-isbn",
+      "count": 61316,
+      "files": {
+        "index": [
+          "ncl-2025.index.0.json",
+          "ncl-2025.index.1.json",
+          "ncl-2025.index.2.json",
+          "ncl-2025.index.3.json",
+          "ncl-2025.index.4.json",
+          "ncl-2025.index.5.json",
+          "ncl-2025.index.6.json",
+          "ncl-2025.index.7.json",
+          "ncl-2025.index.8.json",
+          "ncl-2025.index.9.json",
+          "ncl-2025.index.10.json",
+          "ncl-2025.index.11.json",
+          "ncl-2025.index.12.json",
+          "ncl-2025.index.13.json",
+          "ncl-2025.index.14.json",
+          "ncl-2025.index.15.json",
+          "ncl-2025.index.16.json",
+          "ncl-2025.index.17.json",
+          "ncl-2025.index.18.json",
+          "ncl-2025.index.19.json",
+          "ncl-2025.index.20.json"
+        ],
+        "full": [
+          "ncl-2025.full.0.json",
+          "ncl-2025.full.1.json",
+          "ncl-2025.full.2.json",
+          "ncl-2025.full.3.json",
+          "ncl-2025.full.4.json",
+          "ncl-2025.full.5.json",
+          "ncl-2025.full.6.json",
+          "ncl-2025.full.7.json",
+          "ncl-2025.full.8.json",
+          "ncl-2025.full.9.json",
+          "ncl-2025.full.10.json",
+          "ncl-2025.full.11.json",
+          "ncl-2025.full.12.json",
+          "ncl-2025.full.13.json",
+          "ncl-2025.full.14.json",
+          "ncl-2025.full.15.json",
+          "ncl-2025.full.16.json",
+          "ncl-2025.full.17.json",
+          "ncl-2025.full.18.json",
+          "ncl-2025.full.19.json",
+          "ncl-2025.full.20.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "2025-01",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202501_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 3318
+        },
+        {
+          "label": "2025-02",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202502_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 4215
+        },
+        {
+          "label": "2025-03",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202503_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5151
+        },
+        {
+          "label": "2025-04",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202504_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5354
+        },
+        {
+          "label": "2025-05",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202505_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5287
+        },
+        {
+          "label": "2025-06",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202506_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5282
+        },
+        {
+          "label": "2025-07",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202507_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5511
+        },
+        {
+          "label": "2025-08",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202508_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5188
+        },
+        {
+          "label": "2025-09",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202509_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5330
+        },
+        {
+          "label": "2025-10",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202510_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5538
+        },
+        {
+          "label": "2025-11",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202511_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5117
+        },
+        {
+          "label": "2025-12",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202512_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 6025
+        }
+      ],
+      "stats": {
+        "withIsbn": 61316,
+        "classifications": 17,
+        "publishers": 4524,
+        "languages": {
+          "es": 12,
+          "zh": 59629,
+          "en": 1438,
+          "fr": 15,
+          "ja": 83,
+          "id": 7,
+          "th": 8,
+          "vi": 7,
+          "ko": 9,
+          "de": 4
+        },
+        "yearRange": [
+          1988,
+          2026
+        ],
+        "topPublishers": [
+          {
+            "name": "東立",
+            "count": 2861
+          },
+          {
+            "name": "青文",
+            "count": 1885
+          },
+          {
+            "name": "臺灣角川",
+            "count": 1797
+          },
+          {
+            "name": "尖端",
+            "count": 1325
+          },
+          {
+            "name": "說頻文化",
+            "count": 1295
+          }
+        ],
+        "topClassifications": [
+          {
+            "name": "漫畫書",
+            "count": 9271
+          },
+          {
+            "name": "小說",
+            "count": 6695
+          },
+          {
+            "name": "人文史地",
+            "count": 6422
+          },
+          {
+            "name": "兒童讀物",
+            "count": 5919
+          },
+          {
+            "name": "考試用書",
+            "count": 4038
+          },
+          {
+            "name": "社會科學",
+            "count": 3904
+          },
+          {
+            "name": "文學",
+            "count": 2863
+          },
+          {
+            "name": "藝術",
+            "count": 2656
+          }
+        ]
+      },
+      "importedAt": "2026-11-05T04:47:44.123Z"
+    },
+    {
+      "id": "ncl-2026",
+      "title": "臺灣出版新書預告書訊 — 2026",
+      "shortTitle": "臺灣 2026",
+      "description": "2026年各出版者向國家圖書館國際標準書號中心申請 ISBN 的新書預告書目。資料為出版前申請紀錄，出版日為預訂日期。",
+      "provider": "國家圖書館 國際標準書號中心",
+      "homepage": "https://data.gov.tw/dataset/6730",
+      "dataDictionary": "https://isbn.ncl.edu.tw/NEW_ISBNNet/",
+      "license": "政府資料開放授權條款－第1版",
+      "licenseUrl": "https://data.gov.tw/license",
+      "region": "Taiwan",
+      "year": 2026,
+      "adapter": "ncl-isbn",
+      "count": 46166,
+      "files": {
+        "index": [
+          "ncl-2026.index.0.json",
+          "ncl-2026.index.1.json",
+          "ncl-2026.index.2.json",
+          "ncl-2026.index.3.json",
+          "ncl-2026.index.4.json",
+          "ncl-2026.index.5.json",
+          "ncl-2026.index.6.json",
+          "ncl-2026.index.7.json",
+          "ncl-2026.index.8.json",
+          "ncl-2026.index.9.json",
+          "ncl-2026.index.10.json",
+          "ncl-2026.index.11.json",
+          "ncl-2026.index.12.json",
+          "ncl-2026.index.13.json",
+          "ncl-2026.index.14.json",
+          "ncl-2026.index.15.json"
+        ],
+        "full": [
+          "ncl-2026.full.0.json",
+          "ncl-2026.full.1.json",
+          "ncl-2026.full.2.json",
+          "ncl-2026.full.3.json",
+          "ncl-2026.full.4.json",
+          "ncl-2026.full.5.json",
+          "ncl-2026.full.6.json",
+          "ncl-2026.full.7.json",
+          "ncl-2026.full.8.json",
+          "ncl-2026.full.9.json",
+          "ncl-2026.full.10.json",
+          "ncl-2026.full.11.json",
+          "ncl-2026.full.12.json",
+          "ncl-2026.full.13.json",
+          "ncl-2026.full.14.json",
+          "ncl-2026.full.15.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "2026-01",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202601_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 4524
+        },
+        {
+          "label": "2026-02",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202602_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 3088
+        },
+        {
+          "label": "2026-03",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202603_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5728
+        },
+        {
+          "label": "2026-04",
+          "url": "https://isbn.ncl.edu.tw/NEW_ISBNNet/opendata/202604_isbn.csv",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5787
+        },
+        {
+          "label": "2026-05",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/90706411-13fd-4bfc-b3f1-ba83142a243c",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5431
+        },
+        {
+          "label": "2026-06",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/e7328d32-8d7b-4bef-8f0a-b9f53cb50aa8",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5329
+        },
+        {
+          "label": "2026-07",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/40d82eb1-2d73-4e67-8aee-29360a32ddcf",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5928
+        },
+        {
+          "label": "2026-08",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/e9b82fd2-6cf4-4bb3-88e2-2a5a09e84e28",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5274
+        },
+        {
+          "label": "2026-09",
+          "url": "https://www.ncl.edu.tw/OpenDataFile/0Q169585372033888603/f145757e-9367-4e8c-bcb2-3ed630a7c0b9",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 5077
+        }
+      ],
+      "stats": {
+        "withIsbn": 46166,
+        "classifications": 18,
+        "publishers": 3756,
+        "languages": {
+          "es": 21,
+          "zh": 44757,
+          "vi": 3,
+          "en": 1265,
+          "ja": 81,
+          "id": 1,
+          "ko": 6,
+          "de": 2,
+          "fr": 5
+        },
+        "yearRange": [
+          2021,
+          2027
+        ],
+        "topPublishers": [
+          {
+            "name": "東立",
+            "count": 2038
+          },
+          {
+            "name": "青文",
+            "count": 1575
+          },
+          {
+            "name": "臺灣角川",
+            "count": 1421
+          },
+          {
+            "name": "說頻文化",
+            "count": 1020
+          },
+          {
+            "name": "時報文化",
+            "count": 914
+          }
+        ],
+        "topClassifications": [
+          {
+            "name": "漫畫書",
+            "count": 7607
+          },
+          {
+            "name": "人文史地",
+            "count": 6107
+          },
+          {
+            "name": "小說",
+            "count": 5906
+          },
+          {
+            "name": "兒童讀物",
+            "count": 5173
+          },
+          {
+            "name": "社會科學",
+            "count": 3857
+          },
+          {
+            "name": "考試用書",
+            "count": 3233
+          },
+          {
+            "name": "文學",
+            "count": 2216
+          },
+          {
+            "name": "心理勵志",
+            "count": 2088
+          }
+        ]
+      },
+      "importedAt": "2026-11-05T01:04:11.523Z"
+    },
     {
       "id": "hkpl-2017",
       "title": "香港印刷書刊目錄 — 2017",
@@ -1586,22 +2237,764 @@
         ]
       },
       "importedAt": "2026-11-04T06:00:41.997Z"
+    },
+    {
+      "id": "ol-hk",
+      "title": "香港書刊 — Open Library",
+      "shortTitle": "OL 香港",
+      "description": "Open Library 收錄的香港出版書刊（2017 年前）。此資料集由公眾協作編輯，並非官方書刊註冊紀錄，完整度與準確度不及其他資料集：約四分之一有國際標準書號，絕大部分沒有封面。",
+      "provider": "Open Library · Internet Archive",
+      "homepage": "https://openlibrary.org/",
+      "dataDictionary": "https://openlibrary.org/dev/docs/api/search",
+      "license": "Open Data Commons Attribution License / CC0 (see openlibrary.org)",
+      "licenseUrl": "https://openlibrary.org/developers/licensing",
+      "region": "Hong Kong",
+      "year": null,
+      "adapter": "openlibrary-editions",
+      "count": 21188,
+      "files": {
+        "index": [
+          "ol-hk.index.0.json",
+          "ol-hk.index.1.json",
+          "ol-hk.index.2.json",
+          "ol-hk.index.3.json",
+          "ol-hk.index.4.json",
+          "ol-hk.index.5.json",
+          "ol-hk.index.6.json",
+          "ol-hk.index.7.json"
+        ],
+        "full": [
+          "ol-hk.full.0.json",
+          "ol-hk.full.1.json",
+          "ol-hk.full.2.json",
+          "ol-hk.full.3.json",
+          "ol-hk.full.4.json",
+          "ol-hk.full.5.json",
+          "ol-hk.full.6.json",
+          "ol-hk.full.7.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "Hong Kong +0",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 487
+        },
+        {
+          "label": "Hong Kong +500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 458
+        },
+        {
+          "label": "Hong Kong +1000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=1000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 478
+        },
+        {
+          "label": "Hong Kong +1500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=1500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 431
+        },
+        {
+          "label": "Hong Kong +2000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=2000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 427
+        },
+        {
+          "label": "Hong Kong +2500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=2500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 467
+        },
+        {
+          "label": "Hong Kong +3000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=3000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 446
+        },
+        {
+          "label": "Hong Kong +3500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=3500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 492
+        },
+        {
+          "label": "Hong Kong +4000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=4000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 496
+        },
+        {
+          "label": "Hong Kong +4500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=4500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 490
+        },
+        {
+          "label": "Hong Kong +5000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=5000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 480
+        },
+        {
+          "label": "Hong Kong +5500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=5500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +6000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=6000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +6500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=6500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +7000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=7000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +7500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=7500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +8000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=8000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +8500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=8500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +9000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=9000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +9500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=9500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +10000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=10000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +10500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=10500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +11000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=11000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +11500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=11500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +12000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=12000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +12500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=12500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +13000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=13000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +13500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=13500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +14000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=14000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +14500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=14500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +15000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=15000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +15500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=15500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +16000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=16000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +16500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=16500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +17000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=17000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +17500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=17500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +18000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=18000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hong Kong +18500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=18500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 424
+        },
+        {
+          "label": "Hong Kong +19000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=19000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +19500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=19500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +20000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=20000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +20500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=20500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +21000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=21000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +21500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=21500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +22000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=22000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +22500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=22500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +23000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=23000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +23500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=23500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +24000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=24000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +24500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=24500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +25000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=25000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +25500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=25500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +26000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=26000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +26500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=26500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +27000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=27000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +27500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=27500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +28000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=28000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +28500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=28500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +29000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=29000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +29500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=29500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +30000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=30000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +30500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=30500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +31000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=31000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +31500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=31500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +32000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=32000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +32500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=32500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong +33000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong&limit=500&offset=33000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hongkong +0",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hongkong +500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hongkong +1000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=1000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hongkong +1500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=1500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 500
+        },
+        {
+          "label": "Hongkong +2000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=2000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 36
+        },
+        {
+          "label": "Hongkong +2500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hongkong&limit=500&offset=2500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Kowloon +0",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Kowloon&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 430
+        },
+        {
+          "label": "Kowloon +500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Kowloon&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Kowloon +1000",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Kowloon&limit=500&offset=1000&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong, China +0",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong%2C+China&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 90
+        },
+        {
+          "label": "Hong Kong, China +500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong%2C+China&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "香港 +0",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=%E9%A6%99%E6%B8%AF&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 54
+        },
+        {
+          "label": "香港 +500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=%E9%A6%99%E6%B8%AF&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        },
+        {
+          "label": "Hong Kong SAR +0",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong+SAR&limit=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 6
+        },
+        {
+          "label": "Hong Kong SAR +500",
+          "url": "https://openlibrary.org/query.json?type=%2Ftype%2Fedition&publish_places=Hong+Kong+SAR&limit=500&offset=500&title=&subtitle=&by_statement=&isbn_13=&isbn_10=&publishers=&publish_date=&languages=&number_of_pages=&pagination=&subjects=&series=&edition_name=&covers=",
+          "file": "",
+          "quarter": "",
+          "language": "",
+          "count": 0
+        }
+      ],
+      "stats": {
+        "withIsbn": 12568,
+        "classifications": 0,
+        "publishers": 4968,
+        "languages": {
+          "zh": 11807,
+          "en": 8900,
+          "ja": 9,
+          "de": 44,
+          "fr": 41,
+          "id": 1,
+          "es": 4,
+          "vi": 10,
+          "ko": 1
+        },
+        "yearRange": [
+          1800,
+          2016
+        ],
+        "topPublishers": [
+          {
+            "name": "Xing He",
+            "count": 752
+          },
+          {
+            "name": "Oxford University Press",
+            "count": 622
+          },
+          {
+            "name": "Cosmos",
+            "count": 545
+          },
+          {
+            "name": "Hong Kong University Press",
+            "count": 508
+          },
+          {
+            "name": "Bo Yi",
+            "count": 502
+          }
+        ],
+        "topClassifications": []
+      },
+      "importedAt": "2026-11-05T06:51:55.204Z"
     }
   ],
-  "coversResolvedAt": "2026-11-04T20:09:30.215Z",
-  "coversFound": 10148,
+  "coversResolvedAt": "2026-11-05T20:01:24.467Z",
+  "coversFound": 56509,
   "db": {
     "file": "books.db",
-    "bytes": 286355456,
+    "bytes": 763928576,
+    "md5": "4cf9a7be0347ea8a37c09fb9df662b00",
     "pageSize": 4096,
     "chunkBytes": 32768,
-    "pages": 69911,
+    "maxReadBytes": 262144,
+    "pages": 186506,
     "probe": {
       "rowid": 1,
-      "id": "hkpl-2017:2017-09285"
+      "id": "ncl-2024:9786269600564"
     },
-    "builtAt": "2026-11-05T00:05:52.733Z",
-    "url": "https://db.jimbocho.app/books-4k.db"
+    "builtAt": "2026-11-05T20:02:55.126Z",
+    "url": "https://db.jimbocho.app/books-4cf9a7be.db"
   },
   "firstPage": {
     "file": "firstpage.json",
@@ -1609,7 +3002,15 @@
     "scopes": [
       "",
       "zh",
-      "en"
+      "en",
+      "ja",
+      "fr",
+      "de",
+      "es",
+      "ko",
+      "vi",
+      "id",
+      "th"
     ]
   }
 }

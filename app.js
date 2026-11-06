@@ -24,6 +24,7 @@
   var totalBooks = 0;
   var firstPage = null;      // precomputed landing views, keyed by language scope
   var sourcePrepared = null; // the open-the-backend promise, created once
+  var searchingTimer = null; // delays the skeleton so a fast query cannot flash it
   var totalResults = 0;
   var source = null; // JsonSource or SqliteSource, chosen by the manifest
   var renderToken = 0; // guards against out-of-order async renders
@@ -48,6 +49,8 @@
     footer: document.getElementById('footer-text'),
     filtersCount: document.getElementById('filters-count'),
     sentinel: document.getElementById('sentinel'),
+    search: document.getElementById('search-form'),
+    results: document.getElementById('results'),
     shelf: document.getElementById('shelf-view'),
     shelfCount: document.getElementById('shelf-count'),
   };
@@ -60,7 +63,7 @@
     { key: 'language', label: '語言', get: function (r) { return r.language; }, name: languageName, open: true },
     { key: 'publisher', label: '出版者', get: function (r) { return r.publisher; }, search: true, limit: 8, open: true },
     { key: 'year', label: '出版年份', get: function (r) { return r.year ? String(r.year) : ''; }, limit: 10, sort: 'key-desc', open: true },
-    { key: 'source', label: '發佈季度', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
+    { key: 'source', label: '發佈期間', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
     { key: 'classification', label: '類別', get: function (r) { return r.classification; }, search: true, limit: 10 },
     { key: 'dataset', label: '資料集', get: function (r) { return r._ds; }, name: datasetName, hideIfSingle: true },
     {
@@ -798,6 +801,13 @@
                   // cannot drift apart. Several pages per request: round trips
                   // cost far more than the extra bytes.
                   requestChunkSize: db.chunkBytes || 4096,
+                  // How far the VFS may run ahead once it decides reads look
+                  // sequential. Its default is 5 MiB, and the heuristic
+                  // misfires badly here: fetching a few hundred scattered rows
+                  // in ascending rowid order looks sequential to it, so it
+                  // prefetched megabytes of neighbouring pages that no query
+                  // wanted — 35 MB of a 38 MB search.
+                  maxReadSpeed: db.maxReadBytes || 524288,
                   // Some static hosts (GitHub Pages among them) answer HEAD
                   // without content-length, leaving the library unable to
                   // discover the file size. The manifest records it exactly.
@@ -887,13 +897,14 @@
       } else if (!where.params.length) {
         counting = Promise.resolve([{ n: totalBooks }]); // unfiltered: already known
       } else if (countScope) {
-        // A single language is the common case — it is the default view — and
-        // COUNT(*) there walks every index entry for that language: about a
-        // megabyte over range requests at a hundred thousand books, growing
-        // with the catalogue. The same number was counted at build time.
+        // One language, one dataset or one year — the views a reader lands on
+        // or clicks first. COUNT(*) there walks every index entry in the slice,
+        // which grows with the catalogue, and the count is the scope facet's
+        // own tally in the unnarrowed scope, already worked out at build time.
+        var at = countScope.indexOf(':');
         counting = SqliteSource.query(
-          "SELECT n FROM facet_counts WHERE scope = '' AND facet = 'language' AND value = ? LIMIT 1",
-          [countScope]
+          "SELECT n FROM facet_counts WHERE scope = '' AND facet = ? AND value = ? LIMIT 1",
+          [countScope.slice(0, at), countScope.slice(at + 1)]
         ).then(function (res) {
           return res.length ? res : SqliteSource.query('SELECT COUNT(*) AS n FROM ' + where.from + where.sql, where.params);
         });
@@ -1036,8 +1047,17 @@
     if (state.q || state.sort !== 'relevance') return null;
     var scope = precomputedScope(null);
     if (scope === null) return null;
-    return firstPage.scopes[scope] || null;
+    // firstpage.json only carries the whole catalogue and the single-language
+    // views, keyed by the bare language, since those are the only ones a reader
+    // can land on without clicking. Anything else comes from the database.
+    if (scope === '') return firstPage.scopes[''] || null;
+    if (scope.indexOf('language:') !== 0) return null;
+    return firstPage.scopes[scope.slice('language:'.length)] || null;
   }
+
+  // The facets the builder precomputes a scope for. Their values select large
+  // slices, so counting one live means reading every matching row.
+  var SCOPE_FACETS = ['language', 'dataset', 'year'];
 
   function precomputedScope(skipFacet) {
     if (matchExpression(state.q)) return null;
@@ -1049,8 +1069,8 @@
       if (!usable || facet.key === skipFacet) return;
       var set = state.filters[facet.key];
       if (!set || !set.size) return;
-      if (facet.key === 'language' && set.size === 1) {
-        set.forEach(function (value) { scope = value; });
+      if (SCOPE_FACETS.indexOf(facet.key) !== -1 && set.size === 1 && !scope) {
+        set.forEach(function (value) { scope = facet.key + ':' + value; });
       } else {
         usable = false;
       }
@@ -1177,6 +1197,37 @@
 
   /* ---------------- render: browse ---------------- */
 
+  /**
+   * Shows that a query is in flight.
+   *
+   * A query the build step did not precompute costs dozens of serial range
+   * requests — SQLite cannot ask for a page until it has read the page that
+   * points at it — so a search can take seconds, and until it answers the grid
+   * still holds the *previous* results. Without this the site looks like it
+   * ignored the keystroke.
+   *
+   * The skeleton waits a moment before appearing, so a fast answer does not
+   * flash an empty grid on its way past.
+   */
+  function setSearching(on) {
+    clearTimeout(searchingTimer);
+    el.search.classList.toggle('busy', !!on);
+    el.results.setAttribute('aria-busy', on ? 'true' : 'false');
+
+    if (!on) {
+      el.count.classList.remove('searching');
+      return;
+    }
+    searchingTimer = setTimeout(function () {
+      if (!el.search.classList.contains('busy')) return;
+      el.count.textContent = '搜尋中…';
+      el.count.classList.add('searching');
+      el.empty.hidden = true;
+      el.grid.innerHTML = '';
+      showSkeleton();
+    }, 150);
+  }
+
   function render() {
     var token = ++renderToken;
     state.page = 1;
@@ -1185,6 +1236,7 @@
     // costs no round trips, so the landing view appears with the page.
     var pre = prerendered();
     if (pre) {
+      setSearching(false);
       results = pre.rows.map(mapSqlRow);
       totalResults = pre.total;
       renderCount();
@@ -1195,12 +1247,15 @@
       return Promise.resolve();
     }
 
+    setSearching(true);
+
     return ensureSource()
       .then(function () {
         return source.page(0, PAGE_SIZE);
       })
       .then(function (res) {
         if (token !== renderToken) return null;
+        setSearching(false);
         results = res.rows;
         totalResults = res.total;
         renderCount();
@@ -1215,6 +1270,7 @@
       })
       .catch(function (err) {
         if (token !== renderToken) return;
+        setSearching(false);
         el.grid.innerHTML = '';
         el.empty.hidden = false;
         el.empty.innerHTML = '<h3>查詢失敗</h3><p>' + escapeHtml(err.message) + '</p>';
@@ -1940,7 +1996,7 @@
       out.push(link('https://openlibrary.org/isbn/' + book.isbn, 'Open Library'));
       out.push(link('https://www.google.com/search?q=' + encodeURIComponent('ISBN ' + book.isbn), '網上搜尋'));
     }
-    out.push(link('https://www.hkpl.gov.hk/en/search?q=' + encodeURIComponent(book.title || ''), '香港公共圖書館'));
+    out.push(catalogueLink(book));
     out.push('</div>');
     out.push('</div></div>');
 
@@ -2055,7 +2111,7 @@
     row2(out, '參考編號', book.ref);
     row2(out, '順序編號', book.serial);
     if (book.source) {
-      row2(out, '發佈季度', book.source.label || book.source.quarter);
+      row2(out, '發佈期間', book.source.label || book.source.quarter || book.source.period);
       if (book.source.url) row2(out, '來源檔案', '<a href="' + escapeAttr(book.source.url) + '" rel="noreferrer">' + escapeHtml(fileName(book.source.url)) + '</a>', true);
       if (book.source.file) row2(out, 'Source file', '<code>' + escapeHtml(book.source.file) + '</code>', true);
     }
@@ -2373,10 +2429,55 @@
     return source ? source.label || source.quarter || parts[1] : value;
   }
 
+  // The Hong Kong catalogue is Chinese and English only; the Taiwan feed adds
+  // the language a translation was written in, so the facet is no longer a
+  // two-value one.
+  var LANGUAGE_NAMES = {
+    zh: '中文',
+    en: '英文',
+    ja: '日文',
+    ko: '韓文',
+    fr: '法文',
+    de: '德文',
+    es: '西班牙文',
+    vi: '越南文',
+    th: '泰文',
+    id: '印尼文',
+  };
+
+  /**
+   * The library catalogue worth searching depends on where the book was
+   * registered: a Taiwanese ISBN application is not in Hong Kong's public
+   * library, and sending a reader there finds nothing.
+   */
+  function catalogueLink(book) {
+    // A grid row carries the dataset as `_ds`; a full record, which is what
+    // the detail view has, carries it as `dataset`.
+    var dataset = datasetOf(book.dataset || book._ds);
+    var region = dataset && dataset.region;
+    if (region === 'Taiwan' || /臺灣|台灣/.test(String(region || ''))) {
+      return link(
+        'https://isbn.ncl.edu.tw/NEW_ISBNNet/main_DisplayBookList.php?Pfile=&FM=1&Ptype=001&searchtext=' +
+          encodeURIComponent(book.title || ''),
+        '全國新書資訊網'
+      );
+    }
+    return link(
+      'https://www.hkpl.gov.hk/en/search?q=' + encodeURIComponent(book.title || ''),
+      '香港公共圖書館'
+    );
+  }
+
+  function datasetOf(id) {
+    if (!manifest || !manifest.datasets) return null;
+    for (var i = 0; i < manifest.datasets.length; i++) {
+      if (manifest.datasets[i].id === id) return manifest.datasets[i];
+    }
+    return null;
+  }
+
   function languageName(code) {
-    if (code === 'zh') return '中文';
-    if (code === 'en') return '英文';
-    return code || '';
+    return LANGUAGE_NAMES[code] || code || '';
   }
 
   function displayName(facet, value) {
