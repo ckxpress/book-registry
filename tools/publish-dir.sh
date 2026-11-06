@@ -23,13 +23,33 @@ DEST=${1:?usage: publish-dir.sh DEST}
 rm -rf "$DEST"
 mkdir -p "$DEST"
 
-git ls-files -z site/ \
-  | grep -zv '\.full\.[0-9]*\.json$' \
-  | while IFS= read -r -d '' f; do
+# Plain newline-delimited, not `git ls-files -z` with `read -r -d ''`: /bin/sh
+# is bash in POSIX mode on macOS, where `read -d` works, and dash on Ubuntu,
+# where it does not. The CI run failed with "read: Illegal option -d" after
+# this had passed on a laptop.
+#
+# Without -z, git quotes any path needing it, so refuse rather than silently
+# mishandle one. No path under site/ has ever needed quoting.
+if git ls-files site/ | grep -q '^"'; then
+  echo "✗ a tracked path under site/ needs quoting; this script cannot handle it:" >&2
+  git ls-files site/ | grep '^"' | sed 's/^/    /' >&2
+  exit 1
+fi
+
+git ls-files site/ \
+  | grep -v '\.full\.[0-9]*\.json$' \
+  | while IFS= read -r f; do
       rel=${f#site/}
       mkdir -p "$DEST/$(dirname "$rel")"
       cp -p "$f" "$DEST/$rel"
     done
+
+# If the copy produced nothing the next line fails with "Directory nonexistent",
+# which says nothing useful about why.
+[ -d "$DEST/data" ] || {
+  echo "✗ nothing was copied into $DEST — is this a git checkout of the project?" >&2
+  exit 1
+}
 
 node tools/publish-manifest.js > "$DEST/data/manifest.json"
 
