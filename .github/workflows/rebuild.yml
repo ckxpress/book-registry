@@ -90,6 +90,20 @@ jobs:
       - name: Build the database
         run: npm run build:db -- --db-url https://db.jimbocho.app/
 
+      # Before the commit, not after. A failed upload must leave nothing behind:
+      # the first CI rebuild committed its manifest and then failed here, so
+      # main advertised an object that returned 404 and was one deploy away from
+      # going live. The site survived only because the publish steps are gated
+      # on this one.
+      - name: Upload the database to R2
+        if: inputs.publish
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: npm run upload:db
+
       - name: Commit the rebuilt catalogue
         id: commit
         run: |
@@ -107,15 +121,6 @@ jobs:
             git push origin HEAD:main
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Upload the database to R2
-        if: inputs.publish
-        env:
-          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
-        run: npm run upload:db
 
       # Publish only after the database is in R2 and verified. The manifest
       # advertises that object's exact byte length, and the startup probe only
