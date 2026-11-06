@@ -291,7 +291,9 @@ function main() {
   // the site serves and the service worker caches like any other asset. First
   // paint then needs the database not at all; it is opened in the background
   // for the first search or filter.
-  manifest.firstPage = writeFirstPage();
+  const precomputed = writeFirstPage();
+  manifest.firstPage = precomputed.firstPage;
+  manifest.pages = precomputed.pages;
   fs.writeFileSync(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 
   console.log(
@@ -662,7 +664,94 @@ function writeFirstPage() {
     '  Landing view precomputed → ' + file + ', ' + (size / 1024).toFixed(0) + ' KB, ' +
       Object.keys(scopes).length + ' scopes (no range requests for first paint)'
   );
-  return { file: file, rows: FIRST_PAGE_ROWS, scopes: Object.keys(scopes) };
+  return {
+    firstPage: { file: file, rows: FIRST_PAGE_ROWS, scopes: Object.keys(scopes) },
+    pages: writeScopePages(COLUMNS, ORDER),
+  };
+}
+
+/**
+ * A precomputed first page for every scope the facet counts cover.
+ *
+ * Why: clicking a filter costs about 45 range requests, and SQLite issues them
+ * largely one after another because it cannot ask for a page before reading
+ * the page that points at it. Measured on the live site, filtering by 東立
+ * took ~20 s from Hong Kong and ~3 minutes through a US exit. The work is not
+ * the problem — the round trips are.
+ *
+ * firstpage.json already removes them for the landing view, which paints in
+ * 0.2 s with no range requests at all. This is the same idea for the other 763
+ * scopes: one small static file each, holding the rows, the total and the
+ * facet counts, so a filtered browse is a single HTTP request and no database
+ * reads whatsoever.
+ *
+ * Scopes are addressed by index rather than by name. A scope is a string like
+ * `publisher:東立` or `source:ncl-holdings#0`, and turning those into
+ * filenames means percent-encoding, a '#' that truncates a URL, and CJK
+ * filenames on a static host. An integer sidesteps all of it, and the manifest
+ * carries the map.
+ *
+ * What it does not cover: the second page onwards, and any two filters at
+ * once. Those still read the database. The first page is what a reader waits
+ * for.
+ */
+function writeScopePages(columns, order) {
+  const dir = path.join(DATA_DIR, 'page');
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+
+  // Every scope the build precomputed counts for, which is exactly the set the
+  // client will ask about.
+  const scopes = json(
+    "SELECT DISTINCT scope FROM facet_counts WHERE scope <> '' ORDER BY scope"
+  ).map((r) => r.scope);
+
+  const index = {};
+  let n = 0;
+  let bytes = 0;
+
+  for (const scope of scopes) {
+    const at = scope.indexOf(':');
+    const facet = scope.slice(0, at);
+    const value = scope.slice(at + 1);
+    const expr = SQL_FACET[facet];
+    if (!expr) continue;
+
+    const where = ' WHERE ' + expr + ' = ' + quote(value);
+    const rows = json(
+      'SELECT ' + columns + ' FROM books b' + where + ' ORDER BY ' + order + ' LIMIT ' + FIRST_PAGE_ROWS
+    );
+    if (!rows.length) continue;
+
+    const total = json('SELECT COUNT(*) AS n FROM books b' + where)[0].n;
+
+    // Same rule as the landing view: a facet is never narrowed by a filter on
+    // itself, so that one is counted across the whole catalogue and the reader
+    // can still see the other values to switch to.
+    const counts = json(
+      'SELECT scope, facet, value, n FROM facet_counts WHERE scope IN (' + quote(scope) + ", '')" +
+        ' ORDER BY facet, n DESC, value'
+    );
+    const facets = {};
+    for (const row of counts) {
+      const want = row.facet === facet ? '' : scope;
+      if (row.scope !== want) continue;
+      if (!facets[row.facet]) facets[row.facet] = [];
+      if (facets[row.facet].length < FACET_LIMIT) facets[row.facet].push({ v: row.value, n: row.n });
+    }
+
+    const payload = JSON.stringify({ total: total, rows: rows, facets: facets }) + '\n';
+    fs.writeFileSync(path.join(dir, n + '.json'), payload);
+    index[scope] = n;
+    bytes += payload.length;
+    n++;
+  }
+
+  console.log(
+    '  Scope pages precomputed → data/page/, ' + n + ' files, ' +
+      (bytes / 1048576).toFixed(1) + ' MB (a filtered browse costs one request)'
+  );
+  return { dir: 'page/', rows: FIRST_PAGE_ROWS, scopes: index };
 }
 
 /** Runs a query and parses sqlite3's own JSON output, so types survive. */

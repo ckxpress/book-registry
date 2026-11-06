@@ -1119,6 +1119,43 @@
     return firstPage.scopes[scope.slice('language:'.length)] || null;
   }
 
+  /**
+   * The same thing for every other scope, fetched rather than carried.
+   *
+   * The landing view ships inside firstpage.json because it is needed before
+   * anything else. The other 763 are one file each, fetched when clicked:
+   * loading them all up front would be 20 MB to open the homepage.
+   *
+   * This is what a filtered browse costs now — one HTTP request, cached by the
+   * edge like any other static file. Against ~45 serial range requests, which
+   * measured 20 s from Hong Kong and about three minutes through a US exit.
+   */
+  var scopePageCache = {};
+
+  function scopePage() {
+    if (!manifest.pages || !manifest.pages.scopes) return null;
+    if (state.q || state.sort !== 'relevance') return null;
+    var scope = precomputedScope(null);
+    if (!scope) return null; // '' and null both fall through to firstPage
+    var n = manifest.pages.scopes[scope];
+    if (n === undefined) return null;
+
+    if (!scopePageCache[n]) {
+      scopePageCache[n] = fetch(DATA + manifest.pages.dir + n + '.json')
+        .then(function (res) {
+          if (!res.ok) throw new Error('scope page ' + n + ': ' + res.status);
+          return res.json();
+        })
+        .catch(function () {
+          // A missing or broken file must not break the view; the database
+          // answers the same question, only slower.
+          scopePageCache[n] = null;
+          return null;
+        });
+    }
+    return scopePageCache[n];
+  }
+
   // The facets the builder precomputes a scope for. Their values select large
   // slices, so counting one live means reading every matching row.
   var SCOPE_FACETS = ['language', 'dataset', 'year', 'source', 'availability', 'identifier'];
@@ -1437,6 +1474,32 @@
     }
 
     setSearching(true);
+
+    // Every other precomputed scope: one fetch, no database. Falls through to
+    // the queries below if the file is missing or the fetch fails, so a bad
+    // deploy degrades to slow rather than to broken.
+    var page = scopePage();
+    if (page) {
+      return page.then(function (data) {
+        if (token !== renderToken) return;
+        if (!data) return renderFromDatabase(token);
+        setSearching(false);
+        results = data.rows.map(mapSqlRow);
+        totalResults = data.total;
+        renderCount();
+        renderChips();
+        renderGrid(false);
+        renderFacets(unpackFacets(data.facets));
+        facetCounts.fresh = true;
+        requestAnimationFrame(maybeLoadMore);
+      });
+    }
+
+    return renderFromDatabase(token);
+  }
+
+  /** The original path: page query, then facets. */
+  function renderFromDatabase(token) {
 
     return ensureSource()
       .then(function () {
