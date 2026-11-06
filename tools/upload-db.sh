@@ -77,14 +77,19 @@ fi
 echo "→ $KEY  ($(echo "$HAVE_BYTES" | awk '{printf "%.1f MB", $1/1048576}'))"
 echo "  md5 $HAVE_MD5"
 
-RCLONE_CONFIG_R2_TYPE=s3 \
-RCLONE_CONFIG_R2_PROVIDER=Cloudflare \
-RCLONE_CONFIG_R2_REGION=auto \
-RCLONE_CONFIG_R2_ENDPOINT="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" \
-RCLONE_CONFIG_R2_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" \
-RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" \
-RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true \
-  rclone copyto "$DB" "r2:$R2_BUCKET/$KEY" --progress
+# Exported, not prefixed onto one command: the verification below shells out
+# to rclone a second time, and a prefix would leave that call with no
+# credentials at all — which is exactly how it first reported a remote size of
+# "?" for an object that was sitting there correctly.
+export RCLONE_CONFIG_R2_TYPE=s3
+export RCLONE_CONFIG_R2_PROVIDER=Cloudflare
+export RCLONE_CONFIG_R2_REGION=auto
+export RCLONE_CONFIG_R2_ENDPOINT="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+export RCLONE_CONFIG_R2_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
+export RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
+export RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true
+
+rclone copyto "$DB" "r2:$R2_BUCKET/$KEY" --progress
 
 # Verify the object rather than trusting the transfer. Not by etag: rclone
 # uploads this in parts, and a multipart etag is a hash *of the part hashes*
@@ -95,9 +100,11 @@ RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true \
 echo
 echo "verifying…"
 
-REMOTE_BYTES=$(rclone lsjson "r2:$R2_BUCKET/$KEY" 2>/dev/null | node -e '
+# `rclone size --json` takes a single object and prints {count, bytes};
+# `lsjson` wants a directory and its shape differs between versions.
+REMOTE_BYTES=$(rclone size --json "r2:$R2_BUCKET/$KEY" 2>/dev/null | node -e '
   let s = ""; process.stdin.on("data", d => s += d).on("end", () => {
-    try { console.log(JSON.parse(s)[0].Size); } catch { console.log("?"); }
+    try { console.log(JSON.parse(s).bytes); } catch { console.log("?"); }
   })')
 if [ "$REMOTE_BYTES" = "$WANT_BYTES" ]; then
   echo "  size   ✓ $REMOTE_BYTES bytes"
