@@ -1,8 +1,18 @@
 # 神保町 · jimbocho.app
 
-A static site for browsing and searching book metadata, seeded with every book
-and periodical registered with the Hong Kong ISBN agency from 2024 to 2026 —
-**25,385 titles**.
+A static site for browsing and searching book metadata from Hong Kong and
+Taiwan — **309,418 books** across 14 datasets, aiming eventually at every book
+published in both places.
+
+| | |
+|---|---|
+| 臺灣出版新書預告書訊 | 169,808 books, 2024–2026 |
+| 香港印刷書刊目錄 | 118,422 books, 2017–2026 |
+| Open Library (pre-2017 Hong Kong) | 21,188 books |
+| with a real cover | 56,509 (18%) |
+| database | 441.3 MB, queried by byte range |
+
+Chinese 248,455 · English 59,727 · nine languages in all.
 
 No framework, no npm dependencies, no server. A Node script imports datasets and
 the browser does the rest — reading plain JSON, or querying a SQLite database by
@@ -10,12 +20,19 @@ byte range once the catalogue outgrows memory (see
 [Two query backends](#two-query-backends)).
 
 ```bash
+npm start        # serve site/ at http://localhost:8080 — no build needed
 npm run import   # fetch + normalise the datasets in datasets.json
-npm start        # serve site/ at http://localhost:8080
 ```
 
-Node 12+ (works on the system Node 14 here). Both scripts use only Node
+Node 12+, and `sqlite3` with FTS5 for database work. Every script uses only Node
 built-ins.
+
+**Contributing, and working from an iPad: [CONTRIBUTING.md](CONTRIBUTING.md).**
+It covers the one-click Codespace, the four constraints that shape the
+architecture, and how to add a dataset.
+
+> The figures above come from `site/data/manifest.json` and are current as of
+> 6 November 2026. They change with every import.
 
 ---
 
@@ -26,11 +43,12 @@ publisher.
 
 **Traditional Chinese throughout.** The interface is in Traditional Chinese,
 and the catalogue leads with Chinese titles: the source publishes separate
-Chinese and English volumes, and 2,250 of the English records carry the Chinese
+Chinese and English volumes, and 25,468 of the English records carry the Chinese
 form of their title as a parallel title, so that form is displayed and the other
 language is shown beneath it. Title ordering groups Chinese ahead of Latin —
-otherwise ~4,300 English titles sort first in any standard collation. A fresh
-visit opens on the 6,545 Chinese-language records, with English a click away in
+otherwise the 46,755 Latin-first titles sort ahead of everything in any standard
+collation. A fresh visit opens on the 248,455 Chinese-language records, with
+English — 59,727 of them — a click away in
 the Language filter; a search that finds nothing because of it offers to search
 every language.
 
@@ -81,10 +99,10 @@ npm run covers
 That probes Google Books for every ISBN on every record, detects the
 placeholder bitmap it returns instead of a 404, and writes the URL into the
 data for the ones that resolve. Results are cached in `cache/covers.json`
-(committed — it represents 15,996 requests), so re-runs only probe what is new.
+(committed — it represents 538,066 requests), so re-runs only probe what is new.
 `npm run build` does it as part of the pipeline.
 
-**2,555 of 25,385 records have a real cover — 10%.** The rest get a generated cover built from the title and a
+**56,509 of 309,418 records have a real cover — 18%.** The rest get a generated cover built from the title and a
 colour seeded by the record id, so every book shows something and nothing
 renders broken.
 
@@ -268,7 +286,7 @@ this week's `manifest.json` would break the page in a way an ordinary visitor
 has no way to clear. So every request tries the network first and falls back to
 the cache after four seconds or on failure. The cache is there for the MTR
 tunnel, not for speed. Verified: with the dev server stopped outright, the app
-still opens and renders all 25,385 books.
+still opens and renders all 309,418 books.
 
 Only same-origin requests are cached. Cover thumbnails come from Google and
 arrive as opaque responses, which some browsers charge several megabytes each
@@ -362,7 +380,9 @@ with it, `apt install sqlite3` elsewhere — and it checks before writing
 anything. Delete `books.db` and remove the `db` key from the manifest to go
 back to the JSON path.
 
-Measured on the 10,912-record catalogue:
+Measured in 2026 on a 10,912-record catalogue, which is why the JSON path wins
+here and no longer does — the catalogue is now 309,418 books and the SQLite
+backend is what ships:
 
 | | JSON shards | SQLite |
 | --- | --- | --- |

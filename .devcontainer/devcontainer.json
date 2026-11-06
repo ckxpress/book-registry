@@ -1,0 +1,35 @@
+{
+  "name": "jimbocho",
+
+  // Plain Debian with Node. The project has no npm dependencies — every script
+  // uses Node built-ins — so there is nothing to install and no lockfile to
+  // honour. What it does need is the sqlite3 CLI with FTS5, which the build
+  // shells out to.
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+
+  "postCreateCommand": "sudo apt-get update -qq && sudo apt-get install -y -qq sqlite3 rclone && sqlite3 :memory: \"CREATE VIRTUAL TABLE t USING fts5(x); SELECT 1;\" > /dev/null && echo \"sqlite3 $(sqlite3 --version | cut -d' ' -f1) with FTS5 · node $(node -v) · rclone ready\"",
+
+  // 8080 is tools/serve.js. Codespaces forwards it to a URL that works in
+  // Safari on an iPad, which is the point of this file: the catalogue cannot be
+  // built on iPadOS — no Node, no sqlite3, and a VACUUM over a 441 MB database
+  // — so the machine lives in the cloud and the tablet is the terminal.
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": { "label": "神保町 dev server", "onAutoForward": "notify" }
+  },
+
+  // 16 GB of disk is not enough to be careless with: a build writes the 441 MB
+  // database and VACUUM needs room for a second copy, on top of ~1.2 GB of
+  // JSON shards in the working tree.
+  "hostRequirements": { "storage": "32gb" },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"],
+      "settings": {
+        "files.eol": "\n",
+        "editor.tabSize": 2
+      }
+    }
+  }
+}
