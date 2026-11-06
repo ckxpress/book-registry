@@ -40,29 +40,6 @@
           "ncl-2024.index.19.json",
           "ncl-2024.index.20.json"
         ],
-        "full": [
-          "ncl-2024.full.0.json",
-          "ncl-2024.full.1.json",
-          "ncl-2024.full.2.json",
-          "ncl-2024.full.3.json",
-          "ncl-2024.full.4.json",
-          "ncl-2024.full.5.json",
-          "ncl-2024.full.6.json",
-          "ncl-2024.full.7.json",
-          "ncl-2024.full.8.json",
-          "ncl-2024.full.9.json",
-          "ncl-2024.full.10.json",
-          "ncl-2024.full.11.json",
-          "ncl-2024.full.12.json",
-          "ncl-2024.full.13.json",
-          "ncl-2024.full.14.json",
-          "ncl-2024.full.15.json",
-          "ncl-2024.full.16.json",
-          "ncl-2024.full.17.json",
-          "ncl-2024.full.18.json",
-          "ncl-2024.full.19.json",
-          "ncl-2024.full.20.json"
-        ],
         "shardSize": 3000
       },
       "sources": [
@@ -245,29 +222,6 @@
           "ncl-2025.index.18.json",
           "ncl-2025.index.19.json",
           "ncl-2025.index.20.json"
-        ],
-        "full": [
-          "ncl-2025.full.0.json",
-          "ncl-2025.full.1.json",
-          "ncl-2025.full.2.json",
-          "ncl-2025.full.3.json",
-          "ncl-2025.full.4.json",
-          "ncl-2025.full.5.json",
-          "ncl-2025.full.6.json",
-          "ncl-2025.full.7.json",
-          "ncl-2025.full.8.json",
-          "ncl-2025.full.9.json",
-          "ncl-2025.full.10.json",
-          "ncl-2025.full.11.json",
-          "ncl-2025.full.12.json",
-          "ncl-2025.full.13.json",
-          "ncl-2025.full.14.json",
-          "ncl-2025.full.15.json",
-          "ncl-2025.full.16.json",
-          "ncl-2025.full.17.json",
-          "ncl-2025.full.18.json",
-          "ncl-2025.full.19.json",
-          "ncl-2025.full.20.json"
         ],
         "shardSize": 3000
       },
@@ -481,24 +435,6 @@
           "ncl-2026.index.14.json",
           "ncl-2026.index.15.json"
         ],
-        "full": [
-          "ncl-2026.full.0.json",
-          "ncl-2026.full.1.json",
-          "ncl-2026.full.2.json",
-          "ncl-2026.full.3.json",
-          "ncl-2026.full.4.json",
-          "ncl-2026.full.5.json",
-          "ncl-2026.full.6.json",
-          "ncl-2026.full.7.json",
-          "ncl-2026.full.8.json",
-          "ncl-2026.full.9.json",
-          "ncl-2026.full.10.json",
-          "ncl-2026.full.11.json",
-          "ncl-2026.full.12.json",
-          "ncl-2026.full.13.json",
-          "ncl-2026.full.14.json",
-          "ncl-2026.full.15.json"
-        ],
         "shardSize": 3000
       },
       "sources": [
@@ -675,13 +611,6 @@
           "hkpl-2017.index.3.json",
           "hkpl-2017.index.4.json"
         ],
-        "full": [
-          "hkpl-2017.full.0.json",
-          "hkpl-2017.full.1.json",
-          "hkpl-2017.full.2.json",
-          "hkpl-2017.full.3.json",
-          "hkpl-2017.full.4.json"
-        ],
         "shardSize": 3000
       },
       "sources": [
@@ -809,13 +738,6 @@
           "hkpl-2018.index.2.json",
           "hkpl-2018.index.3.json",
           "hkpl-2018.index.4.json"
-        ],
-        "full": [
-          "hkpl-2018.full.0.json",
-          "hkpl-2018.full.1.json",
-          "hkpl-2018.full.2.json",
-          "hkpl-2018.full.3.json",
-          "hkpl-2018.full.4.json"
         ],
         "shardSize": 3000
       },
@@ -978,13 +900,6 @@
           "hkpl-2019.index.3.json",
           "hkpl-2019.index.4.json"
         ],
-        "full": [
-          "hkpl-2019.full.0.json",
-          "hkpl-2019.full.1.json",
-          "hkpl-2019.full.2.json",
-          "hkpl-2019.full.3.json",
-          "hkpl-2019.full.4.json"
-        ],
         "shardSize": 3000
       },
       "sources": [
@@ -1145,13 +1060,6 @@
           "hkpl-2020.index.2.json",
           "hkpl-2020.index.3.json",
           "hkpl-2020.index.4.json"
-        ],
-        "full": [
-          "hkpl-2020.full.0.json",
-          "hkpl-2020.full.1.json",
-          "hkpl-2020.full.2.json",
-          "hkpl-2020.full.3.json",
-          "hkpl-2020.full.4.json"
         ],
         "shardSize": 3000
       },
@@ -1314,13 +1222,6 @@
           "hkpl-2021.index.3.json",
           "hkpl-2021.index.4.json"
         ],
-        "full": [
-          "hkpl-2021.full.0.json",
-          "hkpl-2021.full.1.json",
-          "hkpl-2021.full.2.json",
-          "hkpl-2021.full.3.json",
-          "hkpl-2021.full.4.json"
-        ],
         "shardSize": 3000
       },
       "sources": [
@@ -1480,12 +1381,6 @@
           "hkpl-2022.index.1.json",
           "hkpl-2022.index.2.json",
           "hkpl-2022.index.3.json"
-        ],
-        "full": [
-          "hkpl-2022.full.0.json",
-          "hkpl-2022.full.1.json",
-          "hkpl-2022.full.2.json",
-          "hkpl-2022.full.3.json"
         ],
         "shardSize": 3000
       },
@@ -1647,12 +1542,6 @@
           "hkpl-2023.index.2.json",
           "hkpl-2023.index.3.json"
         ],
-        "full": [
-          "hkpl-2023.full.0.json",
-          "hkpl-2023.full.1.json",
-          "hkpl-2023.full.2.json",
-          "hkpl-2023.full.3.json"
-        ],
         "shardSize": 3000
       },
       "sources": [
@@ -1812,12 +1701,6 @@
           "hkpl-2024.index.1.json",
           "hkpl-2024.index.2.json",
           "hkpl-2024.index.3.json"
-        ],
-        "full": [
-          "hkpl-2024.full.0.json",
-          "hkpl-2024.full.1.json",
-          "hkpl-2024.full.2.json",
-          "hkpl-2024.full.3.json"
         ],
         "shardSize": 3000
       },
@@ -1979,12 +1862,6 @@
           "hkpl-2025.index.2.json",
           "hkpl-2025.index.3.json"
         ],
-        "full": [
-          "hkpl-2025.full.0.json",
-          "hkpl-2025.full.1.json",
-          "hkpl-2025.full.2.json",
-          "hkpl-2025.full.3.json"
-        ],
         "shardSize": 3000
       },
       "sources": [
@@ -2143,10 +2020,6 @@
           "hkpl-2026.index.0.json",
           "hkpl-2026.index.1.json"
         ],
-        "full": [
-          "hkpl-2026.full.0.json",
-          "hkpl-2026.full.1.json"
-        ],
         "shardSize": 3000
       },
       "sources": [
@@ -2262,16 +2135,6 @@
           "ol-hk.index.5.json",
           "ol-hk.index.6.json",
           "ol-hk.index.7.json"
-        ],
-        "full": [
-          "ol-hk.full.0.json",
-          "ol-hk.full.1.json",
-          "ol-hk.full.2.json",
-          "ol-hk.full.3.json",
-          "ol-hk.full.4.json",
-          "ol-hk.full.5.json",
-          "ol-hk.full.6.json",
-          "ol-hk.full.7.json"
         ],
         "shardSize": 3000
       },
@@ -3012,5 +2875,6 @@
       "id",
       "th"
     ]
-  }
+  },
+  "publishedWithout": "files.full"
 }
