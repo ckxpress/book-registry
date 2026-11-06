@@ -109,6 +109,8 @@
       byId = new Map();
       return JsonSource.prepare();
     });
+    // The footer states which backend is answering; it is only knowable now.
+    sourcePrepared.then(function () { renderBuildId(); }, function () {});
     return sourcePrepared;
   }
 
@@ -145,7 +147,7 @@
       })
       .then(function () {
         el.brandSub.textContent =
-          fmt(totalBooks) + ' 本書刊 · ' + manifest.datasets.length + ' 個資料集';
+          fmt(totalBooks) + ' 筆書目 · ' + manifest.datasets.length + ' 個資料集';
         route();
       })
       .catch(function (err) {
@@ -2649,17 +2651,29 @@
     var object = hashed ? hashed[1] : file;
     var built = String((manifest.db && manifest.db.builtAt) || manifest.generatedAt || '').slice(0, 10);
 
+    // Which backend is actually answering. This is the important one: when the
+    // SQLite database cannot be used the app falls back to loading every index
+    // shard — 109 files, 90 MB — and says so only on the About page. From the
+    // outside that is indistinguishable from a slow database, and it is the
+    // difference between a filter taking half a second and taking minutes.
+    var backend = !sourcePrepared ? '…' : source === JsonSource ? 'json shards' : 'sqlite';
+
     var parts = [];
     if (object) parts.push('db ' + object);
     if (built) parts.push(built);
+    parts.push(backend);
 
     function paint(worker) {
       node.textContent = parts.concat(worker ? ['sw ' + worker] : []).join(' · ');
       node.title =
         'Database object: ' + (file || '(none — reading the JSON shards)') +
         '\nBuilt: ' + built +
+        '\nBackend: ' + backend +
+        (dbFallbackReason ? ' — ' + dbFallbackReason : '') +
         '\nService worker: ' + (worker || 'not controlling this page') +
-        '\n\nIf these look old, reload. The worker name matches the database hash.';
+        '\n\nIf these look old, reload. The worker name matches the database hash.' +
+        '\n"json shards" means the database could not be used and everything is' +
+        '\nbeing read from 90 MB of JSON instead, which is very much slower.';
     }
 
     paint('');
