@@ -467,16 +467,18 @@ function finalise() {
     // idx_browse_year, and idx_src for dataset — and SQLite will use a
     // composite's prefix perfectly well. They cost 23.7 MB to duplicate
     // structures the file already carried.
-    'CREATE INDEX idx_publisher ON books(publisher);',
+    // idx_publisher, idx_title and idx_year_title were here. The first is now
+    // the leading column of idx_browse_publisher below. The other two served a
+    // sort path that cannot run: b.title is only ordered on when the zh_first
+    // column is absent, and this build always writes it, so the ORDER BY is
+    // always on title_display. 51.2 MB between them.
     'CREATE INDEX idx_src ON books(dataset, src);',
     'CREATE INDEX idx_forsale ON books(forsale);',
     'CREATE INDEX idx_isbn ON books(isbn);',
     'CREATE UNIQUE INDEX idx_id ON books(id);',
     // Browse order without a query: keeps the default listing off a full sort.
-    'CREATE INDEX idx_title ON books(title);',
     // Default browse order: Chinese titles first, alphabetical within each group.
     'CREATE INDEX idx_zh_title ON books(zh_first, title_display);',
-    'CREATE INDEX idx_year_title ON books(year DESC, title);',
 
     // The default browse order, indexed as the expression the query actually
     // sorts by. Without these SQLite answers the opening page with SCAN +
@@ -500,6 +502,13 @@ function finalise() {
     "CREATE INDEX idx_browse_dataset ON books(dataset, cover = '', zh_first, title_display);",
     "CREATE INDEX idx_browse_year ON books(year, cover = '', zh_first, title_display);",
     "CREATE INDEX idx_browse_class ON books(classification, cover = '', zh_first, title_display);",
+    // Filtering by publisher had no index that also satisfied the browse
+    // order, so SQLite fetched every matching row — 8,972 of them for 東立,
+    // each a separate range request — sorted them in a temp b-tree and
+    // returned 60. The filter never finished. This is the same shape as the
+    // four above, and it also lets the 出版者 sort use an index instead of
+    // sorting the whole table.
+    "CREATE INDEX idx_browse_publisher ON books(publisher, cover = '', zh_first, title_display);",
 
     // Every facet column in one index, so counting a facet against the other
     // active filters never has to fetch a row. The precomputed table only

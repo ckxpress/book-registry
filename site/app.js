@@ -1144,18 +1144,32 @@
     // titles ahead of Latin ones — the same rule the in-memory path applies.
     var t = SqliteSource._zh ? 'b.zh_first, b.title_display' : 'b.title';
     var tDesc = SqliteSource._zh ? 'b.zh_first, b.title_display DESC' : 'b.title DESC';
+    // Every term reversed, so an index can be scanned backwards rather than
+    // the result sorted. `tDesc` keeps zh_first ascending, which cannot be.
+    var tDescAll = SqliteSource._zh ? 'b.zh_first DESC, b.title_display DESC' : 'b.title DESC';
 
     switch (state.sort) {
       case 'title':
         return t;
       case 'title-desc':
         return tDesc;
+      // These three spell out the exact column order of idx_browse_year and
+      // idx_browse_publisher, including the cover expression in the middle,
+      // because anything else makes SQLite sort the whole table in a temp
+      // b-tree — 446,090 rows fetched one range request at a time to return
+      // sixty. Descending reverses every term, which is what lets the same
+      // index be read backwards.
+      //
+      // The cost is that undated books, and books with no publisher, now lead
+      // the ascending orders instead of trailing them: the old expressions put
+      // them last with a `year IS NULL` or `publisher = ''` term in front, and
+      // that term is what no index can satisfy.
       case 'year':
-        return 'b.year IS NULL, b.year, ' + t;
+        return "b.year, b.cover = '', " + t;
       case 'year-desc':
-        return 'b.year IS NULL, b.year DESC, ' + t;
+        return "b.year DESC, b.cover = '' DESC, " + tDescAll;
       case 'publisher':
-        return "b.publisher = '', b.publisher, " + t;
+        return "b.publisher, b.cover = '', " + t;
       default:
         // Empty cover sorts last, so books with one lead the browse order.
         return state.q ? 'bm25(books_fts)' : "b.cover = '', " + t;
