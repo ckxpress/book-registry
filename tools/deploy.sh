@@ -64,6 +64,12 @@ git push origin "$commit:gh-pages"
 echo
 echo "pushed — waiting for GitHub Pages to publish…"
 
+# If Pages is set to the "GitHub Actions" source, this push is inert: nothing
+# builds from the branch and the site stays exactly as it was. Rather than wait
+# fifteen minutes for a deployment that will never be created, say so.
+PAGES_HINT="  If Settings -> Pages -> Source is \"GitHub Actions\", a branch push does nothing —
+  run the Deploy site workflow from the Actions tab instead."
+
 REPO=$(git remote get-url origin | sed -e 's#^.*github\.com[:/]##' -e 's#\.git$##')
 API="https://api.github.com/repos/$REPO/deployments?environment=github-pages&per_page=5"
 
@@ -95,10 +101,17 @@ while [ "$i" -lt 60 ]; do
       echo "✗ GitHub Pages deployment $state for $commit — the site still serves the previous build." >&2
       echo "  Check https://github.com/$REPO/deployments" >&2
       exit 1 ;;
+    pending)
+      printf '  waiting for a deployment of %s (%ds)\r' "$(echo "$commit" | cut -c1-8)" "$((i * 15))"
+      if [ "$i" = "8" ]; then
+        echo
+        echo "$PAGES_HINT" >&2
+      fi ;;
     *)
       printf '  %s (%ds)\r' "$state" "$((i * 15))" ;;
   esac
 done
 
-echo "✗ timed out after 15 minutes waiting for the deployment." >&2
+echo "✗ no deployment appeared for $commit after 15 minutes." >&2
+echo "$PAGES_HINT" >&2
 exit 1
