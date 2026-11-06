@@ -1042,11 +1042,51 @@
       );
     },
     query: function (sql, params) {
-      return SqliteSource._worker.db.query(sql, params || []);
+      // Timed, because the cost of a query here is invisible everywhere else:
+      // the range requests happen inside a Web Worker, so they appear in
+      // neither the page's resource timeline nor the browser's network panel.
+      // Without this there is no way to tell a slow query from many of them,
+      // which is exactly the question that took four deploys to answer.
+      var t0 = (window.performance || Date).now();
+      return SqliteSource._worker.db.query(sql, params || []).then(function (res) {
+        recordTiming(sql, (window.performance || Date).now() - t0, res && res.length);
+        return res;
+      }, function (err) {
+        recordTiming(sql, (window.performance || Date).now() - t0, 'error');
+        throw err;
+      });
     },
   };
 
   /* SQL_FACET and FACET_LIMIT come from schema.js, shared with the builder. */
+
+/**
+ * The last few queries, with how long each took.
+ *
+ * Shown on the About page and left on window.__timings, so a slow page can be
+ * reported as numbers rather than as "it takes forever" — which was accurate
+ * every time it was said, and told neither of us which of nine queries was at
+ * fault.
+ */
+  var timings = [];
+
+  function recordTiming(sql, ms, rows) {
+    var label = String(sql).replace(/\s+/g, ' ').trim();
+    // Enough of the statement to tell the nine apart, not the whole thing.
+    if (label.length > 72) label = label.slice(0, 72) + '…';
+    timings.push({ ms: Math.round(ms), rows: rows, sql: label });
+    if (timings.length > 40) timings.shift();
+    window.__timings = timings;
+  }
+
+  function timingSummary() {
+    if (!timings.length) return 'no queries yet';
+    var total = timings.reduce(function (a, t) { return a + t.ms; }, 0);
+    var lines = timings.slice(-12).map(function (t) {
+      return String(t.ms).padStart(6) + ' ms  ' + String(t.rows).padStart(5) + ' rows  ' + t.sql;
+    });
+    return timings.length + ' queries, ' + total + ' ms in total\n\n' + lines.join('\n');
+  }
 
   function toOption(r) {
     return { value: String(r.v), count: r.n };
@@ -2568,6 +2608,8 @@
     // wrong.
     out.push('<h2>版本</h2>');
     out.push('<p class="buildblock"><code id="about-build">…</code></p>');
+    out.push('<p class="muted">最近的資料庫查詢及耗時（供回報問題用）：</p>');
+    out.push('<pre class="timings" id="about-timings">—</pre>');
     out.push(
       '<p class="muted">上方第一段為資料庫檔名（含內容雜湊）、製作日期、' +
         '實際使用的後端（<code>sqlite</code> 或 <code>json shards</code>），' +
@@ -2629,6 +2671,8 @@
 
     el.about.innerHTML = out.join('');
     renderBuildId(); // the node above only exists once this is in the DOM
+    var t = document.getElementById('about-timings');
+    if (t) t.textContent = timingSummary();
     var toggle = document.getElementById('covers-toggle');
     toggle.addEventListener('change', function () {
       covers = toggle.checked;

@@ -1636,3 +1636,16 @@ a.tag-link:focus-visible {
   display: inline-block;
   user-select: all;
 }
+
+/* The query timings on the About page. Monospace and scrollable: this is read
+   when something is slow, and copied into a bug report. */
+.timings {
+  font: 400 11px/1.5 var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  color: var(--text-faint);
+  background: var(--surface-2, rgba(128, 128, 128, 0.1));
+  padding: 10px 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre;
+  user-select: all;
+}
