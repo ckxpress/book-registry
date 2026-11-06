@@ -130,6 +130,10 @@ case $verdict in
 esac
 
 echo
-echo "✓ uploaded and verified. Now deploy the site so the manifest points at it:"
-echo "    git push origin main && npm run deploy"
-echo "  The live site keeps reading the old object until you do."
+echo "✓ uploaded and verified. Now publish the site, so its manifest points here:"
+echo "    git push origin main"
+echo "  then run the Deploy site workflow from the Actions tab."
+echo
+echo "  Not npm run deploy: publishing moved to Actions, and the github-pages"
+echo "  environment only allows main, so a gh-pages push is refused outright."
+echo "  The live site keeps reading the old object until the workflow runs."
