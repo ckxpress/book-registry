@@ -135,6 +135,17 @@ Change either and you change both consumers. That is the point.
 
 ---
 
+## What needs doing
+
+[`docs/open-issues.md`](docs/open-issues.md) holds the current open work,
+drafted as issues, with the measurements behind each one. Two are marked as
+good first issues: they are self-contained and need no decision from anyone.
+
+If none of it appeals, adding a catalogue is the most useful thing here and is
+entirely self-contained.
+
+---
+
 ## Adding a dataset
 
 This is the most useful thing a contributor can do, and it is self-contained.
