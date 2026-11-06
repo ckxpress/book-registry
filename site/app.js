@@ -2615,7 +2615,63 @@
       fmt(manifest.totalBooks || 0) +
       ' 項紀錄 · 製作於 ' +
       escapeHtml(String(manifest.generatedAt || '').slice(0, 10)) +
-      ' · <a href="#/about">資料說明及新增資料集方法</a>';
+      ' · <a href="#/about">資料說明及新增資料集方法</a>' +
+      '<span class="build" id="build-id"></span>';
+
+    renderBuildId();
+  }
+
+  /**
+   * Which build this page is actually running.
+   *
+   * Not vanity — a diagnostic. The site is three things deployed separately:
+   * the page, the manifest, and a 467 MiB database in R2 whose object name
+   * carries its content hash. A service worker sits in front of all of it. So
+   * "I deployed a fix and it is still broken" has several possible meanings,
+   * and they are indistinguishable from the outside: a stale page, a stale
+   * manifest pointing at the previous database, or a fix that simply did not
+   * work.
+   *
+   * This says which database the page is querying, and which service worker
+   * cache is answering for it. If the object name here does not match the one
+   * the build printed, a reload is the whole problem.
+   */
+  function renderBuildId() {
+    var node = document.getElementById('build-id');
+    if (!node) return;
+
+    var file = manifest.db && manifest.db.url ? manifest.db.url.split('/').pop() : '';
+    // Production names carry the content hash — books-4f71445f.db — and the
+    // hash alone is the useful part. A local build is plain books.db, which
+    // has nothing to shorten, so it is shown whole rather than mangled into
+    // the word "books".
+    var hashed = /^books-([0-9a-f]{6,})\.db$/.exec(file);
+    var object = hashed ? hashed[1] : file;
+    var built = String((manifest.db && manifest.db.builtAt) || manifest.generatedAt || '').slice(0, 10);
+
+    var parts = [];
+    if (object) parts.push('db ' + object);
+    if (built) parts.push(built);
+
+    function paint(worker) {
+      node.textContent = parts.concat(worker ? ['sw ' + worker] : []).join(' · ');
+      node.title =
+        'Database object: ' + (file || '(none — reading the JSON shards)') +
+        '\nBuilt: ' + built +
+        '\nService worker: ' + (worker || 'not controlling this page') +
+        '\n\nIf these look old, reload. The worker name matches the database hash.';
+    }
+
+    paint('');
+    // The cache name is stamped with the database hash at build time, so the
+    // two agreeing is proof the page, the manifest and the worker are one
+    // build.
+    if (navigator.serviceWorker && navigator.serviceWorker.controller && window.caches) {
+      caches.keys().then(function (keys) {
+        var mine = keys.filter(function (k) { return k.indexOf('jimbocho-') === 0; })[0] || '';
+        paint(mine.replace('jimbocho-', ''));
+      }).catch(function () {});
+    }
   }
 
   function datasetById(id) {

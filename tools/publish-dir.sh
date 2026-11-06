@@ -80,6 +80,33 @@ if [ -n "$DB_URL" ]; then
   fi
 fi
 
+# Name the service worker's cache after the site it is caching.
+#
+# The worker is network-first with a four-second timeout, so on a slow
+# connection it answers from cache — which is correct for an aeroplane and
+# wrong after a deploy, because the visitor then runs the previous app.js
+# against the current manifest, or the previous manifest against a database
+# that has been pruned away.
+#
+# A cache name that changes whenever any published byte changes makes that
+# impossible: the old cache is dropped on activate. Bumping it by hand failed
+# the first time it mattered, and stamping it from the database hash alone
+# failed the first time only the code changed.
+#
+# sw.js is excluded from its own hash, for obvious reasons.
+STAMP=$(find "$DEST" -type f ! -name sw.js | sort | xargs cat | shasum | cut -c1-8)
+if [ -f "$DEST/sw.js" ]; then
+  TMP="$DEST/sw.js.stamping"
+  sed "s/var CACHE = '[^']*';/var CACHE = 'jimbocho-$STAMP';/" "$DEST/sw.js" > "$TMP"
+  if cmp -s "$DEST/sw.js" "$TMP"; then
+    rm -f "$TMP"
+    echo "✗ could not stamp the cache name in sw.js — has the CACHE line moved?" >&2
+    exit 1
+  fi
+  mv "$TMP" "$DEST/sw.js"
+  echo "service worker cache → jimbocho-$STAMP"
+fi
+
 n=$(find "$DEST" -type f | wc -l | tr -d ' ')
 mb=$(du -sm "$DEST" | cut -f1)
 echo "assembled $DEST — $n files, ${mb} MB"

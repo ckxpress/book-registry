@@ -253,15 +253,6 @@ function main() {
   };
   if (url) manifest.db.url = url;
 
-  // Stamp the service worker's cache name with this build's hash.
-  //
-  // The worker precaches the manifest, and the manifest names which R2 object
-  // holds the database. A cache that outlives a rebuild therefore points a
-  // returning visitor at the previous build — which may lack an index added
-  // since, and which tools/prune-r2.sh will eventually delete outright. Doing
-  // this by hand failed exactly that way: the publisher-index rebuild went out
-  // under the previous cache name and only new visitors saw the fix.
-  stampServiceWorker(digest.slice(0, 8));
 
   // The landing view is the same for every first-time reader, and answering it
   // from the database costs scattered range requests that SQLite must issue one
@@ -386,18 +377,6 @@ function insertBook(rowid, rec, ds) {
 function blob(rec) {
   const json = Buffer.from(JSON.stringify(encodeDoc(rec)), 'utf8');
   return "X'" + zlib.deflateRawSync(json, { level: 9 }).toString('hex') + "'";
-}
-
-/** Rewrites the one CACHE line in site/sw.js, and says so if it cannot. */
-function stampServiceWorker(tag) {
-  const file = path.join(ROOT, 'site', 'sw.js');
-  const before = fs.readFileSync(file, 'utf8');
-  const after = before.replace(/var CACHE = '[^']*';/, "var CACHE = 'jimbocho-" + tag + "';");
-  if (after === before) {
-    throw new Error('could not stamp the cache name in site/sw.js — has the CACHE line moved?');
-  }
-  if (after !== before) fs.writeFileSync(file, after);
-  console.log('  Service worker cache → jimbocho-' + tag + ' (invalidates the old manifest)');
 }
 
 function hasCjk(text) {

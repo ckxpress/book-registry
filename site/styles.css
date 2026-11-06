@@ -1613,3 +1613,14 @@ a.tag-link:focus-visible {
   margin: 0;
   padding: 4px 0;
 }
+
+/* The build identifier in the footer: which database this page is querying and
+   which service worker cache answered for it. Quiet enough to ignore, present
+   enough to read out when something looks wrong. */
+.build {
+  display: block;
+  margin-top: 6px;
+  font: 400 11px/1.5 var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+}

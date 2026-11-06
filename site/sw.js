@@ -9,12 +9,15 @@
  */
 'use strict';
 
-/* Stamped by tools/build-sqlite.js on every build, from the database's own
-   content hash. Bumping this by hand was unreliable: the publisher-index
-   rebuild shipped under the previous name, so returning visitors kept a cached
-   manifest naming the superseded database and the 出版者 filter went on
-   hanging for them alone. */
-var CACHE = 'jimbocho-4f71445f';
+/* Replaced at publish time by tools/publish-dir.sh, with a hash of every file
+   being published. This value is only what a local `npm start` sees.
+
+   It is stamped rather than typed because typing it failed twice: the
+   publisher-index rebuild went out under the previous name, so returning
+   visitors kept a cached manifest naming the superseded database and the
+   出版者 filter went on hanging for them alone — and stamping it from the
+   database hash alone then failed the first time only the code changed. */
+var CACHE = 'jimbocho-dev';
 var NET_TIMEOUT = 4000;
 
 /* Two files that must never be served stale while the network is reachable.
