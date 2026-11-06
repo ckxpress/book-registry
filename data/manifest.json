@@ -2846,18 +2846,18 @@
   "coversFound": 56509,
   "db": {
     "file": "books.db",
-    "bytes": 763928576,
-    "md5": "4cf9a7be0347ea8a37c09fb9df662b00",
+    "bytes": 462712832,
+    "md5": "bb609d0681e0e0d6e798cb931a802328",
     "pageSize": 4096,
     "chunkBytes": 32768,
     "maxReadBytes": 262144,
-    "pages": 186506,
+    "pages": 112967,
     "probe": {
       "rowid": 1,
       "id": "ncl-2024:9786269600564"
     },
-    "builtAt": "2026-11-05T20:02:55.126Z",
-    "url": "https://db.jimbocho.app/books-4cf9a7be.db"
+    "builtAt": "2026-11-06T01:15:23.180Z",
+    "url": "https://db.jimbocho.app/books-bb609d06.db"
   },
   "firstPage": {
     "file": "firstpage.json",

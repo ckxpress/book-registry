@@ -1006,11 +1006,19 @@
       });
     },
     record: function (id) {
+      // One query, both halves. `docs` holds only what `books` does not, so
+      // the detail view reads the row and the blob together — the same single
+      // round trip it has always been, because the two live at the same rowid.
+      var columns =
+        'b.id, b.dataset, b.title, b.subtitle, b.parallel_title, b.authors, b.publisher,' +
+        ' b.year, b.isbn, b.classification, b.language, b.series, b.ref, b.src,' +
+        ' b.price, b.currency, b.forsale, b.cover';
       return SqliteSource.query(
-        'SELECT d.doc AS doc FROM books b JOIN docs d ON d.rowid = b.rowid WHERE b.id = ? LIMIT 1',
+        'SELECT ' + columns + ', d.doc AS doc FROM books b JOIN docs d ON d.rowid = b.rowid' +
+          ' WHERE b.id = ? LIMIT 1',
         [id]
       ).then(function (res) {
-        return res.length ? JSON.parse(res[0].doc) : null;
+        return res.length ? mergeRecord(res[0]) : null;
       });
     },
     byIds: function (ids) {
@@ -1185,6 +1193,62 @@
     }
     if (r.forsale === 0 || r.forsale === 1) row.forSale = r.forsale === 1;
     return row;
+  }
+
+  /**
+   * Rebuilds a full record from the `books` row and the thinned blob beside it.
+   *
+   * `docs` used to hold the whole record, which made it 60% of the database
+   * and put the file over Cloudflare's 512 MB cacheable ceiling — past which
+   * every range request is answered from origin, measured at +258 ms each. It
+   * now holds only the fields the row does not, and this puts the two back
+   * together.
+   *
+   * `authors`, `series` and `price` are read from the blob rather than the
+   * row: the columns hold lossy forms of all three (a joined display string,
+   * `series.title` where the description wants `series.raw`, and the numeric
+   * amount where a tenth of priced books have only "Unpriced"). The fallbacks
+   * below are for a record that predates the blob carrying them.
+   */
+  function mergeRecord(r) {
+    var rec = JSON.parse(r.doc || '{}');
+
+    rec.id = r.id;
+    rec.dataset = r.dataset;
+    rec.title = r.title;
+    rec.subtitle = r.subtitle;
+    rec.parallelTitle = r.parallel_title || '';
+    rec.publisher = r.publisher;
+    rec.year = r.year;
+    rec.isbn = r.isbn;
+    rec.classification = r.classification;
+    rec.language = r.language;
+    rec.ref = r.ref;
+    rec.cover = r.cover ? { url: r.cover } : null;
+
+    // `src` indexes the dataset's own list of source files, which the manifest
+    // already carries; the record used to spell the label and URL out again
+    // for every book published from that file.
+    var ds = datasetById(r.dataset);
+    rec.source = ds && ds.sources ? ds.sources[Number(r.src || 0)] : null;
+
+    if (!rec.authors) {
+      rec.authors = r.authors
+        ? String(r.authors).split(', ').map(function (n) { return { name: n, display: n }; })
+        : [];
+    }
+    if (!rec.series && r.series) rec.series = { title: r.series, raw: r.series };
+    if (!rec.price && typeof r.price === 'number') {
+      rec.price = { amount: r.price, currency: r.currency || '' };
+    }
+    if (rec.price && (r.forsale === 0 || r.forsale === 1)) rec.price.forSale = r.forsale === 1;
+
+    // Derived, not stored: site/derive.js is the same code the build ran, so
+    // these read exactly as they did when the database carried them.
+    if (!rec.description && window.buildDescription) rec.description = window.buildDescription(rec);
+    if (!rec.copyright && window.buildCopyright) rec.copyright = window.buildCopyright(rec);
+
+    return rec;
   }
 
   function querySignature() {
