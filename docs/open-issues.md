@@ -171,7 +171,29 @@ The catalogue's floors are set by what the registries publish, not by choice:
 | 香港印刷書刊目錄 | 2017 Q1 | the floor of HKPL's own archive; DATA.GOV.HK lists nothing earlier |
 | 臺灣出版新書預告書訊 | 2024-01 | the earliest month `isbn.ncl.edu.tw` still serves, established by probing, including ROC-year URL variants. No Wayback snapshots exist |
 
-Two routes are closed and should stay closed:
+**NBINet is published as open data after all.** The data.gov.tw catalogue — all
+52,582 datasets of it, downloadable in bulk from
+`https://data.gov.tw/datasets/export/csv` with no key — lists 34 National
+Central Library datasets, including:
+
+| id | dataset | licence |
+|---|---|---|
+| **7502** | 全國圖書書目資訊網(NBINet) | OGDL v1.0, free |
+| **27311** | 國家圖書館館藏書目資訊 | OGDL v1.0, free |
+| 37878 | 臺灣華文電子書庫書目資料 | OGDL v1.0, free |
+| 7503 | 漢學出版品書目資料 | OGDL v1.0, free |
+| 6839 | 古籍書目資料 | OGDL v1.0, **收費** |
+
+Every one of those download URLs is on `www.ncl.edu.tw`, which returns 503 to
+us — the whole host, homepage included. So the blocker is no longer permission
+but reachability, and `docs/ncl-nbinet-followup.md` asks about exactly that.
+
+This was missed for a day because the Primo discovery interface's `robots.txt`
+was checked and the open-data catalogue was not, even though that catalogue is
+where dataset 6730 came from. Check the official channel before concluding a
+source is closed.
+
+Two scraping routes are closed and should stay closed:
 
 - **HKALL** requires a login, is members-only, and its OAI-PMH endpoint codes
   are invalid; its records are OCLC-derived.
