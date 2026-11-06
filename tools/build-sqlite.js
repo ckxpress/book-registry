@@ -95,6 +95,63 @@ const FIRST_PAGE_ROWS = 60;
  */
 const SCOPE_FACETS = ['language', 'dataset', 'year'];
 
+/**
+ * What `docs` has to carry: the fields of a record that the `books` table does
+ * not already hold, and nothing else.
+ *
+ * `docs` was the whole record as JSON — 1,240 bytes a row, 436 MB, 60% of the
+ * database — and most of it was a second copy of columns beside it. The detail
+ * view now reads the row and this blob together, so each field is stored once.
+ *
+ * Three groups come out:
+ *
+ *  - Columns `books` has. The browser reads them from the row it already
+ *    fetched for the card, so repeating them bought nothing.
+ *  - `source`, which `books` normalises into a `src` integer against a table
+ *    of sources. Spelling the label and URL out per record cost more than the
+ *    whole source table.
+ *  - `description` and `copyright` *when derived*. They are a pure function of
+ *    fields the browser has, and site/derive.js computes them identically —
+ *    verified against 3,000 of the stored ones, byte for byte. A description
+ *    that came from the dataset itself is real data and stays.
+ *
+ * This is what keeps the database under Cloudflare's 512 MB cacheable
+ * ceiling, past which every range request is served from origin.
+ */
+const DOC_DROP = [
+  'id', 'dataset', 'title', 'parallelTitle', 'titleDisplay', 'subtitle',
+  'publisher', 'year', 'isbn', 'classification', 'language', 'ref', 'cover',
+  'forsale', 'source',
+];
+
+/*
+ * Three that stay, because `books` flattens them and the flattening is lossy.
+ * Measured over 5,000 records:
+ *
+ *  - `series`: the column holds `series.title`, while the description reads
+ *    `series.raw`. They differ for 107 of 363 records that have a series, so
+ *    the browser would describe those books differently from the way the
+ *    build described them.
+ *  - `authors`: the column is `(a.display || a.name)` joined, which renders
+ *    correctly but loses `name` — and `name` is what an author search link
+ *    points at. 438 of 8,562 author entries have the two differing.
+ *  - `price`: the column is the numeric amount, and 484 of 4,963 priced
+ *    records carry only a raw string instead ("Unpriced", "$38.00;
+ *    Unpriced"). Dropped, those books would show no price at all.
+ *
+ * Keeping them costs about 24 MB, against a 100 MB margin under the ceiling.
+ */
+
+function thinDoc(rec) {
+  const out = {};
+  for (const key of Object.keys(rec)) {
+    if (DOC_DROP.indexOf(key) !== -1) continue;
+    if ((key === 'description' || key === 'copyright') && rec[key] && rec[key].source === 'derived') continue;
+    out[key] = rec[key];
+  }
+  return out;
+}
+
 const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
 
 main();
@@ -301,7 +358,7 @@ function insertBook(rowid, rec, ds) {
 
   return (
     'INSERT INTO books VALUES (' + values.join(',') + ');\n' +
-    'INSERT INTO docs VALUES (' + rowid + ',' + str(JSON.stringify(rec)) + ');\n' +
+    'INSERT INTO docs VALUES (' + rowid + ',' + str(JSON.stringify(thinDoc(rec))) + ');\n' +
     'INSERT INTO books_fts(rowid, search) VALUES (' + rowid + ',' + str(tokens) + ');\n'
   );
 }

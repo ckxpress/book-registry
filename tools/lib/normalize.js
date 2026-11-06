@@ -169,49 +169,10 @@ function displayName(name) {
  * The registration catalogue carries no abstracts, so compose a factual
  * summary from the fields that do exist. Flagged as derived in the UI.
  */
-function buildDescription(rec) {
-  const zh = rec.language === 'zh';
-  const bits = [];
-
-  const kind = rec.classification || (zh ? '書刊' : 'Title');
-  const place = rec.place || (zh ? '香港' : 'Hong Kong');
-
-  if (zh) {
-    bits.push(
-      `${kind}類書刊，${rec.publisher ? `由${rec.publisher}` : ''}${rec.year ? `於${rec.year}年` : ''}在${place}出版。`.replace(/，，/g, '，')
-    );
-    if (rec.edition) bits.push(rec.edition + '。');
-    if (rec.physical && rec.physical.raw) bits.push(rec.physical.raw + '。');
-    if (rec.series && rec.series.raw) bits.push('叢書：' + rec.series.raw + '。');
-    if (rec.notes) bits.push(rec.notes + '。');
-    return { text: bits.join('').replace(/。+/g, '。').trim(), source: DERIVED };
-  }
-
-  let s = `${kind} published in ${place}`;
-  if (rec.publisher) s += ` by ${rec.publisher}`;
-  if (rec.year) s += ` in ${rec.year}`;
-  bits.push(s + '.');
-
-  if (rec.edition) bits.push(rec.edition.replace(/\.?$/, '.'));
-  if (rec.physical && rec.physical.raw) bits.push(rec.physical.raw.replace(/\.?$/, '.'));
-  if (rec.series && rec.series.raw) bits.push('Series: ' + rec.series.raw + '.');
-  if (rec.notes) bits.push(rec.notes.replace(/\.?$/, '.'));
-
-  return { text: bits.join(' ').replace(/\s+/g, ' ').trim(), source: DERIVED };
-}
-
-/**
- * No copyright column exists upstream; the defensible reading is
- * publisher + year of publication, so state it and mark it derived.
- */
-function buildCopyright(rec) {
-  if (!rec.year && !rec.publisher) return null;
-  const holder = rec.publisher || '';
-  const parts = ['©'];
-  if (rec.year) parts.push(String(rec.year));
-  if (holder) parts.push(holder);
-  return { year: rec.year || null, holder: holder || null, statement: parts.join(' '), source: DERIVED };
-}
+/* Derived identically in the browser, which now computes these rather than
+   reading them out of the database — see site/derive.js for why. One
+   implementation, two consumers, as with the tokenizer. */
+const { buildDescription, buildCopyright } = require('./derive');
 
 function isbn10to13(isbn10) {
   const core = '978' + isbn10.slice(0, 9);
