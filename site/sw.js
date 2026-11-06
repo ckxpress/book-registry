@@ -9,7 +9,7 @@
  */
 'use strict';
 
-var CACHE = 'jimbocho-v2';
+var CACHE = 'jimbocho-v3';
 var NET_TIMEOUT = 4000;
 
 /* Enough to open the app and show the shelf with no network at all. The data
