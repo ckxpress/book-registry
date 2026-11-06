@@ -1083,6 +1083,19 @@
   // slices, so counting one live means reading every matching row.
   var SCOPE_FACETS = ['language', 'dataset', 'year'];
 
+  /**
+   * Facets the builder scopes only above a size, because they have too many
+   * values to scope exhaustively — 38,053 publishers, of which 312 have 200
+   * records or more.
+   *
+   * The client does not need a list of which ones were precomputed: by the
+   * time the facets run, the page query has already returned the result count,
+   * and that is the same number the builder thresholded on. Above it the scope
+   * exists; below it the live aggregation reads fewer than 200 rows and is
+   * cheap anyway.
+   */
+  var BIG_SCOPE_FACETS = { publisher: 200 };
+
   function precomputedScope(skipFacet) {
     if (matchExpression(state.q)) return null;
 
@@ -1093,7 +1106,11 @@
       if (!usable || facet.key === skipFacet) return;
       var set = state.filters[facet.key];
       if (!set || !set.size) return;
-      if (SCOPE_FACETS.indexOf(facet.key) !== -1 && set.size === 1 && !scope) {
+      var floor = BIG_SCOPE_FACETS[facet.key];
+      var scopable =
+        SCOPE_FACETS.indexOf(facet.key) !== -1 ||
+        (floor !== undefined && totalResults >= floor);
+      if (scopable && set.size === 1 && !scope) {
         set.forEach(function (value) { scope = facet.key + ':' + value; });
       } else {
         usable = false;

@@ -98,6 +98,20 @@ const FIRST_PAGE_ROWS = 60;
 const SCOPE_FACETS = ['language', 'dataset', 'year'];
 
 /**
+ * Facets with too many values to precompute every scope, and the size at which
+ * a scope earns one.
+ *
+ * There are 38,053 publishers, so scoping them all would be absurd. But only
+ * 312 have 200 records or more, and those 312 account for 200,237 of the
+ * 446,090 records — 45% of the catalogue in 0.8% of the publishers. Below that
+ * threshold the live aggregation reads fewer than 200 rows and is fine.
+ *
+ * This is what made clicking 東立 (8,972 records) never return: eight facets,
+ * each fetching all 8,972 rows across the network to read one column.
+ */
+const BIG_SCOPE_FACETS = { publisher: 200 };
+
+/**
  * What `docs` has to carry: the fields of a record that the `books` table does
  * not already hold, and nothing else.
  *
@@ -432,8 +446,15 @@ function precomputedFacets() {
     );
   }
 
-  for (const scopeFacet of SCOPE_FACETS) {
+  const scoped = SCOPE_FACETS.concat(Object.keys(BIG_SCOPE_FACETS));
+  for (const scopeFacet of scoped) {
     const scopeExpr = SQL_FACET[scopeFacet].replace(/\bb\./g, '');
+    // Big facets precompute only the scopes worth precomputing.
+    const floor = BIG_SCOPE_FACETS[scopeFacet];
+    const bigOnly = floor
+      ? ' AND ' + scopeExpr + ' IN (SELECT ' + scopeExpr + ' FROM books WHERE ' + scopeExpr +
+        " <> '' GROUP BY 1 HAVING COUNT(*) >= " + floor + ')'
+      : '';
     for (const key of Object.keys(SQL_FACET)) {
       // A facet is never narrowed by a filter on itself — the reader has to be
       // able to see the other values to switch to one — so for that facet the
@@ -446,7 +467,7 @@ function precomputedFacets() {
           "  SELECT '" + scopeFacet + ":' || " + scopeExpr + " AS scope, '" + key + "' AS facet,\n" +
           '         ' + expr + ' AS value, COUNT(*) AS n,\n' +
           '         ROW_NUMBER() OVER (PARTITION BY ' + scopeExpr + ' ORDER BY COUNT(*) DESC) AS rk\n' +
-          '  FROM books WHERE ' + expr + " <> '' AND " + scopeExpr + " <> ''\n" +
+          '  FROM books WHERE ' + expr + " <> '' AND " + scopeExpr + " <> ''" + bigOnly + '\n' +
           '  GROUP BY ' + scopeExpr + ', value\n' +
           ') WHERE rk <= ' + FACET_LIMIT + ';'
       );
