@@ -57,7 +57,7 @@ eval "$(node -e '
 
 for v in R2_ACCOUNT_ID R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET; do
   eval "set +u; val=\${$v:-}; set -u"
-  [ -n "$val" ] || { echo "✗ \$$v is not set — see the comments in $0" >&2; exit 1; }
+  [ -n "$val" ] || { echo "✗ $v is not set (an environment variable, or a repository secret of that exact name — no \"\$\") — see the comments in $0" >&2; exit 1; }
 done
 
 command -v rclone >/dev/null 2>&1 || {
