@@ -14,6 +14,11 @@ Contact, from the dataset's own metadata:
 Not sent by Claude. Review it, put your own name and contact at the bottom, and
 send it yourself.
 
+**Sent.** A follow-up for the same thread is drafted in
+[`ncl-nbinet-followup.md`](ncl-nbinet-followup.md): NBINet is the better source
+than this feed, and because it now runs on Alma, an OAI-PMH set or a publishing
+profile is a setting they already have rather than work someone must do.
+
 ---
 
 ## Draft (Traditional Chinese)

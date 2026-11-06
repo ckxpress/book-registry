@@ -182,9 +182,16 @@ Two routes are closed and should stay closed:
   and scraping not.
 
 The open route is asking. `docs/ncl-data-request.md` has been sent to the NCL;
-`docs/julac-data-request.md` is drafted. Worth adding to a follow-up: NBINet
-runs on Alma, so a bulk export or an OAI-PMH set is a configuration change at
-their end rather than a project.
+`docs/ncl-nbinet-followup.md` is drafted as a reply on that thread, making the
+NBINet case — it runs on Alma, so an OAI-PMH set or a publishing profile is a
+setting they already have rather than a project. `docs/julac-data-request.md`
+is drafted and unsent.
+
+Re-probed on 6 November 2026 from a different network, to rule out the earlier
+throttling having distorted the result: `202401_isbn.csv` serves 1,399,632
+bytes and every month before it returns a clean 404 of 196 bytes. The floor is
+the archive, not us being refused, and no amount of different infrastructure
+changes it.
 
 **Help wanted** on other sources. If you know a catalogue — a national library,
 a regional union catalogue, a publishers' association — that publishes
