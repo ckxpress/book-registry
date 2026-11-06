@@ -2162,12 +2162,33 @@
 
     var n = document.createElement('span');
     n.className = 'n';
-    n.textContent = fmt(entry.count);
+    // A search with more hits than FACET_SCAN_CAP counts its facets over the
+    // first 600 of them, because counting all of them means fetching every
+    // matching row. The number is then a sample, and saying so is cheaper and
+    // more honest than either pretending or paying for the real figure.
+    if (facetsAreSampled()) {
+      n.textContent = '≈' + fmt(entry.count);
+      n.title = '約數：此搜尋的篩選數字取自前 ' + fmt(FACET_SCAN_CAP) + ' 筆結果';
+    } else {
+      n.textContent = fmt(entry.count);
+    }
 
     label.appendChild(input);
     label.appendChild(text);
     label.appendChild(n);
     return label;
+  }
+
+  /**
+   * Whether the facet numbers on screen are a sample rather than a count.
+   *
+   * True only for a text search that matched more than the scan cap: the facet
+   * query materialises the first FACET_SCAN_CAP hits and counts those, so a
+   * search for 香港 with 16,724 matches shows figures drawn from 600 of them.
+   * Browsing is never sampled — those counts are precomputed over everything.
+   */
+  function facetsAreSampled() {
+    return !!(state.q && matchExpression(state.q) && totalResults > FACET_SCAN_CAP);
   }
 
   function toggleFilter(key, value, on) {
