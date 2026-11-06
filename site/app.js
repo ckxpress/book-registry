@@ -1081,7 +1081,7 @@
 
   // The facets the builder precomputes a scope for. Their values select large
   // slices, so counting one live means reading every matching row.
-  var SCOPE_FACETS = ['language', 'dataset', 'year'];
+  var SCOPE_FACETS = ['language', 'dataset', 'year', 'source', 'availability', 'identifier'];
 
   /**
    * Facets the builder scopes only above a size, because they have too many
@@ -1094,7 +1094,7 @@
    * exists; below it the live aggregation reads fewer than 200 rows and is
    * cheap anyway.
    */
-  var BIG_SCOPE_FACETS = { publisher: 200 };
+  var BIG_SCOPE_FACETS = { publisher: 200, classification: 200 };
 
   function precomputedScope(skipFacet) {
     if (matchExpression(state.q)) return null;

@@ -3222,18 +3222,18 @@
   "coversFound": 56509,
   "db": {
     "file": "books.db",
-    "bytes": 491212800,
-    "md5": "0a5711cb362d5641eef5e6f86816890c",
+    "bytes": 496197632,
+    "md5": "d1e70540c5eda94db5ad06543029d54a",
     "pageSize": 4096,
     "chunkBytes": 32768,
     "maxReadBytes": 262144,
-    "pages": 119925,
+    "pages": 121142,
     "probe": {
       "rowid": 1,
       "id": "ncl-nbinet:年全國工業總會白皮書-2008"
     },
-    "builtAt": "2026-11-06T22:14:54.147Z",
-    "url": "https://db.jimbocho.app/books-0a5711cb.db"
+    "builtAt": "2026-11-06T22:39:23.299Z",
+    "url": "https://db.jimbocho.app/books-d1e70540.db"
   },
   "firstPage": {
     "file": "firstpage.json",

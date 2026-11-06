@@ -95,21 +95,34 @@ const FIRST_PAGE_ROWS = 60;
  * Declared here with the other top-level constants because main() runs as this
  * module loads, before anything declared further down is initialised.
  */
-const SCOPE_FACETS = ['language', 'dataset', 'year'];
+/*
+ * Facets whose every value gets a precomputed scope. The bar is simply how
+ * many distinct values there are: 10 languages, 16 datasets, 213 years, 156
+ * release files, 3 availability states, 2 identifier states.
+ *
+ * source, availability and identifier were missing, and they hold the largest
+ * slices in the catalogue — 來源 = ncl-holdings#0 is 118,153 records and
+ * 識別號 = has an ISBN is 367,305. Filtering by either ran eight live
+ * aggregations over every matching row, which is what made 東立's 8,972 never
+ * return before publisher was scoped. These would have been fourteen and forty
+ * times worse.
+ */
+const SCOPE_FACETS = ['language', 'dataset', 'year', 'source', 'availability', 'identifier'];
 
 /**
  * Facets with too many values to precompute every scope, and the size at which
  * a scope earns one.
  *
- * There are 38,053 publishers, so scoping them all would be absurd. But only
- * 312 have 200 records or more, and those 312 account for 200,237 of the
+ * There are 38,053 publishers and 1,149 classifications, so scoping them all
+ * would be absurd. But only 312 publishers and 51 classifications have 200
+ * records or more, and those 312 account for 200,237 of the
  * 446,090 records — 45% of the catalogue in 0.8% of the publishers. Below that
  * threshold the live aggregation reads fewer than 200 rows and is fine.
  *
  * This is what made clicking 東立 (8,972 records) never return: eight facets,
  * each fetching all 8,972 rows across the network to read one column.
  */
-const BIG_SCOPE_FACETS = { publisher: 200 };
+const BIG_SCOPE_FACETS = { publisher: 200, classification: 200 };
 
 /**
  * What `docs` has to carry: the fields of a record that the `books` table does
