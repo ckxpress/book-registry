@@ -9,8 +9,29 @@
  */
 'use strict';
 
-var CACHE = 'jimbocho-v5';
+/* Stamped by tools/build-sqlite.js on every build, from the database's own
+   content hash. Bumping this by hand was unreliable: the publisher-index
+   rebuild shipped under the previous name, so returning visitors kept a cached
+   manifest naming the superseded database and the 出版者 filter went on
+   hanging for them alone. */
+var CACHE = 'jimbocho-4f71445f';
 var NET_TIMEOUT = 4000;
+
+/* Two files that must never be served stale while the network is reachable.
+ *
+ * The manifest names which object in R2 holds the database, and its exact byte
+ * length. Serve a stale one and the app queries the previous build — which at
+ * best lacks the newest indexes, and at worst no longer exists, because
+ * tools/prune-r2.sh keeps only the live object and a single rollback. The
+ * landing view is built against the same database and has the same problem.
+ *
+ * So these two wait for the network however long it takes, and fall back to
+ * the cache only when the fetch actually fails. Everything else keeps the
+ * four-second timeout, where stale merely means slightly old.
+ */
+function mustBeFresh(url) {
+  return /\/data\/(manifest|firstpage)\.json$/.test(url.pathname);
+}
 
 /* Enough to open the app and show the shelf with no network at all. The data
  * shards are not precached — they are big, and they land in the cache the
@@ -98,14 +119,19 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  event.respondWith(networkFirst(req));
+  event.respondWith(networkFirst(req, mustBeFresh(url)));
 });
 
-/** Network, with a timeout and the cache as the safety net. */
-function networkFirst(req) {
+/**
+ * Network, with the cache as the safety net.
+ *
+ * `fresh` drops the timeout: the request then waits for the network and uses
+ * the cache only if the fetch fails outright.
+ */
+function networkFirst(req, fresh) {
   return new Promise(function (resolve, reject) {
     var settled = false;
-    var timer = setTimeout(function () {
+    var timer = fresh ? 0 : setTimeout(function () {
       fromCache(req).then(function (hit) {
         if (hit && !settled) {
           settled = true;
