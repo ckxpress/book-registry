@@ -1,7 +1,195 @@
 {
-  "generatedAt": "2026-11-05T06:51:55.205Z",
-  "totalBooks": 309418,
+  "generatedAt": "2026-11-06T05:32:35.793Z",
+  "totalBooks": 446090,
   "datasets": [
+    {
+      "id": "ncl-nbinet",
+      "title": "全國圖書書目資訊網 NBINet 圖書聯合目錄",
+      "shortTitle": "全國圖書書目資訊網 NBINet 圖書聯合目錄",
+      "description": "",
+      "provider": "",
+      "homepage": "",
+      "dataDictionary": "",
+      "license": "",
+      "licenseUrl": "",
+      "region": "",
+      "year": null,
+      "adapter": "ncl-nbinet",
+      "count": 18519,
+      "files": {
+        "index": [
+          "ncl-nbinet.index.0.json",
+          "ncl-nbinet.index.1.json",
+          "ncl-nbinet.index.2.json",
+          "ncl-nbinet.index.3.json",
+          "ncl-nbinet.index.4.json",
+          "ncl-nbinet.index.5.json",
+          "ncl-nbinet.index.6.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "nbidata_115Q3.csv",
+          "url": "",
+          "file": "cache/ncl-opendata/nbidata_115Q3.csv",
+          "quarter": "",
+          "language": "",
+          "count": 18519
+        }
+      ],
+      "stats": {
+        "withIsbn": 15508,
+        "classifications": 0,
+        "publishers": 4307,
+        "languages": {
+          "zh": 18031,
+          "ja": 265,
+          "ko": 48
+        },
+        "yearRange": [
+          1917,
+          2028
+        ],
+        "topPublishers": [
+          {
+            "name": "東立",
+            "count": 746
+          },
+          {
+            "name": "臺灣角川",
+            "count": 433
+          },
+          {
+            "name": "尖端",
+            "count": 408
+          },
+          {
+            "name": "青文",
+            "count": 322
+          },
+          {
+            "name": "時報文化出版企業股份有限公司",
+            "count": 233
+          }
+        ],
+        "topClassifications": []
+      },
+      "importedAt": "2026-11-06T05:32:35.792Z"
+    },
+    {
+      "id": "ncl-holdings",
+      "title": "國家圖書館館藏書目資訊",
+      "shortTitle": "國家圖書館館藏書目資訊",
+      "description": "",
+      "provider": "",
+      "homepage": "",
+      "dataDictionary": "",
+      "license": "",
+      "licenseUrl": "",
+      "region": "",
+      "year": null,
+      "adapter": "ncl-holdings",
+      "count": 118153,
+      "files": {
+        "index": [
+          "ncl-holdings.index.0.json",
+          "ncl-holdings.index.1.json",
+          "ncl-holdings.index.2.json",
+          "ncl-holdings.index.3.json",
+          "ncl-holdings.index.4.json",
+          "ncl-holdings.index.5.json",
+          "ncl-holdings.index.6.json",
+          "ncl-holdings.index.7.json",
+          "ncl-holdings.index.8.json",
+          "ncl-holdings.index.9.json",
+          "ncl-holdings.index.10.json",
+          "ncl-holdings.index.11.json",
+          "ncl-holdings.index.12.json",
+          "ncl-holdings.index.13.json",
+          "ncl-holdings.index.14.json",
+          "ncl-holdings.index.15.json",
+          "ncl-holdings.index.16.json",
+          "ncl-holdings.index.17.json",
+          "ncl-holdings.index.18.json",
+          "ncl-holdings.index.19.json",
+          "ncl-holdings.index.20.json",
+          "ncl-holdings.index.21.json",
+          "ncl-holdings.index.22.json",
+          "ncl-holdings.index.23.json",
+          "ncl-holdings.index.24.json",
+          "ncl-holdings.index.25.json",
+          "ncl-holdings.index.26.json",
+          "ncl-holdings.index.27.json",
+          "ncl-holdings.index.28.json",
+          "ncl-holdings.index.29.json",
+          "ncl-holdings.index.30.json",
+          "ncl-holdings.index.31.json",
+          "ncl-holdings.index.32.json",
+          "ncl-holdings.index.33.json",
+          "ncl-holdings.index.34.json",
+          "ncl-holdings.index.35.json",
+          "ncl-holdings.index.36.json",
+          "ncl-holdings.index.37.json",
+          "ncl-holdings.index.38.json",
+          "ncl-holdings.index.39.json"
+        ],
+        "shardSize": 3000
+      },
+      "sources": [
+        {
+          "label": "ncl-aleph.csv",
+          "url": "",
+          "file": "cache/ncl-opendata/ncl-aleph.csv",
+          "quarter": "",
+          "language": "",
+          "count": 118153
+        }
+      ],
+      "stats": {
+        "withIsbn": 78207,
+        "classifications": 1,
+        "publishers": 16196,
+        "languages": {
+          "zh": 82460,
+          "ko": 754,
+          "ja": 3103
+        },
+        "yearRange": [
+          1600,
+          2025
+        ],
+        "topPublishers": [
+          {
+            "name": "Springer Nature Switzerland : Imprint: Springer",
+            "count": 3832
+          },
+          {
+            "name": "巴比樂視網路科技股份有限公司",
+            "count": 3080
+          },
+          {
+            "name": "Springer Nature Singapore : Imprint: Springer",
+            "count": 2573
+          },
+          {
+            "name": "Springer International Publishing : Imprint: Springer",
+            "count": 1722
+          },
+          {
+            "name": "千華駐科技出版有限公司",
+            "count": 1415
+          }
+        ],
+        "topClassifications": [
+          {
+            "name": "學位論文",
+            "count": 19216
+          }
+        ]
+      },
+      "importedAt": "2026-11-06T05:32:33.117Z"
+    },
     {
       "id": "ncl-2024",
       "title": "臺灣出版新書預告書訊 — 2024",
@@ -183,7 +371,7 @@
         ],
         "topClassifications": []
       },
-      "importedAt": "2026-11-05T04:48:19.654Z"
+      "importedAt": "2026-11-06T03:45:58.599Z"
     },
     {
       "id": "ncl-2025",
@@ -400,7 +588,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-05T04:47:44.123Z"
+      "importedAt": "2026-11-06T03:45:46.901Z"
     },
     {
       "id": "ncl-2026",
@@ -587,7 +775,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-05T01:04:11.523Z"
+      "importedAt": "2026-11-06T03:45:32.788Z"
     },
     {
       "id": "hkpl-2017",
@@ -715,7 +903,7 @@
         ],
         "topClassifications": []
       },
-      "importedAt": "2026-11-04T17:46:11.720Z"
+      "importedAt": "2026-11-06T03:45:14.096Z"
     },
     {
       "id": "hkpl-2018",
@@ -876,7 +1064,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T17:46:29.985Z"
+      "importedAt": "2026-11-06T03:45:09.572Z"
     },
     {
       "id": "hkpl-2019",
@@ -1037,7 +1225,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T17:46:48.529Z"
+      "importedAt": "2026-11-06T03:45:05.133Z"
     },
     {
       "id": "hkpl-2020",
@@ -1198,7 +1386,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T17:18:28.957Z"
+      "importedAt": "2026-11-06T03:44:57.635Z"
     },
     {
       "id": "hkpl-2021",
@@ -1359,7 +1547,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T17:18:20.309Z"
+      "importedAt": "2026-11-06T03:44:54.439Z"
     },
     {
       "id": "hkpl-2022",
@@ -1519,7 +1707,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T17:16:46.425Z"
+      "importedAt": "2026-11-06T03:44:51.184Z"
     },
     {
       "id": "hkpl-2023",
@@ -1679,7 +1867,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T17:10:29.259Z"
+      "importedAt": "2026-11-06T03:44:48.339Z"
     },
     {
       "id": "hkpl-2024",
@@ -1839,7 +2027,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T02:57:07.035Z"
+      "importedAt": "2026-11-06T03:44:43.624Z"
     },
     {
       "id": "hkpl-2025",
@@ -1999,7 +2187,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T02:57:06.379Z"
+      "importedAt": "2026-11-06T03:44:40.583Z"
     },
     {
       "id": "hkpl-2026",
@@ -2109,7 +2297,7 @@
           }
         ]
       },
-      "importedAt": "2026-11-04T06:00:41.997Z"
+      "importedAt": "2026-11-06T03:44:45.664Z"
     },
     {
       "id": "ol-hk",
@@ -2839,25 +3027,25 @@
         ],
         "topClassifications": []
       },
-      "importedAt": "2026-11-05T06:51:55.204Z"
+      "importedAt": "2026-11-06T03:47:00.808Z"
     }
   ],
-  "coversResolvedAt": "2026-11-05T20:01:24.467Z",
+  "coversResolvedAt": "2026-11-06T03:47:11.776Z",
   "coversFound": 56509,
   "db": {
     "file": "books.db",
-    "bytes": 462712832,
-    "md5": "bb609d0681e0e0d6e798cb931a802328",
+    "bytes": 513286144,
+    "md5": "6971e62c785e059a5869290f75a90fc9",
     "pageSize": 4096,
     "chunkBytes": 32768,
     "maxReadBytes": 262144,
-    "pages": 112967,
+    "pages": 125314,
     "probe": {
       "rowid": 1,
-      "id": "ncl-2024:9786269600564"
+      "id": "ncl-nbinet:年全國工業總會白皮書-2008"
     },
-    "builtAt": "2026-11-06T01:15:23.180Z",
-    "url": "https://db.jimbocho.app/books-bb609d06.db"
+    "builtAt": "2026-11-06T13:52:32.509Z",
+    "url": "https://db.jimbocho.app/books-6971e62c.db"
   },
   "firstPage": {
     "file": "firstpage.json",
@@ -2867,10 +3055,10 @@
       "zh",
       "en",
       "ja",
+      "ko",
       "fr",
       "de",
       "es",
-      "ko",
       "vi",
       "id",
       "th"
