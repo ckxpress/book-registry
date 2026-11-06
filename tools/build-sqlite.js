@@ -34,7 +34,7 @@ const crypto = require('crypto');
 const { indexTokens } = require('./lib/tokenize');
 const { encodeDoc } = require('./lib/doc-codec');
 const zlib = require('zlib');
-const { SQL_FACET, FACET_LIMIT } = require('../site/schema.js');
+const { SQL_FACET, FACET_LIMIT, FACET_FULL_LIST } = require('../site/schema.js');
 
 const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(ROOT, 'site', 'data');
@@ -294,6 +294,7 @@ function main() {
   const precomputed = writeFirstPage();
   manifest.firstPage = precomputed.firstPage;
   manifest.pages = precomputed.pages;
+  manifest.facetLists = writeFacetLists();
   fs.writeFileSync(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 
   console.log(
@@ -752,6 +753,42 @@ function writeScopePages(columns, order) {
       (bytes / 1048576).toFixed(1) + ' MB (a filtered browse costs one request)'
   );
   return { dir: 'page/', rows: FIRST_PAGE_ROWS, scopes: index };
+}
+
+/**
+ * The complete list of values for the facets that have a search box.
+ *
+ * The facet lists the client holds are capped at FACET_LIMIT — 200 — which is
+ * ample for showing options but hopeless for searching: there are 38,053
+ * publishers, so typing 天窗 found nothing although 天窗出版社有限公司 has 181
+ * records. The box searched the 200 it had.
+ *
+ * Each file is an array of [value, count], sorted by count, fetched only when
+ * someone types in that facet's box. Publishers come to about 1 MB, which
+ * gzips to a fraction of that and is never loaded otherwise.
+ */
+function writeFacetLists() {
+  const dir = path.join(DATA_DIR, 'facet');
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+
+  const out = {};
+  for (const key of FACET_FULL_LIST) {
+    const expr = SQL_FACET[key].replace(/\bb\./g, '');
+    const rows = json(
+      'SELECT ' + expr + ' AS v, COUNT(*) AS n FROM books WHERE ' + expr +
+        " <> '' GROUP BY v ORDER BY n DESC, v"
+    );
+    const payload = JSON.stringify(rows.map((r) => [r.v, r.n])) + '\n';
+    fs.writeFileSync(path.join(dir, key + '.json'), payload);
+    out[key] = rows.length;
+    console.log(
+      '  Full ' + key + ' list → data/facet/' + key + '.json, ' +
+        rows.length.toLocaleString('en-US') + ' values, ' +
+        (payload.length / 1048576).toFixed(1) + ' MB'
+    );
+  }
+  return { dir: 'facet/', counts: out };
 }
 
 /** Runs a query and parses sqlite3's own JSON output, so types survive. */

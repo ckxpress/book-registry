@@ -16,10 +16,19 @@ var SQL_FACET = {
 /* How many options a facet list ever needs; the UI shows far fewer. */
 var FACET_LIMIT = 200;
 
+/* Facets whose complete list of values is published as its own file, because
+   the capped list is nowhere near all of them and these are the two with a
+   search box. There are 38,053 publishers and 1,149 classifications against a
+   FACET_LIMIT of 200, so searching the loaded options reached 0.5% of
+   publishers — 天窗出版社有限公司, with 181 records, could not be found.
+   The file is fetched only when someone types in that box. */
+var FACET_FULL_LIST = ['publisher', 'classification'];
+
 if (typeof window !== 'undefined') {
   window.SQL_FACET = SQL_FACET;
   window.FACET_LIMIT = FACET_LIMIT;
+  window.FACET_FULL_LIST = FACET_FULL_LIST;
 }
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { SQL_FACET: SQL_FACET, FACET_LIMIT: FACET_LIMIT };
+  module.exports = { SQL_FACET: SQL_FACET, FACET_LIMIT: FACET_LIMIT, FACET_FULL_LIST: FACET_FULL_LIST };
 }

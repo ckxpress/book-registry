@@ -3232,7 +3232,7 @@
       "rowid": 1,
       "id": "ncl-nbinet:年全國工業總會白皮書-2008"
     },
-    "builtAt": "2026-11-06T23:31:35.379Z",
+    "builtAt": "2026-11-06T23:50:34.426Z",
     "url": "https://db.jimbocho.app/books-d1e70540.db"
   },
   "firstPage": {
@@ -4017,6 +4017,13 @@
       "year:2027": 758,
       "year:2028": 759,
       "year:2030": 760
+    }
+  },
+  "facetLists": {
+    "dir": "facet/",
+    "counts": {
+      "publisher": 38053,
+      "classification": 1149
     }
   }
 }

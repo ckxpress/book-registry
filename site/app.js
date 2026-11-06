@@ -2055,12 +2055,21 @@
       var limit = facet.limit || 999;
       var expanded = false;
 
-      // Only the options on show go into the DOM — the full list lives here,
-      // so searching can still reach all of them.
+      // Only the options on show go into the DOM. `options` is the counted
+      // list, capped at FACET_LIMIT, which is plenty to browse — but searching
+      // it reached 200 of 38,053 publishers, so 天窗出版社有限公司 and its 181
+      // records could not be found. When this facet has a published full list,
+      // a search uses that instead and falls back to the capped one until it
+      // arrives.
       function paintOptions() {
         var query = String(searches[facet.key] || '').trim().toLowerCase();
+        var pool = options;
+        if (query) {
+          var full = fullFacetList(facet.key, paintOptions);
+          if (full) pool = full;
+        }
         var matches = query
-          ? options.filter(function (entry) {
+          ? pool.filter(function (entry) {
               return displayName(facet, entry.value).toLowerCase().indexOf(query) !== -1;
             })
           : options;
@@ -2205,6 +2214,41 @@
     else list.sort(function (a, b) { return b.count - a.count || String(a.value).localeCompare(String(b.value)); });
 
     return list;
+  }
+
+  /**
+   * The complete value list for a facet with a search box, fetched once.
+   *
+   * Returns null while it is loading — the caller shows the capped list in the
+   * meantime and is called back when the real one lands, so typing is never
+   * blocked on a megabyte of publishers.
+   */
+  var facetLists = {};
+
+  function fullFacetList(key, onReady) {
+    if (!manifest.facetLists || !manifest.facetLists.counts[key]) return null;
+    if (facetLists[key] && facetLists[key].ready) return facetLists[key].values;
+    if (facetLists[key]) return null; // already in flight
+
+    facetLists[key] = { ready: false, values: null };
+    fetch(DATA + manifest.facetLists.dir + key + '.json')
+      .then(function (res) {
+        if (!res.ok) throw new Error(key + ' list: ' + res.status);
+        return res.json();
+      })
+      .then(function (pairs) {
+        facetLists[key] = {
+          ready: true,
+          values: pairs.map(function (p) { return { value: p[0], count: p[1] }; }),
+        };
+        if (onReady) onReady();
+      })
+      .catch(function () {
+        // Leave it un-ready rather than marked failed: the capped list still
+        // works, and a later keystroke can retry.
+        delete facetLists[key];
+      });
+    return null;
   }
 
   function renderChips() {
