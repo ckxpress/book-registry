@@ -1,0 +1,64 @@
+# Publishes the site to GitHub Pages.
+#
+# This uses the "GitHub Actions" publishing source rather than pushing the
+# gh-pages branch, because a branch push from CI would never publish: "Commits
+# pushed by a GitHub Actions workflow that uses the GITHUB_TOKEN do not trigger
+# a GitHub Pages build."
+#
+# Requires Settings → Pages → Build and deployment → Source = "GitHub Actions".
+# While that is set, pushing gh-pages does nothing, so `npm run deploy` stops
+# being the way the site goes live — a push to main is.
+name: Deploy site
+
+on:
+  workflow_dispatch:
+
+  # Uncomment once Settings -> Pages -> Source is set to "GitHub Actions".
+  # Until then this would run on every push and fail at the deploy step,
+  # because deploy-pages cannot publish to a branch-sourced Pages site.
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'site/**'
+  #     - 'tools/publish-dir.sh'
+  #     - 'tools/publish-manifest.js'
+  #     - '.github/workflows/deploy.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never two deployments at once, and never cancel one halfway: a half-published
+# site serves a manifest whose database object may not match.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Everything tracked under site/ except the full JSON shards, which a
+      # working site never fetches and which took the published site to 462 MB
+      # — past what a deployment can publish inside its 10-minute limit.
+      - name: Assemble the publishable site
+        run: sh tools/publish-dir.sh _site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

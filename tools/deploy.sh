@@ -8,17 +8,52 @@
 # This builds a commit whose tree *is* site/ and parents it on the current
 # remote tip. It does not use `git subtree push`: that keeps a parallel split
 # history, and mixing the two makes every later push a non-fast-forward.
+#
+# Two things it does beyond that, both learned the hard way on 6 Nov 2026:
+#
+#  1. The full JSON shards are left out of the published tree. They are 369 MB
+#     of the 462 MB site and a working site never fetches one — they exist for
+#     the JSON fallback's detail view, and for the build and cover scripts,
+#     which read them from the repository rather than over HTTP. Published in
+#     full, the deploy exceeded the documented limit ("GitHub Pages deployments
+#     will timeout if they take longer than 10 minutes") and failed at 10m14s.
+#
+#  2. It waits for GitHub to actually publish. Pushing to gh-pages only queues
+#     a deployment; the old version keeps being served if that deployment
+#     fails. This script used to print "✓ deployed" on a successful push, which
+#     is why a failed publish went unnoticed for half an hour.
 set -e
 
 cd "$(dirname "$0")/.."
 
 git fetch -q origin gh-pages
 
-remote_tree=$(git rev-parse origin/gh-pages^{tree})
-local_tree=$(git rev-parse HEAD:site)
+# Build the published tree in a scratch index, so the working tree is untouched.
+INDEX=$(mktemp -t jimbocho-publish)
+trap 'rm -f "$INDEX" "$INDEX.lock"' EXIT
+export GIT_INDEX_FILE="$INDEX"
 
+git read-tree "HEAD:site"
+
+# Drop the full shards, and swap in a manifest that no longer advertises them
+# so the app never requests a file that is not there.
+FULL=$(git ls-files 'data/*.full.*.json')
+if [ -n "$FULL" ]; then
+  echo "$FULL" | tr '\n' '\0' | xargs -0 git update-index --force-remove --
+fi
+BLOB=$(unset GIT_INDEX_FILE; node tools/publish-manifest.js | git hash-object -w --stdin)
+git update-index --add --cacheinfo "100644,$BLOB,data/manifest.json"
+
+local_tree=$(git write-tree)
+unset GIT_INDEX_FILE
+
+published_mb=$(git ls-tree -r -l "$local_tree" | awk '{s+=$4} END {printf "%.0f", s/1048576}')
+published_n=$(git ls-tree -r "$local_tree" | wc -l | tr -d ' ')
+echo "publishing $published_n files, ${published_mb} MB (full shards withheld)"
+
+remote_tree=$(git rev-parse "origin/gh-pages^{tree}")
 if [ "$remote_tree" = "$local_tree" ]; then
-  echo "✓ already deployed — site/ matches gh-pages, nothing to push"
+  echo "✓ already deployed — nothing to push"
   exit 0
 fi
 
@@ -27,4 +62,39 @@ commit=$(git commit-tree "$local_tree" -p "$(git rev-parse origin/gh-pages)" \
 git push origin "$commit:gh-pages"
 
 echo
-echo "✓ deployed $(git rev-parse --short HEAD) — GitHub Pages rebuilds in about a minute"
+echo "pushed — waiting for GitHub Pages to publish…"
+
+REPO=$(git remote get-url origin | sed -e 's#^.*github\.com[:/]##' -e 's#\.git$##')
+API="https://api.github.com/repos/$REPO/deployments?environment=github-pages&per_page=1"
+
+i=0
+while [ "$i" -lt 60 ]; do
+  sleep 15
+  i=$((i + 1))
+  state=$(curl -sS --max-time 20 "$API" 2>/dev/null | node -e '
+    let s = ""; process.stdin.on("data", d => s += d).on("end", async () => {
+      try {
+        const dep = JSON.parse(s)[0];
+        if (!dep) return console.log("none");
+        const res = await fetch(dep.statuses_url, { headers: { "user-agent": "jimbocho-deploy" } });
+        const st = (await res.json())[0];
+        console.log(st ? st.state : "none");
+      } catch { console.log("unknown"); }
+    });
+  ' 2>/dev/null)
+
+  case "$state" in
+    success)
+      echo "✓ published $(git rev-parse --short HEAD) — live at https://jimbocho.app"
+      exit 0 ;;
+    failure|error)
+      echo "✗ GitHub Pages deployment $state — the site still serves the previous build." >&2
+      echo "  Check https://github.com/$REPO/deployments" >&2
+      exit 1 ;;
+    *)
+      printf '  %s (%ds)\r' "$state" "$((i * 15))" ;;
+  esac
+done
+
+echo "✗ timed out after 15 minutes waiting for the deployment." >&2
+exit 1

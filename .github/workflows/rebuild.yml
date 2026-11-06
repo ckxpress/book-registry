@@ -1,0 +1,158 @@
+# The whole catalogue pipeline, so a rebuild needs no computer of your own —
+# only a browser, which is the point: run it from the Actions tab.
+#
+#   import → covers → build:db → commit → upload to R2 → publish
+#
+# Why it runs here rather than on a laptop: the 729 MB upload and the ~538,000
+# cover probes both leave from a datacentre instead of crossing a home VPN, and
+# nothing has to stay awake.
+#
+# Needs four repository secrets (Settings → Secrets and variables → Actions),
+# from R2 → Manage R2 API Tokens with Object Read & Write on the one bucket:
+#   R2_ACCOUNT_ID  R2_ACCESS_KEY_ID  R2_SECRET_ACCESS_KEY  R2_BUCKET
+#
+# The deploy is inline rather than a call to deploy.yml on purpose. A reusable
+# workflow runs against the caller's commit, which here is the commit *before*
+# this job wrote the new shards and manifest — it would publish a manifest
+# pointing at the previous database.
+name: Rebuild catalogue
+
+on:
+  workflow_dispatch:
+    inputs:
+      cover_limit:
+        description: 'Cover lookups this run (0 skips the step)'
+        default: '40000'
+        required: false
+      refresh:
+        description: 'Ignore the download cache and re-fetch every source'
+        type: boolean
+        default: false
+      publish:
+        description: 'Upload to R2 and publish the site'
+        type: boolean
+        default: true
+
+  # A monthly run would suit the sources — the Taiwan ISBN feed is monthly and
+  # the Hong Kong catalogue lands in quarters. Left commented because enabling
+  # it makes this deploy to production on a schedule, which is your call:
+  # schedule:
+  #   - cron: '0 18 5 * *'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: catalogue
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    # The job ceiling is six hours. A full --recheck of all 538,066 ISBNs runs
+    # about eleven at the polite concurrency the cover resolver uses, which is
+    # why cover_limit exists: it caps one run, and the cache is committed, so
+    # the next run picks up where this one stopped.
+    timeout-minutes: 330
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # deploy.sh is not used here, but a shallow clone cannot be pushed
+          # from, and this job commits the rebuilt shards back.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install sqlite3 and rclone
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sqlite3 rclone
+          # build-sqlite.js checks for FTS5 itself and fails loudly, but a
+          # clear line here beats a failure forty minutes into an import.
+          sqlite3 :memory: 'CREATE VIRTUAL TABLE t USING fts5(x); SELECT 1;' >/dev/null
+          echo "sqlite3 $(sqlite3 --version | cut -d' ' -f1) with FTS5 · rclone $(rclone version | head -1)"
+
+      - name: Import every dataset
+        run: npm run import ${{ inputs.refresh && '-- --refresh' || '' }}
+
+      - name: Resolve covers
+        if: inputs.cover_limit != '0'
+        run: npm run covers -- --limit ${{ inputs.cover_limit }}
+
+      - name: Build the database
+        run: npm run build:db -- --db-url https://db.jimbocho.app/
+
+      - name: Commit the rebuilt catalogue
+        id: commit
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "nothing changed — no commit"
+          else
+            git commit -q -m "Rebuild catalogue: $(node -e "
+              const m = require('./site/data/manifest.json');
+              process.stdout.write(m.totalBooks.toLocaleString('en-US') + ' books, ' + m.coversFound.toLocaleString('en-US') + ' covers');
+            ")"
+            git push origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload the database to R2
+        if: inputs.publish
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: npm run upload:db
+
+      # Publish only after the database is in R2 and verified. The manifest
+      # advertises that object's exact byte length, and the startup probe only
+      # reads one row near the head of the file, so a site published ahead of
+      # its database fails silently at the facet tables in the tail.
+      - name: Assemble the publishable site
+        if: inputs.publish
+        run: sh tools/publish-dir.sh _site
+
+      - uses: actions/configure-pages@v5
+        if: inputs.publish
+
+      - uses: actions/upload-pages-artifact@v3
+        if: inputs.publish
+        with:
+          path: _site
+
+      - id: deployment
+        if: inputs.publish
+        uses: actions/deploy-pages@v4
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Catalogue rebuild"
+            echo
+            if [ -f site/data/manifest.json ]; then
+              node -e "
+                const m = require('./site/data/manifest.json');
+                console.log('| | |');
+                console.log('|---|---|');
+                console.log('| books | ' + m.totalBooks.toLocaleString('en-US') + ' |');
+                console.log('| covers | ' + m.coversFound.toLocaleString('en-US') + ' |');
+                console.log('| database | ' + (m.db.bytes / 1048576).toFixed(1) + ' MB |');
+                console.log('| object | \`' + m.db.url.split('/').pop() + '\` |');
+                console.log('| committed | ${{ steps.commit.outputs.changed }} |');
+              "
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

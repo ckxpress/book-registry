@@ -27,6 +27,19 @@ set -eu
 
 cd "$(dirname "$0")/.."
 
+# macOS has `md5 -q`, Linux has `md5sum`. This runs in both places — on a
+# developer's Mac and on an Ubuntu CI runner — so neither name is assumed.
+md5_of() {
+  if command -v md5 >/dev/null 2>&1; then md5 -q "$@"
+  else md5sum "$@" | cut -d' ' -f1
+  fi
+}
+md5_stdin() {
+  if command -v md5 >/dev/null 2>&1; then md5 -q
+  else md5sum | cut -d' ' -f1
+  fi
+}
+
 DB=site/data/books.db
 MANIFEST=site/data/manifest.json
 
@@ -52,7 +65,7 @@ command -v rclone >/dev/null 2>&1 || {
 
 # Refuse to upload a file the manifest does not describe. Catches the easy
 # mistake of uploading after editing shards but before rebuilding.
-HAVE_MD5=$(md5 -q "$DB" 2>/dev/null || md5sum "$DB" | cut -d' ' -f1)
+HAVE_MD5=$(md5_of "$DB")
 HAVE_BYTES=$(wc -c < "$DB" | tr -d ' ')
 if [ "$HAVE_MD5" != "$WANT_MD5" ] || [ "$HAVE_BYTES" != "$WANT_BYTES" ]; then
   echo "✗ $DB does not match the manifest — rebuild before uploading." >&2
@@ -62,7 +75,7 @@ if [ "$HAVE_MD5" != "$WANT_MD5" ] || [ "$HAVE_BYTES" != "$WANT_BYTES" ]; then
 fi
 
 echo "→ $KEY  ($(echo "$HAVE_BYTES" | awk '{printf "%.1f MB", $1/1048576}'))"
-echo "  md5 $HAVE_MD5 — R2 shows this as the object's etag"
+echo "  md5 $HAVE_MD5"
 
 RCLONE_CONFIG_R2_TYPE=s3 \
 RCLONE_CONFIG_R2_PROVIDER=Cloudflare \
@@ -71,9 +84,42 @@ RCLONE_CONFIG_R2_ENDPOINT="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" \
 RCLONE_CONFIG_R2_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" \
 RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" \
 RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true \
-  rclone copyto "$DB" "r2:$R2_BUCKET/$KEY" --progress --s3-upload-cutoff 5G
+  rclone copyto "$DB" "r2:$R2_BUCKET/$KEY" --progress
+
+# Verify the object rather than trusting the transfer. Not by etag: rclone
+# uploads this in parts, and a multipart etag is a hash *of the part hashes*
+# with a "-146" style suffix, not the file's md5 — so it cannot be compared
+# with anything local. Size is exact, and two ranges fetched back and compared
+# against the file on disk catch a truncated or reordered upload, which is the
+# failure that would otherwise show up as wrong facet counts weeks later.
+echo
+echo "verifying…"
+
+REMOTE_BYTES=$(rclone lsjson "r2:$R2_BUCKET/$KEY" 2>/dev/null | node -e '
+  let s = ""; process.stdin.on("data", d => s += d).on("end", () => {
+    try { console.log(JSON.parse(s)[0].Size); } catch { console.log("?"); }
+  })')
+if [ "$REMOTE_BYTES" = "$WANT_BYTES" ]; then
+  echo "  size   ✓ $REMOTE_BYTES bytes"
+else
+  echo "  size   ✗ remote $REMOTE_BYTES, expected $WANT_BYTES" >&2
+  exit 1
+fi
+
+TAIL_AT=$((WANT_BYTES - 4096))
+for range in "0-4095" "$TAIL_AT-$((WANT_BYTES - 1))"; do
+  want=$(dd if="$DB" bs=4096 skip=$((${range%-*} / 4096)) count=1 2>/dev/null | md5_stdin)
+  got=$(curl -sS -r "$range" --max-time 120 "$URL" 2>/dev/null | md5_stdin)
+  if [ "$want" = "$got" ]; then
+    echo "  bytes $range  ✓ match"
+  else
+    echo "  bytes $range  ✗ differ (local $want, served $got)" >&2
+    echo "  The object is wrong, or $URL is not yet serving it. Do not deploy." >&2
+    exit 1
+  fi
+done
 
 echo
-echo "✓ uploaded. Now deploy the site so the manifest points at it:"
+echo "✓ uploaded and verified. Now deploy the site so the manifest points at it:"
 echo "    git push origin main && npm run deploy"
 echo "  The live site keeps reading the old object until you do."
