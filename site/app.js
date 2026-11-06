@@ -2544,6 +2544,19 @@
       );
     }
 
+    // The same line the footer carries, repeated here because the footer is
+    // unreachable on the browse view: the result list loads more as you scroll
+    // and there are 446,090 records, so scrolling to the bottom never ends.
+    // This page is finite, and it is where someone looks when something is
+    // wrong.
+    out.push('<h2>版本</h2>');
+    out.push('<p class="buildblock"><code id="about-build">…</code></p>');
+    out.push(
+      '<p class="muted">上方第一段為資料庫檔名（含內容雜湊）、製作日期、' +
+        '實際使用的後端（<code>sqlite</code> 或 <code>json shards</code>），' +
+        '以及 Service Worker 的快取名稱。回報問題時請一併附上。</p>'
+    );
+
     out.push('<h2>資料集</h2>');
     manifest.datasets.forEach(function (ds) {
       out.push('<div class="dscard">');
@@ -2598,6 +2611,7 @@
     out.push('</div>');
 
     el.about.innerHTML = out.join('');
+    renderBuildId(); // the node above only exists once this is in the DOM
     var toggle = document.getElementById('covers-toggle');
     toggle.addEventListener('change', function () {
       covers = toggle.checked;
@@ -2639,8 +2653,14 @@
    * the build printed, a reload is the whole problem.
    */
   function renderBuildId() {
-    var node = document.getElementById('build-id');
-    if (!node) return;
+    // Both places, because the footer cannot be reached while browsing.
+    var nodes = [document.getElementById('build-id'), document.getElementById('about-build')]
+      .filter(Boolean);
+    if (!nodes.length) return;
+    var node = {
+      set textContent(v) { nodes.forEach(function (n) { n.textContent = v; }); },
+      set title(v) { nodes.forEach(function (n) { n.title = v; }); },
+    };
 
     var file = manifest.db && manifest.db.url ? manifest.db.url.split('/').pop() : '';
     // Production names carry the content hash — books-4f71445f.db — and the

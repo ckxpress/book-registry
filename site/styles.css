@@ -1624,3 +1624,15 @@ a.tag-link:focus-visible {
   color: var(--text-faint);
   letter-spacing: 0.02em;
 }
+
+/* The build identifier repeated on the About page, where it can actually be
+   reached: the browse view loads more results as you scroll, so its footer
+   never arrives. */
+.buildblock code {
+  font: 400 13px/1.6 var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  background: var(--surface-2, rgba(128, 128, 128, 0.12));
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  user-select: all;
+}
