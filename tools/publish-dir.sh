@@ -36,6 +36,30 @@ node tools/publish-manifest.js > "$DEST/data/manifest.json"
 # Jekyll would otherwise ignore files beginning with an underscore.
 touch "$DEST/.nojekyll"
 
+# Refuse to publish a site whose database is not actually being served.
+#
+# The manifest advertises that object's exact byte length, and the startup
+# probe only reads one row near the head of the file — so a site published
+# ahead of its database does not fail loudly, it fails at the facet tables in
+# the tail, weeks later. Ordering the build steps is not enough: a CI rebuild
+# committed a manifest and then failed to upload, leaving main one deploy away
+# from advertising an object that returned 404.
+. "$(dirname "$0")/lib/object-check.sh"
+
+DB_URL=$(node -e 'const m = require("./site/data/manifest.json").db; process.stdout.write(m && m.url ? m.url : "");')
+DB_BYTES=$(node -e 'const m = require("./site/data/manifest.json").db; process.stdout.write(m && m.url ? String(m.bytes) : "");')
+
+if [ -n "$DB_URL" ]; then
+  verdict=$(check_object "$DB_URL" "$DB_BYTES")
+  if [ "$verdict" = "ok" ]; then
+    echo "database ✓ $DB_URL serves $DB_BYTES bytes"
+  else
+    echo "✗ not publishing: $DB_URL is $verdict" >&2
+    explain_object "$verdict" "$DB_URL"
+    exit 1
+  fi
+fi
+
 n=$(find "$DEST" -type f | wc -l | tr -d ' ')
 mb=$(du -sm "$DEST" | cut -f1)
 echo "assembled $DEST — $n files, ${mb} MB"

@@ -113,18 +113,21 @@ else
   exit 1
 fi
 
-TAIL_AT=$((WANT_BYTES - 4096))
-for range in "0-4095" "$TAIL_AT-$((WANT_BYTES - 1))"; do
-  want=$(dd if="$DB" bs=4096 skip=$((${range%-*} / 4096)) count=1 2>/dev/null | md5_stdin)
-  got=$(curl -sS -r "$range" --max-time 120 "$URL" 2>/dev/null | md5_stdin)
-  if [ "$want" = "$got" ]; then
-    echo "  bytes $range  ✓ match"
-  else
-    echo "  bytes $range  ✗ differ (local $want, served $got)" >&2
-    echo "  The object is wrong, or $URL is not yet serving it. Do not deploy." >&2
-    exit 1
-  fi
-done
+. "$(dirname "$0")/lib/object-check.sh"
+
+verdict=$(check_object "$URL" "$WANT_BYTES")
+case $verdict in
+  ok)
+    echo "  served ✓ $URL returns $WANT_BYTES bytes" ;;
+  stale-cache)
+    echo "  served ✗ cached 404" >&2
+    explain_object "$verdict" "$URL"
+    exit 1 ;;
+  *)
+    echo "  served ✗ $verdict" >&2
+    explain_object "$verdict" "$URL"
+    exit 1 ;;
+esac
 
 echo
 echo "✓ uploaded and verified. Now deploy the site so the manifest points at it:"
