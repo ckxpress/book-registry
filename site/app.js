@@ -57,14 +57,21 @@
 
   /* ---------------- facet definitions ---------------- */
 
-  // Sidebar order. 語言 first, then 出版者, then when it was published and how
-  // it was catalogued.
+  // Sidebar order: who published it, when, from which release, what kind of
+  // book — then 語言.
+  //
+  // 語言 sits fifth and starts collapsed although 中文 is ticked by default,
+  // which is unusual: a facet with a selection normally opens so the reader
+  // can see what is narrowing their results. Here that selection is the
+  // catalogue's resting state rather than a choice anyone made, and putting
+  // it first with a tick in it made the sidebar open on a question nobody
+  // asked. The chip above the results still says it is on.
   var FACETS = [
-    { key: 'language', label: '語言', get: function (r) { return r.language; }, name: languageName, open: true },
     { key: 'publisher', label: '出版者', get: function (r) { return r.publisher; }, search: true, limit: 8, open: true, sort: 'stroke' },
     { key: 'year', label: '出版年份', get: function (r) { return r.year ? String(r.year) : ''; }, limit: 10, sort: 'key-desc', open: true },
     { key: 'source', label: '發佈期間', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
     { key: 'classification', label: '類別', get: function (r) { return r.classification; }, search: true, limit: 10 },
+    { key: 'language', label: '語言', get: function (r) { return r.language; }, name: languageName, collapsed: true },
     { key: 'dataset', label: '資料集', get: function (r) { return r._ds; }, name: datasetName, hideIfSingle: true },
     {
       key: 'availability',
@@ -2037,7 +2044,16 @@
       var details = document.createElement('details');
       details.className = 'facet';
       details.dataset.key = facet.key;
-      details.open = open[facet.key] !== undefined ? open[facet.key] : selected.size > 0 || !!facet.open;
+      // `collapsed` wins over having a selection: 語言 is ticked for everyone
+      // on arrival, and opening it for that is noise. Whatever the reader
+      // opens or closes themselves is remembered in `open` and takes
+      // precedence over both.
+      details.open =
+        open[facet.key] !== undefined
+          ? open[facet.key]
+          : facet.collapsed
+            ? false
+            : selected.size > 0 || !!facet.open;
 
       var summary = document.createElement('summary');
       summary.textContent = facet.label;
