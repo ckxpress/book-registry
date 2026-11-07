@@ -61,7 +61,7 @@
   // it was catalogued.
   var FACETS = [
     { key: 'language', label: '語言', get: function (r) { return r.language; }, name: languageName, open: true },
-    { key: 'publisher', label: '出版者', get: function (r) { return r.publisher; }, search: true, limit: 8, open: true },
+    { key: 'publisher', label: '出版者', get: function (r) { return r.publisher; }, search: true, limit: 8, open: true, sort: 'stroke' },
     { key: 'year', label: '出版年份', get: function (r) { return r.year ? String(r.year) : ''; }, limit: 10, sort: 'key-desc', open: true },
     { key: 'source', label: '發佈期間', get: function (r) { return r._ds + '#' + (r.src || 0); }, name: sourceName, limit: 10 },
     { key: 'classification', label: '類別', get: function (r) { return r.classification; }, search: true, limit: 10 },
@@ -2055,6 +2055,15 @@
       var limit = facet.limit || 999;
       var expanded = false;
 
+      // Which 200 are shown is still decided by how many books each has — a
+      // list of the rarest publishers would be useless. The order they are
+      // shown in is another question, and facet.sort answers it.
+      //
+      // This used to be applied only on the JSON path, so 出版年份 asked for
+      // newest-first and got most-books-first: 2024, 2025, 2026, 2023.
+      var order = facetOrder(facet);
+      if (order) options = options.slice().sort(order);
+
       // Only the options on show go into the DOM. `options` is the counted
       // list, capped at FACET_LIMIT, which is plenty to browse — but searching
       // it reached 200 of 38,053 publishers, so 天窗出版社有限公司 and its 181
@@ -2189,6 +2198,56 @@
    */
   function facetsAreSampled() {
     return !!(state.q && matchExpression(state.q) && totalResults > FACET_SCAN_CAP);
+  }
+
+  /** The comparator a facet asked for, or null to leave it by count. */
+  function facetOrder(facet) {
+    if (facet.sort === 'stroke') return byStroke;
+    if (facet.sort === 'key-desc') {
+      return function (a, b) {
+        var x = String(a.value);
+        var y = String(b.value);
+        return x === y ? 0 : x < y ? 1 : -1;
+      };
+    }
+    return null;
+  }
+
+  /**
+   * 部首筆畫 order, by comparing code points.
+   *
+   * True 筆畫 ordering needs a stroke count per character, which lives in
+   * Unicode's Unihan database (kTotalStrokes) and is an 8 MB download this
+   * project does not otherwise need. What code points give instead is very
+   * close and free: the CJK Unified Ideographs block, U+4E00–U+9FA5, is
+   * arranged by Kangxi radical and then by residual stroke count, so sorting
+   * on them is the ordering a Chinese dictionary uses.
+   *
+   *   一 丁 七 三 上 下   radical 1
+   *   人 今 代 以         radical 9
+   *   天 太               radical 37
+   *
+   * Latin names sort before Chinese ones, since ASCII is below U+4E00.
+   *
+   * Comparing the strings directly rather than with localeCompare, because
+   * localeCompare under zh-Hant may order by pinyin, by stroke, or by
+   * whatever the platform decided, and differing between a reader's browsers
+   * is worse than one predictable order.
+   */
+  var CJK_FIRST = /^[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
+
+  function byStroke(a, b) {
+    var x = String(a.value);
+    var y = String(b.value);
+    // Chinese before Latin, as the catalogue's own title ordering does with
+    // zh_first. Code points alone put every ASCII name first, and with eight
+    // options on show that meant a reader saw Bo Yi, Cosmos and Crown and not
+    // one Chinese publisher.
+    var cx = CJK_FIRST.test(x) ? 0 : 1;
+    var cy = CJK_FIRST.test(y) ? 0 : 1;
+    if (cx !== cy) return cx - cy;
+    if (x === y) return 0;
+    return x < y ? -1 : 1;
   }
 
   function toggleFilter(key, value, on) {
