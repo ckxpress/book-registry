@@ -13,16 +13,20 @@ name: Deploy site
 on:
   workflow_dispatch:
 
-  # Uncomment once Settings -> Pages -> Source is set to "GitHub Actions".
-  # Until then this would run on every push and fail at the deploy step,
-  # because deploy-pages cannot publish to a branch-sourced Pages site.
-  # push:
-  #   branches: [main]
-  #   paths:
-  #     - 'site/**'
-  #     - 'tools/publish-dir.sh'
-  #     - 'tools/publish-manifest.js'
-  #     - '.github/workflows/deploy.yml'
+  # A push that changes what is published, publishes it. Anything touching the
+  # site itself or the two scripts that assemble it, and nothing else — a
+  # change to an adapter or a letter in docs/ should not redeploy the site.
+  #
+  # Rebuilding the database stays manual, in the Rebuild catalogue workflow,
+  # because that uploads 473 MiB to R2 and overwrites what readers are being
+  # served. That one should be asked for, not triggered.
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'tools/publish-dir.sh'
+      - 'tools/publish-manifest.js'
+      - '.github/workflows/deploy.yml'
 
 permissions:
   contents: read
